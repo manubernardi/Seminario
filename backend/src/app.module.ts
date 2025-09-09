@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { entities } from './entities/index';
+import { StockController } from './stock/stock.controller';
+import { StockService } from './stock/stock.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -20,7 +22,7 @@ import { entities } from './entities/index';
       // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, StockController],
+  providers: [AppService, StockService],
 })
 export class AppModule {}
