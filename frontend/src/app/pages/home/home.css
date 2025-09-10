@@ -1,0 +1,15 @@
+.menu-principal {
+    display: flex;
+    justify-content:end;
+    gap: 3rem;
+    padding: 1.5rem;
+    background-color: var(--primary-color);
+
+    a{
+        text-decoration: none;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 18px;
+    }
+}
