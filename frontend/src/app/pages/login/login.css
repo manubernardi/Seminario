@@ -18,7 +18,7 @@ body {
 
 .card-body {
     background-color: #ffffff;
-    padding: 20px;
+    padding: 10px;
     max-width: 500px;
     border-radius: 9px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -28,9 +28,10 @@ body {
 }
 
 .titulo {
-    height: 150px;
-    padding-top: 4rem;
+    height: 90px;
+    padding-top: 2rem;
     font-weight: bold;
+    font-size: 40px;
 }
 
 .form-signin {
