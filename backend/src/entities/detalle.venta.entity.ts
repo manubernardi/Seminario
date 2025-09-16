@@ -19,6 +19,6 @@ export class DetalleVentaEntity{
     @Column()
     subtotal: number;
 
-    @ManyToOne(()=> PrendaEntity, prenda => prenda.ventas)
+    @ManyToOne(() => PrendaEntity)
     prenda: PrendaEntity;
 }

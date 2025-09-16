@@ -17,9 +17,6 @@ export class PrendaEntity {
     cantidad: number;
 
     @ManyToOne(() => TalleEntity)
-    @JoinColumn({ name: 'talle_id' })
+    @JoinColumn({ name: 'talleCodigo' })
     talle: TalleEntity;
-
-    @ManyToOne(()=> DetalleVentaEntity, detalle => detalle.prenda)
-    ventas: DetalleVentaEntity;
 }
