@@ -3,5 +3,12 @@
   <a [routerLink]="['/register']">Nuevo Usuario</a>
   
 </nav>
+<div class="solapas">
+  <a routerLink = "/ventas" routerLinkActive="active" class="tab"><span>Ventas</span></a>
+  <a routerLink = "/Stock" routerLinkActive="active" class="tab"><span>Stock</span></a>
+   <a routerLink = "/Clientes" routerLinkActive="active" class="tab"><span>Clientes</span></a>
+    <a routerLink = "/Compras" routerLinkActive="active" class="tab"><span>Compras</span></a>
+</div>
+
 
 <router-outlet></router-outlet>
