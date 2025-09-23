@@ -28,10 +28,11 @@ body {
 }
 
 .titulo {
-    height: 90px;
-    padding-top: 2rem;
+    height: 50px;
+    padding-top: 1rem;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 30px;
+    padding-bottom: 2rem;
 }
 
 .form-signin {
