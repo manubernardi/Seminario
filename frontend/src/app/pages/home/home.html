@@ -1,13 +1,38 @@
 <nav class="menu-principal">
   <a routerLink="/">Inicio</a>
   <a [routerLink]="['/register']">Nuevo Usuario</a>
-  
 </nav>
-<div class="solapas">
-  <a routerLink = "/ventas" routerLinkActive="active" class="tab"><span>Ventas</span></a>
-  <a routerLink = "/Stock" routerLinkActive="active" class="tab"><span>Stock</span></a>
-   <a routerLink = "/Clientes" routerLinkActive="active" class="tab"><span>Clientes</span></a>
-    <a routerLink = "/Compras" routerLinkActive="active" class="tab"><span>Compras</span></a>
+
+<div class="grid-opciones">
+
+  <a routerLink = "/nueva-venta" routerLinkActive="active" class="tab nueva-venta">
+    <i class="bi bi-receipt"></i>
+    <span>Nueva Venta</span>
+  </a>
+
+  <a routerLink = "/ventas" routerLinkActive="active" class="tab ver-ventas">
+    <i class="bi bi-bag-check"></i>
+    <span>Ver Ventas</span>
+  </a>
+
+  <a routerLink = "/Stock" routerLinkActive="active" class="tab stock">
+    <i class="bi bi-box-seam"></i>
+    <span>Gestionar Stock</span>
+  </a>
+
+  <a routerLink = "/Clientes" routerLinkActive="active" class="tab clientes">
+    <i class="bi bi-person"></i>
+    <span>Gestionar Clientes</span>
+  </a>
+
+  <a routerLink = "/nueva-compras" routerLinkActive="active" class="tab nueva-compra">
+    <i class="bi bi-cart"></i>
+    <span>Nueva Compra</span>
+  </a>
+  <a routerLink = "/Compras" routerLinkActive="active" class="tab ver-compras">
+    <i class="bi bi-list-check"></i>
+    <span>Ver Compras</span>
+  </a>
 </div>
 
 
