@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { entities } from './entities/index';
+import { EmpleadoModule } from './empleados/empleados.module';
+import { VentasModule } from './ventas/ventas.module';
+import { StockModule } from './stock/stock.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,6 +20,9 @@ import { entities } from './entities/index';
         dropSchema: false,
         entities,
       }),
+       VentasModule,
+      EmpleadoModule,  // <-- Agregá estos
+      StockModule,
       // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
   ],
