@@ -12,7 +12,7 @@ import {
   HttpCode
 } from '@nestjs/common';
 import { EmpleadoService } from './empleados.service';
-import { CreateEmpleadoDto } from '../dto/create-empleado.dto';
+import { CreateEmpleadoDto } from 'src/dto/create-empleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
 import { EmpleadoEntity } from '../entities/empleado.entity';
 

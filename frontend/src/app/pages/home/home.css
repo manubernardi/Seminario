@@ -55,3 +55,9 @@ body {
 i.bi {
   font-size: 2rem;
 }
+
+.desactivado {
+  background-color: grey;
+  cursor:default;
+  pointer-events: none;
+}
