@@ -11,8 +11,14 @@
         cursor: pointer;
         font-weight: bold;
         font-size: 18px;
+        
     }
+    .a .active {
+      border-bottom: 4px solid black;
+      /* resalta la pestaña activa */
 }
+}
+
 .solapas {
   display: flex; 
   height: 70px;/* color base detrás de las pestañas */
@@ -36,7 +42,7 @@
 
 .solapas .tab span {
   display: flex;
-  font-size: 20px;
+  font-size: clamp(14px, 2vw, 18px);
   align-items: center;
 }
 
@@ -50,5 +56,5 @@
 .tab-orange { background-color: #ef6c00; }
 
 .solapas .active {
-  border-bottom: 4px solid yellow; /* resalta la pestaña activa */
+  border-bottom: 4px solid black; /* resalta la pestaña activa */
 }
