@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Patch } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { PrendaEntity } from '../entities/prenda.entity';
+import { CreatePrendaDto } from '../dto/createPrenda.dto';
 
 
 @Controller('stock')
@@ -9,8 +10,15 @@ export class StockController {
 
     // GET /stock - ver todas las prendas
     @Get()
-    async getAllPrendas(@Query('limite') limite?: number) {
-        return await this.stockService.getAllPrendas(limite);
+    async findAll() {
+        return this.stockService.findAll();
+    }
+
+    // (Método duplicado eliminado)
+
+    @Patch(':codigo')
+    async update(@Param('codigo') codigo: string, @Body() updateData: Partial<PrendaEntity>) {
+        return this.stockService.update(codigo, updateData);
     }
 
     // GET /stock/:codigo - obtener prenda por código
@@ -19,11 +27,6 @@ export class StockController {
         return await this.stockService.getPrendaByCodigo(codigo);
     }
 
-    // POST /stock - crear nueva prenda
-    @Post()
-    async createPrenda(@Body() prendaData: Partial<PrendaEntity>) {
-        return await this.stockService.createPrenda(prendaData);
-    }
 
     // PUT /stock/:codigo - actualizar prenda
     @Put(':codigo')

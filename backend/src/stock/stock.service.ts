@@ -2,27 +2,37 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { PrendaEntity } from '../entities/prenda.entity';
+import { CreatePrendaDto } from '../dto/createPrenda.dto';
 
 @Injectable()
 export class StockService {
     constructor(
-        @InjectRepository(PrendaEntity)
-        private readonly prendaRepository: Repository<PrendaEntity>
+    @InjectRepository(PrendaEntity)
+    private readonly prendaRepository: Repository<PrendaEntity>,
     ) {}
 
-    // Obtener todas las prendas
-    async getAllPrendas(limite?: number): Promise<PrendaEntity[]> {
-        const query = this.prendaRepository
-            .createQueryBuilder('prenda')
-            .leftJoinAndSelect('prenda.talle', 'talle')
-            .orderBy('prenda.descripcion', 'ASC');
-
-        if (limite) {
-            query.limit(limite);
-        }
-
-        return await query.getMany();
+    async findAll(): Promise<PrendaEntity[]> {
+        return this.prendaRepository.find();
     }
+
+    async create(createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {
+                // Validar que el código no exista
+        const existente = await this.prendaRepository.findOne({
+            where: { codigo: createPrendaDto.codigo }
+        });
+
+        if (existente) {
+            throw new BadRequestException(`Ya existe una prenda con código ${createPrendaDto.codigo}`);
+        }
+        const newPrenda = this.prendaRepository.create(createPrendaDto);
+        return this.prendaRepository.save(newPrenda);
+    }
+
+    async update(codigo: string, updateData: Partial<PrendaEntity>): Promise<PrendaEntity | null> {
+        await this.prendaRepository.update(codigo, updateData);
+        return this.prendaRepository.findOne({ where: { codigo } });
+    }
+
 
     // Obtener prenda por código
     async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
