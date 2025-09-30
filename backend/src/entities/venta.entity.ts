@@ -7,26 +7,26 @@ import { EmpleadoEntity } from './empleado.entity';
 export class VentaEntity {
 
     @PrimaryGeneratedColumn()
-    numVenta: number;
+    numVenta!: number;
 
     @Column()
-    fecha: Date;
+    fecha!: Date;
 
     @Column()
-    total: number;
+    total!: number;
 
     @Column()
-    empleadoId: number;
+    empleadoId!: number;
 
     @OneToMany(() => DetalleVentaEntity, detalle => detalle.venta, {
         cascade: true,
         eager: true
     })
-    detalles: DetalleVentaEntity;
+    detalles!: DetalleVentaEntity;
 
-    @ManyToOne(()=> ClienteEntity, cliente => cliente.ventas)
-    cliente: ClienteEntity;
+    @ManyToOne(() => ClienteEntity, cliente => cliente.ventas)
+    cliente!: ClienteEntity;
 
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.ventas)
-    empleado: EmpleadoEntity;
+    empleado!: EmpleadoEntity;
 }

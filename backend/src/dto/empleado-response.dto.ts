@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class RolResponseDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  nombre: string;
+  nombre!: string;
 
   @ApiProperty()
-  descripcion: string;
+  descripcion!: string;
 
   @ApiProperty()
   permissions?: PermissionResponseDto[];
@@ -16,44 +16,44 @@ export class RolResponseDto {
 
 export class PermissionResponseDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 }
 
 export class VentaResponseDto {
   @ApiProperty()
-  numVenta: number;
+  numVenta!: number;
 
   @ApiProperty()
-  fecha: Date;
+  fecha!: Date;
 
   @ApiProperty()
-  total: number;
+  total!: number;
 
   @ApiProperty()
-  empleadoId: number;
+  empleadoId!: number;
 }
 
 export class EmpleadoResponseDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  nombre: string;
+  nombre!: string;
 
   @ApiProperty()
-  apellido: string;
+  apellido!: string;
 
   @ApiProperty()
-  legajo: string;
+  legajo!: string;
 
   @ApiProperty()
-  telefono: string;
+  telefono!: string;
 
   @ApiProperty({ type: RolResponseDto })
-  rol: RolResponseDto;
+  rol!: RolResponseDto;
 
   @ApiProperty({ type: [VentaResponseDto], required: false })
   ventas?: VentaResponseDto[];

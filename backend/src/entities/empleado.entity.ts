@@ -5,24 +5,24 @@ import { VentaEntity } from './venta.entity'
 @Entity('empleados')
 export class EmpleadoEntity /* implements EmpleadoI */ {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    nombre: string;
+    nombre!: string;
 
     @Column()
-    apellido: string;
+    apellido!: string;
 
     @Column({ unique: true })
-    legajo: string;
+    legajo!: string;
 
     @Column()
-    telefono: string;
+    telefono!: string;
 
     @ManyToOne(() => RoleEntity, role => role.empleados, { eager: true })
     @JoinColumn({ name: 'rol_id' })
-    rol: RoleEntity;
+    rol!: RoleEntity;
 
-    @OneToMany(()=> VentaEntity, ventas => ventas.empleado)
-    ventas: VentaEntity[];
+    @OneToMany(() => VentaEntity, ventas => ventas.empleado)
+    ventas!: VentaEntity[];
 }

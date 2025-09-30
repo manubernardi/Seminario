@@ -6,19 +6,19 @@ import { PrendaEntity } from './prenda.entity';
 export class DetalleVentaEntity{
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @ManyToOne(()=> VentaEntity, venta => venta.detalles, {
         onDelete: 'CASCADE'
     })
-    venta: VentaEntity;
+    venta!: VentaEntity;
 
     @Column()
-    cantidad: number;
+    cantidad!: number;
 
     @Column()
-    subtotal: number;
+    subtotal!: number;
 
-    @ManyToOne(()=> PrendaEntity, prenda => prenda.ventas)
-    prenda: PrendaEntity;
+    @ManyToOne(() => PrendaEntity, prenda => prenda.ventas)
+    prenda!: PrendaEntity;
 }

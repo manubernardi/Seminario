@@ -5,18 +5,18 @@ import { VentaEntity } from './venta.entity';
 export class ClienteEntity {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    nombre: string;
+    nombre!: string;
 
     @Column()
-    apellido: string;
+    apellido!: string;
 
     @Column()
-    telefono: number;
+    telefono!: number;
 
-    @OneToMany(()=> VentaEntity, venta => venta.cliente)
-    ventas: VentaEntity[];
+    @OneToMany(() => VentaEntity, venta => venta.cliente)
+    ventas!: VentaEntity[];
 
 }

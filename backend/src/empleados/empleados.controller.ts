@@ -11,9 +11,10 @@ import {
   HttpStatus,
   HttpCode
 } from '@nestjs/common';
-import { EmpleadoService } from './empleado.service';
-import { CreateEmpleadoDto, UpdateEmpleadoDto } from './dto/empleado.dto';
-import { EmpleadoEntity } from './entities/empleado.entity';
+import { EmpleadoService } from './empleados.service';
+import { CreateEmpleadoDto } from '../dto/create-empleado.dto';
+import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
+import { EmpleadoEntity } from '../entities/empleado.entity';
 
 @Controller('empleados')
 export class EmpleadoController {

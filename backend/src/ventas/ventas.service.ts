@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Equal, Repository } from 'typeorm';
 import { VentaEntity } from '../entities/venta.entity';
 import { DetalleVentaEntity } from '../entities/detalle.venta.entity';
 import { EmpleadoEntity } from '../entities/empleado.entity';
@@ -25,17 +25,13 @@ export class VentasService {
 
   async create(createVentaDto: CreateVentaDto): Promise<VentaEntity> {
     // Validar empleado
-    const empleado = await this.empleadoRepository.findOne({
-      where: { id: createVentaDto.empleadoId }
-    });
+    const empleado = await this.empleadoRepository.findOneBy({ id: createVentaDto.empleadoId });
     if (!empleado) {
       throw new NotFoundException(`Empleado con ID ${createVentaDto.empleadoId} no encontrado`);
     }
 
     // Validar cliente
-    const cliente = await this.clienteRepository.findOne({
-      where: { id: createVentaDto.clienteId }
-    });
+    const cliente = await this.clienteRepository.findOneBy({ id: createVentaDto.clienteId });
     if (!cliente) {
       throw new NotFoundException(`Cliente con ID ${createVentaDto.clienteId} no encontrado`);
     }
@@ -89,39 +85,11 @@ export class VentasService {
   }
 
   async findAll(): Promise<VentaEntity[]> {
-    return await this.ventaRepository.find({
-      relations: {
-        cliente: true,
-        empleado: {
-          rol: true
-        },
-        detalles: {
-          prenda: {
-            talle: true
-          }
-        }
-      },
-      order: {
-        fecha: 'DESC'
-      }
-    });
+    return await this.ventaRepository.find();
   }
 
   async findOne(numVenta: number): Promise<VentaEntity> {
-    const venta = await this.ventaRepository.findOne({
-      where: { numVenta },
-      relations: {
-        cliente: true,
-        empleado: {
-          rol: true
-        },
-        detalles: {
-          prenda: {
-            talle: true
-          }
-        }
-      }
-    });
+    const venta = await this.ventaRepository.findOneBy({ numVenta });
 
     if (!venta) {
       throw new NotFoundException(`Venta con número ${numVenta} no encontrada`);
@@ -141,62 +109,28 @@ export class VentasService {
 
     return await this.ventaRepository.find({
       where: { empleadoId },
-      relations: {
-        cliente: true,
-        empleado: true,
-        detalles: {
-          prenda: {
-            talle: true
-          }
-        }
-      },
-      order: {
-        fecha: 'DESC'
-      }
     });
   }
 
   async findByCliente(clienteId: number): Promise<VentaEntity[]> {
+    return await this.ventaRepository.find({ where: { cliente: { id: clienteId } } as any });
+  }
+
+
+  async findByFecha(fechaInicio: Date, fechaFin: Date): Promise<VentaEntity[]> {
     return await this.ventaRepository.find({
-      where: { cliente: { id: clienteId } },
-      relations: {
-        cliente: true,
-        empleado: true,
-        detalles: {
-          prenda: {
-            talle: true
-          }
-        }
-      },
-      order: {
-        fecha: 'DESC'
+      where: {
+        fecha: Between(fechaInicio, fechaFin)
       }
     });
   }
 
-  async findByFecha(fechaInicio: Date, fechaFin: Date): Promise<VentaEntity[]> {
-    return await this.ventaRepository
-      .createQueryBuilder('venta')
-      .leftJoinAndSelect('venta.cliente', 'cliente')
-      .leftJoinAndSelect('venta.empleado', 'empleado')
-      .leftJoinAndSelect('venta.detalles', 'detalles')
-      .leftJoinAndSelect('detalles.prenda', 'prenda')
-      .where('venta.fecha BETWEEN :fechaInicio AND :fechaFin', { fechaInicio, fechaFin })
-      .orderBy('venta.fecha', 'DESC')
-      .getMany();
-  }
-
   async getTotalVentas(): Promise<{ total: number; cantidad: number }> {
-    const result = await this.ventaRepository
-      .createQueryBuilder('venta')
-      .select('SUM(venta.total)', 'total')
-      .addSelect('COUNT(venta.numVenta)', 'cantidad')
-      .getRawOne();
+    const ventas = await this.ventaRepository.find();
 
-    return {
-      total: parseFloat(result.total) || 0,
-      cantidad: parseInt(result.cantidad) || 0
-    };
+    const total = ventas.reduce((acc, venta) => acc + venta.total, 0);
+    const cantidad = ventas.length;
+    return { total, cantidad };
   }
 
   async remove(numVenta: number): Promise<void> {

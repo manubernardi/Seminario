@@ -5,21 +5,21 @@ import { DetalleVentaEntity } from "./detalle.venta.entity";
 @Entity('prendas')
 export class PrendaEntity {
     @PrimaryColumn()
-    codigo : string;
+    codigo! : string;
 
     @Column()
-    descripcion: string;
+    descripcion!: string;
 
     @Column()
-    precio: number;
+    precio!: number;
 
     @Column()
-    cantidad: number;
+    cantidad!: number;
 
     @ManyToOne(() => TalleEntity)
     @JoinColumn({ name: 'talle_id' })
-    talle: TalleEntity;
+    talle!: TalleEntity;
 
-    @ManyToOne(()=> DetalleVentaEntity, detalle => detalle.prenda)
-    ventas: DetalleVentaEntity;
+    @ManyToOne(() => DetalleVentaEntity, detalle => detalle.prenda)
+    ventas!: DetalleVentaEntity;
 }
