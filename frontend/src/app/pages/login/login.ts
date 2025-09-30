@@ -24,15 +24,27 @@ export class Login {
     private fb: FormBuilder,
     private router: Router
   ){
-      this.loginForm = this.fb.group({
-          dni: ['', [Validators.required, 
-                    Validators.minLength(7), 
-                    Validators.maxLength(8),
-                    Validators.pattern(/^\d+$/)]],
-          password:['', [Validators.required, 
-                        Validators.minLength(6), 
-                        Validators.maxLength(20)]]
-      });
+    this.loginForm = this.fb.group({
+        dni: ['', [Validators.required, 
+                  Validators.minLength(7), 
+                  Validators.maxLength(8),
+                  Validators.pattern(/^\d+$/)]],
+        supervisor: this.fb.group({
+          enabled: [false],
+          password:['']
+        })
+    });
+
+    // si se marca el checkbox, agrego validadores al password
+    this.loginForm.get('supervisor.enabled')?.valueChanges.subscribe(isSupervisor => {
+      const passwordCtrl = this.loginForm.get('supervisor.password');
+      if (isSupervisor) {
+        passwordCtrl?.setValidators([Validators.required, Validators.minLength(6), Validators.maxLength(20)]);
+      } else {
+        passwordCtrl?.clearValidators();
+      }
+      passwordCtrl?.updateValueAndValidity();
+    });
   }
 
   ngOnInit(){
