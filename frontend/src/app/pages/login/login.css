@@ -72,3 +72,16 @@ body {
     border-radius: 5px;
     border-color: red;
 }
+
+.opcion-supervisor{
+    display: flex;
+    gap: 1rem;
+}
+
+.unchecked {
+    display: none;
+}
+
+.checked {
+    display: flex;
+}
