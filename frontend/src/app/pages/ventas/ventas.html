@@ -1,1 +1,26 @@
-<p>ventas works!</p>
+<h2>Listado de Ventas</h2>
+
+<div class="ventas-container">
+  <div class="venta-card" *ngFor="let venta of ventas">
+    <div class="venta-header">
+      <h3>Venta {{ venta.numVenta }}</h3>
+      <span class="venta-fecha">{{ venta.fecha | date:'short' }}</span>
+    </div>
+
+    <div class="venta-body">
+      <p><strong>Id Empleado:</strong> {{ venta.empleadoId }}</p>
+      <p><strong>Total:</strong> {{ venta.total | currency:'ARS ' }}</p>
+
+      <h4>Detalles</h4>
+      <ul>
+        <li *ngFor="let d of venta.detalles">
+          Producto #{{ d.id }} – Cant: {{ d.cantidad }} – 
+          Subtotal: {{ d.subtotal | currency:'ARS' }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div *ngIf="ventas.length === 0" class="no-ventas">
+  No hay ventas registradas.
+</div>
