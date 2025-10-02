@@ -57,6 +57,10 @@ export class StockController {
     ) {
         return await this.stockService.ajustarStock(codigo, ajuste.cantidad, ajuste.motivo);
     }
+     @Post()
+    async create(@Body() createPrendaDto: CreatePrendaDto) {
+        return await this.stockService.create(createPrendaDto);
+    }
 
     // GET /stock/dashboard/stats - estadísticas para dashboard
     @Get('dashboard/stats')
