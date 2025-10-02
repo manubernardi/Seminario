@@ -1,1 +1,130 @@
-<p>stock works!</p>
+<body>
+    <div class="inicio text-white p-4 mb-2">
+        <h4 class="text-center">GESTIÓN DE STOCK</h4>
+    </div>
+
+    <div class="container-fluid p-4">
+        <!-- Barra de búsqueda y botones -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="input-group w-50">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    placeholder="Buscar por código o descripción..."
+                    [(ngModel)]="searchTerm"
+                    (input)="buscarPrendas()">
+                <button class="btn btn-primary" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
+                <i class="bi bi-plus-circle"></i> Nueva Prenda
+            </button>
+        </div>
+
+        <!-- Tabla de prendas -->
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-header">
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Talle</th>
+                        <th>Precio</th>
+                        <th>Stock Actual</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (prendas.length === 0) {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <p class="text-muted">No hay prendas en stock</p>
+                            </td>
+                        </tr>
+                    }
+                    @for (prenda of prendasFiltradas; track prenda.codigo) {
+                        <tr [class.stock-bajo]="prenda.cantidad < 5">
+                            <td class="text-center">
+                                <!-- TODO: Reemplazar con la ruta de la imagen cuando esté disponible -->
+                                <!-- <img [src]="prenda.imagen" alt="{{prenda.descripcion}}" class="prenda-img"> -->
+                                <div class="placeholder-img">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            </td>
+                            <td>{{ prenda.codigo }}</td>
+                            <td>{{ prenda.descripcion }}</td>
+                            <td>{{ prenda.talle?.descripcion || 'N/A' }}</td>
+                            <td>${{ prenda.precio | number:'1.2-2' }}</td>
+                            <td>
+                                <span [class.badge-warning]="prenda.cantidad < 5" 
+                                      [class.badge-success]="prenda.cantidad >= 5"
+                                      class="badge">
+                                    {{ prenda.cantidad }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button 
+                                        class="btn btn-sm btn-success" 
+                                        title="Sumar stock"
+                                        (click)="ajustarStock(prenda, 1)">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button 
+                                        class="btn btn-sm btn-warning" 
+                                        title="Restar stock"
+                                        (click)="ajustarStock(prenda, -1)"
+                                        [disabled]="prenda.cantidad === 0">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <button 
+                                        class="btn btn-sm btn-info" 
+                                        title="Editar"
+                                        (click)="editarPrenda(prenda)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button 
+                                        class="btn btn-sm btn-danger" 
+                                        title="Eliminar"
+                                        (click)="eliminarPrenda(prenda)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <h5>Total de Prendas</h5>
+                        <h2>{{ prendas.length }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <h5>Stock Total</h5>
+                        <h2>{{ getTotalStock() }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card stock-bajo-card">
+                    <div class="card-body text-center">
+                        <h5>Stock Bajo (&lt;5)</h5>
+                        <h2>{{ getPrendasStockBajo() }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

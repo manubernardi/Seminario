@@ -12,8 +12,12 @@ export class StockService {
     ) {}
 
     async findAll(): Promise<PrendaEntity[]> {
-        return this.prendaRepository.find();
+  return await this.prendaRepository.find({
+    relations: {
+      talle: true  // <-- AGREGÁ ESTO
     }
+  });
+}
 
     async create(createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {
                 // Validar que el código no exista
