@@ -127,4 +127,102 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para Nueva/Editar Prenda -->
+    <div class="modal fade" id="modalPrenda" tabindex="-1" aria-labelledby="modalPrendaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPrendaLabel">
+                        {{ modoEdicion ? 'Editar Prenda' : 'Nueva Prenda' }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código *</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="codigo"
+                                formControlName="codigo"
+                                [readonly]="modoEdicion"
+                                placeholder="Ej: P001">
+                            @if (prendaForm.get('codigo')?.invalid && prendaForm.get('codigo')?.touched) {
+                                <div class="text-danger mt-1">El código es obligatorio</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción *</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="descripcion"
+                                formControlName="descripcion"
+                                placeholder="Ej: Remera negra">
+                            @if (prendaForm.get('descripcion')?.invalid && prendaForm.get('descripcion')?.touched) {
+                                <div class="text-danger mt-1">La descripción es obligatoria</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio *</label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="precio"
+                                formControlName="precio"
+                                placeholder="0.00">
+                            @if (prendaForm.get('precio')?.invalid && prendaForm.get('precio')?.touched) {
+                                <div class="text-danger mt-1">El precio debe ser mayor a 0</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad *</label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="cantidad"
+                                formControlName="cantidad"
+                                placeholder="0">
+                            @if (prendaForm.get('cantidad')?.invalid && prendaForm.get('cantidad')?.touched) {
+                                <div class="text-danger mt-1">La cantidad debe ser mayor o igual a 0</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="talle_id" class="form-label">Talle *</label>
+                            <select 
+                                class="form-select" 
+                                id="talle_id"
+                                formControlName="talle_id">
+                                <option value="">Seleccione un talle</option>
+                                @for (talle of talles; track talle.codigo) {
+                                    <option [value]="talle.codigo">{{ talle.descripcion }}</option>
+                                }
+                            </select>
+                            @if (prendaForm.get('talle_id')?.invalid && prendaForm.get('talle_id')?.touched) {
+                                <div class="text-danger mt-1">Debe seleccionar un talle</div>
+                            }
+                        </div>
+
+                        <!-- TODO: Agregar campo para imagen cuando esté implementado -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary"
+                            [disabled]="prendaForm.invalid">
+                            {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>

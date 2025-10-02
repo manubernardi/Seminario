@@ -6,6 +6,7 @@ import { entities } from './entities/index';
 import { EmpleadoModule } from './empleados/empleados.module';
 import { VentasModule } from './ventas/ventas.module';
 import { StockModule } from './stock/stock.module';
+import { TallesModule } from './talles/talles.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -23,6 +24,7 @@ import { StockModule } from './stock/stock.module';
        VentasModule,
       EmpleadoModule,  // <-- Agregá estos
       StockModule,
+      TallesModule,
       // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
   ],

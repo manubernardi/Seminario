@@ -32,12 +32,6 @@ export class StockService {
         return this.prendaRepository.save(newPrenda);
     }
 
-    async update(codigo: string, updateData: Partial<PrendaEntity>): Promise<PrendaEntity | null> {
-        await this.prendaRepository.update(codigo, updateData);
-        return this.prendaRepository.findOne({ where: { codigo } });
-    }
-
-
     // Obtener prenda por código
     async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
         const prenda = await this.prendaRepository

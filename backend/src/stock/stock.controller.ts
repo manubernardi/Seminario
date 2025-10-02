@@ -18,7 +18,7 @@ export class StockController {
 
     @Patch(':codigo')
     async update(@Param('codigo') codigo: string, @Body() updateData: Partial<PrendaEntity>) {
-        return this.stockService.update(codigo, updateData);
+        return this.stockService.updatePrenda(codigo, updateData);
     }
 
     // GET /stock/:codigo - obtener prenda por código

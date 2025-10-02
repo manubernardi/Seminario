@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+
+declare var bootstrap: any;
 
 interface Talle {
   codigo: number;
@@ -20,20 +22,47 @@ interface Prenda {
 @Component({
   selector: 'app-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe],
   templateUrl: './stock.html',
   styleUrls: ['./stock.css']
 })
 export class Stock implements OnInit {
   prendas: Prenda[] = [];
   prendasFiltradas: Prenda[] = [];
+  talles: Talle[] = [];
   searchTerm: string = '';
-  private apiUrl = 'http://localhost:3000/stock'; // Ajusta según tu backend
+  prendaForm: FormGroup;
+  modoEdicion: boolean = false;
+  private apiUrl = 'http://localhost:3000/stock';
+  private modalInstance: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder
+  ) {
+    this.prendaForm = this.fb.group({
+      codigo: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      precio: [0, [Validators.required, Validators.min(0.01)]],
+      cantidad: [0, [Validators.required, Validators.min(0)]],
+      talle_id: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.cargarPrendas();
+    this.cargarTalles();
+  }
+
+  cargarTalles(): void {
+    this.http.get<Talle[]>('http://localhost:3000/talles').subscribe({
+      next: (data) => {
+        this.talles = data;
+      },
+      error: (error) => {
+        console.error('Error al cargar talles:', error);
+      }
+    });
   }
 
   cargarPrendas(): void {
@@ -87,9 +116,15 @@ export class Stock implements OnInit {
   }
 
   editarPrenda(prenda: Prenda): void {
-    // TODO: Implementar modal o navegación para editar
-    console.log('Editar prenda:', prenda);
-    alert('Función de edición en desarrollo');
+    this.modoEdicion = true;
+    this.prendaForm.patchValue({
+      codigo: prenda.codigo,
+      descripcion: prenda.descripcion,
+      precio: prenda.precio,
+      cantidad: prenda.cantidad,
+      talle_id: prenda.talle?.codigo || ''
+    });
+    this.abrirModal();
   }
 
   eliminarPrenda(prenda: Prenda): void {
@@ -111,9 +146,70 @@ export class Stock implements OnInit {
   }
 
   abrirModalNuevaPrenda(): void {
-    // TODO: Implementar modal o navegación para crear nueva prenda
-    console.log('Abrir modal nueva prenda');
-    alert('Función de nueva prenda en desarrollo');
+    this.modoEdicion = false;
+    this.prendaForm.reset({
+      codigo: '',
+      descripcion: '',
+      precio: 0,
+      cantidad: 0,
+      talle_id: ''
+    });
+    this.abrirModal();
+  }
+
+  private abrirModal(): void {
+    const modalElement = document.getElementById('modalPrenda');
+    if (modalElement) {
+      this.modalInstance = new bootstrap.Modal(modalElement);
+      this.modalInstance.show();
+    }
+  }
+
+  private cerrarModal(): void {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
+  }
+
+  guardarPrenda(): void {
+    if (this.prendaForm.invalid) {
+      Object.keys(this.prendaForm.controls).forEach(key => {
+        this.prendaForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
+
+    const prendaData = { ...this.prendaForm.value,
+    talle_id: Number(this.prendaForm.value.talle_id) // para pasar lo del talle_ID a Talle con letra
+    };
+
+    if (this.modoEdicion) {
+      // Actualizar prenda existente
+      this.http.put(`${this.apiUrl}/${prendaData.codigo}`, prendaData).subscribe({
+        next: (response) => {
+          alert('Prenda actualizada correctamente');
+          this.cargarPrendas();
+          this.cerrarModal();
+        },
+        error: (error) => {
+          console.error('Error al actualizar prenda:', error);
+          alert('Error al actualizar la prenda');
+        }
+      });
+    } else {
+      // Crear nueva prenda
+      this.http.post(this.apiUrl, prendaData).subscribe({
+        next: (response) => {
+          alert('Prenda creada correctamente');
+          this.cargarPrendas();
+          this.cerrarModal();
+        },
+        error: (error) => {
+          console.error('Error al crear prenda:', error);
+          alert(error.error?.message || 'Error al crear la prenda');
+        }
+      });
+    }
   }
 
   getTotalStock(): number {

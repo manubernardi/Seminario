@@ -16,6 +16,9 @@ export class PrendaEntity {
     @Column()
     cantidad!: number;
 
+    @Column({ name: 'talle_id' }) 
+    talle_id: number;
+
     @ManyToOne(() => TalleEntity)
     @JoinColumn({ name: 'talle_id' })
     talle!: TalleEntity;
