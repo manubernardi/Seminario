@@ -18,8 +18,3 @@ app-root {
   min-height: 100vh;
 }
 
-:root {
-  --primary-color: #4A90E2;
-  --primary-hover: #357ABD;
-  --secondary-color: #F5F5F5;
-}
