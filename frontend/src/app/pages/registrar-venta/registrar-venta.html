@@ -1,1 +1,190 @@
-<p>registrar-venta works!</p>
+<body>
+    <div class="inicio text-white p-4 mb-2">
+        <h4 class="text-center">NUEVA VENTA</h4>
+    </div>
+
+    <div class="container-fluid p-4">
+        <form [formGroup]="ventaForm" (ngSubmit)="guardarVenta()">
+            <div class="row">
+                <!-- Columna izquierda: Datos de la venta -->
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Datos de la Venta</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Empleado -->
+                            <div class="mb-3">
+                                <label for="empleadoId" class="form-label">Empleado *</label>
+                                <select 
+                                    class="form-select" 
+                                    id="empleadoId"
+                                    formControlName="empleadoId">
+                                    <option value="">Seleccione un empleado</option>
+                                    @for (empleado of empleados; track empleado.id) {
+                                        <option [value]="empleado.id">
+                                            {{ empleado.nombre }} {{ empleado.apellido }}
+                                        </option>
+                                    }
+                                </select>
+                                @if (ventaForm.get('empleadoId')?.invalid && ventaForm.get('empleadoId')?.touched) {
+                                    <div class="text-danger mt-1">Debe seleccionar un empleado</div>
+                                }
+                            </div>
+
+                            <!-- Cliente -->
+                            <div class="mb-3">
+                                <label for="clienteId" class="form-label">Cliente *</label>
+                                <select 
+                                    class="form-select" 
+                                    id="clienteId"
+                                    formControlName="clienteId">
+                                    <option value="">Seleccione un cliente</option>
+                                    @for (cliente of clientes; track cliente.id) {
+                                        <option [value]="cliente.id">
+                                            {{ cliente.nombre }} {{ cliente.apellido }}
+                                        </option>
+                                    }
+                                </select>
+                                @if (ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched) {
+                                    <div class="text-danger mt-1">Debe seleccionar un cliente</div>
+                                }
+                            </div>
+
+                            <!-- Fecha (solo lectura) -->
+                            <div class="mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    [value]="fechaActual | date:'dd/MM/yyyy HH:mm'"
+                                    readonly>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="mb-3">
+                                <label class="form-label">Total</label>
+                                <div class="total-display">
+                                    ${{ calcularTotal() | number:'1.2-2' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha: Agregar prendas -->
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Agregar Prendas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-md-6">
+                                    <label for="prendaSelect" class="form-label">Prenda</label>
+                                    <select 
+                                        class="form-select" 
+                                        id="prendaSelect"
+                                        [(ngModel)]="prendaSeleccionada"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="onPrendaChange()">
+                                        <option [ngValue]="null">Seleccione una prenda</option>
+                                        @for (prenda of prendas; track prenda.codigo) {
+                                            <option [ngValue]="prenda">
+                                                {{ prenda.codigo }} - {{ prenda.descripcion }} (${{ prenda.precio }}) - Stock: {{ prenda.cantidad }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="cantidadInput" class="form-label">Cantidad</label>
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        id="cantidadInput"
+                                        [(ngModel)]="cantidadSeleccionada"
+                                        [ngModelOptions]="{standalone: true}"
+                                        min="1"
+                                        [max]="prendaSeleccionada?.cantidad || 0">
+                                </div>
+                                <div class="col-md-3">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-success w-100"
+                                        (click)="agregarPrenda()"
+                                        [disabled]="!prendaSeleccionada || cantidadSeleccionada <= 0">
+                                        <i class="bi bi-plus-circle"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de detalles -->
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Detalle de la Venta</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (detalles.length === 0) {
+                                <p class="text-center text-muted py-4">
+                                    No hay prendas agregadas. Agregue al menos una prenda para continuar.
+                                </p>
+                            } @else {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Descripción</th>
+                                                <th>Precio Unit.</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (detalle of detalles; track detalle.codigoPrenda; let i = $index) {
+                                                <tr>
+                                                    <td>{{ detalle.codigoPrenda }}</td>
+                                                    <td>{{ detalle.descripcion }}</td>
+                                                    <td>${{ detalle.precio | number:'1.2-2' }}</td>
+                                                    <td>{{ detalle.cantidad }}</td>
+                                                    <td>${{ detalle.subtotal | number:'1.2-2' }}</td>
+                                                    <td>
+                                                        <button 
+                                                            type="button"
+                                                            class="btn btn-sm btn-danger"
+                                                            (click)="eliminarDetalle(i)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary"
+                            (click)="cancelar()">
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary btn-lg"
+                            [disabled]="ventaForm.invalid || detalles.length === 0">
+                            <i class="bi bi-check-circle"></i> Guardar Venta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
