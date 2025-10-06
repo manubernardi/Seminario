@@ -85,7 +85,7 @@ export class VentasService {
   }
 
   async findAll(): Promise<VentaEntity[]> {
-    return await this.ventaRepository.find();
+    return await this.ventaRepository.find({relations: ['detalles','detalles.prenda', 'cliente', 'empleado']});
   }
 
   async findOne(numVenta: number): Promise<VentaEntity> {

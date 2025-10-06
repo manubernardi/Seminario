@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class Ventas {
   ventas: any[] = [];
+  ventaSeleccionada: any = null;
   constructor(private readonly ventasService: VentasService) {}
   ngOnInit(): void {
   
@@ -18,5 +19,13 @@ export class Ventas {
       console.log(data);
     });
 
+  }
+  verDetalles(venta: any): void {
+    this.ventaSeleccionada = venta;
+  }
+
+  cerrarModal(): void {
+    this.ventaSeleccionada = null;
+  }
 }
-}
+
