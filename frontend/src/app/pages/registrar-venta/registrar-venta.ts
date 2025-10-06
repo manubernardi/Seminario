@@ -3,12 +3,7 @@ import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-
-interface Empleado {
-  id: number;
-  nombre: string;
-  apellido: string;
-}
+import { AuthService } from '../../services/auth.service';
 
 interface Cliente {
   id: number;
@@ -40,7 +35,6 @@ interface DetalleVenta {
 })
 export class RegistrarVenta implements OnInit {
   ventaForm: FormGroup;
-  empleados: Empleado[] = [];
   clientes: Cliente[] = [];
   prendas: Prenda[] = [];
   detalles: DetalleVenta[] = [];
@@ -48,36 +42,39 @@ export class RegistrarVenta implements OnInit {
   prendaSeleccionada: Prenda | null = null;
   cantidadSeleccionada: number = 1;
   fechaActual: Date = new Date();
+  empleadoLogueado: any = null;
 
   private apiUrl = 'http://localhost:3000';
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.ventaForm = this.fb.group({
-      empleadoId: ['', Validators.required],
-      clienteId: ['', Validators.required]
+      empleadoId: [{ value: '', disabled: true }, Validators.required],
+      clienteId: ['']
     });
   }
 
   ngOnInit(): void {
-    this.cargarEmpleados();
+    this.cargarEmpleadoLogueado();
     this.cargarClientes();
     this.cargarPrendas();
   }
 
-  cargarEmpleados(): void {
-    this.http.get<Empleado[]>(`${this.apiUrl}/empleados`).subscribe({
-      next: (data) => {
-        this.empleados = data;
-      },
-      error: (error) => {
-        console.error('Error al cargar empleados:', error);
-        alert('Error al cargar empleados');
-      }
-    });
+  cargarEmpleadoLogueado(): void {
+    this.empleadoLogueado = this.authService.getEmpleadoLogueado();
+    
+    if (this.empleadoLogueado) {
+      this.ventaForm.patchValue({
+        empleadoId: this.empleadoLogueado.id
+      });
+    } else {
+      alert('Debe iniciar sesión para registrar ventas');
+      this.router.navigate(['/login']);
+    }
   }
 
   cargarClientes(): void {
@@ -95,7 +92,7 @@ export class RegistrarVenta implements OnInit {
   cargarPrendas(): void {
     this.http.get<Prenda[]>(`${this.apiUrl}/stock`).subscribe({
       next: (data) => {
-        this.prendas = data.filter(p => p.cantidad > 0); // Solo prendas con stock
+        this.prendas = data.filter(p => p.cantidad > 0);
       },
       error: (error) => {
         console.error('Error al cargar prendas:', error);
@@ -118,7 +115,6 @@ export class RegistrarVenta implements OnInit {
       return;
     }
 
-    // Verificar si la prenda ya está en el detalle
     const detalleExistente = this.detalles.find(d => d.codigoPrenda === this.prendaSeleccionada!.codigo);
     
     if (detalleExistente) {
@@ -132,7 +128,6 @@ export class RegistrarVenta implements OnInit {
       detalleExistente.cantidad = nuevaCantidad;
       detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
     } else {
-      // Agregar nuevo detalle
       const detalle: DetalleVenta = {
         codigoPrenda: this.prendaSeleccionada.codigo,
         descripcion: this.prendaSeleccionada.descripcion,
@@ -144,7 +139,6 @@ export class RegistrarVenta implements OnInit {
       this.detalles.push(detalle);
     }
 
-    // Resetear selección
     this.prendaSeleccionada = null;
     this.cantidadSeleccionada = 1;
   }
@@ -158,24 +152,30 @@ export class RegistrarVenta implements OnInit {
   }
 
   guardarVenta(): void {
-    if (this.ventaForm.invalid || this.detalles.length === 0) {
-      alert('Complete todos los campos y agregue al menos una prenda');
+    if (this.detalles.length === 0) {
+      alert('Agregue al menos una prenda');
       return;
     }
 
-    const ventaData = {
-      empleadoId: Number(this.ventaForm.value.empleadoId),
-      clienteId: Number(this.ventaForm.value.clienteId),
+    const empleadoId = this.ventaForm.get('empleadoId')?.value;
+    const clienteId = this.ventaForm.get('clienteId')?.value;
+
+    const ventaData: any = {
+      empleadoId: Number(empleadoId),
       detalles: this.detalles.map(d => ({
         codigoPrenda: d.codigoPrenda,
         cantidad: d.cantidad
       }))
     };
 
+    if (clienteId) {
+      ventaData.clienteId = Number(clienteId);
+    }
+
     this.http.post(`${this.apiUrl}/ventas`, ventaData).subscribe({
       next: (response) => {
         alert('Venta registrada correctamente');
-        this.router.navigate(['/ventas']); // Ajusta la ruta según tu routing
+        this.router.navigate(['/ventas']);
       },
       error: (error) => {
         console.error('Error al guardar venta:', error);
@@ -187,7 +187,7 @@ export class RegistrarVenta implements OnInit {
   cancelar(): void {
     if (this.detalles.length > 0) {
       if (confirm('¿Está seguro de cancelar? Se perderán los datos ingresados')) {
-        this.router.navigate(['/ventas']); // Ajusta la ruta según tu routing
+        this.router.navigate(['/ventas']);
       }
     } else {
       this.router.navigate(['/ventas']);

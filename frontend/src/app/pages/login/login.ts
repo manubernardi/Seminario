@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 
 
@@ -19,10 +20,13 @@ export class Login {
 
   loginForm: FormGroup;
   error = '';
+  login= false;
 
+  
   constructor( 
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ){
     this.loginForm = this.fb.group({
         dni: ['', [Validators.required, 
@@ -61,15 +65,42 @@ export class Login {
     })
   }
 
-  public enviar(){
-    if (this.loginForm.invalid) {
-      this.error = 'Completa todos los campos correctamente.';
-      return;
-    }
-
-    console.log(this.loginForm.value);
-
-    this.router.navigate(['/home']);
+  public enviar() {
+  if (this.loginForm.invalid) {
+    this.error = 'Completa todos los campos correctamente.';
+    return;
   }
 
+  const formValue = this.loginForm.value;
+  const isSupervisor = formValue.supervisor.enabled;
+
+  // Construir payload limpio
+  const data = {
+    dni: formValue.dni,
+    ...(isSupervisor && { isSupervisor: true })
+  };
+
+  console.log('Enviando datos:', data);
+
+  this.authService.login(data).subscribe({
+    next: response => {
+      console.log('Login exitoso:', response);
+      this.router.navigate(['/home']);
+    },
+    error: err => {
+      console.error('Error en login:', err);
+      
+      // Mejorar mensajes de error
+      if (err.status === 404) {
+        this.error = 'DNI no encontrado';
+      } else if (err.status === 403) {
+        this.error = 'No tienes permisos de supervisor';
+      } else if (err.status === 400) {
+        this.error = 'DNI inválido';
+      } else {
+        this.error = 'Error de conexión con el servidor';
+      }
+    }
+  });
+  }
 }

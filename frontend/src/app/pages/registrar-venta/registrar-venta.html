@@ -13,42 +13,40 @@
                             <h5 class="mb-0">Datos de la Venta</h5>
                         </div>
                         <div class="card-body">
-                            <!-- Empleado -->
+                            <!-- Empleado (AUTO-CARGADO Y DESHABILITADO) -->
                             <div class="mb-3">
                                 <label for="empleadoId" class="form-label">Empleado *</label>
-                                <select 
-                                    class="form-select" 
-                                    id="empleadoId"
-                                    formControlName="empleadoId">
-                                    <option value="">Seleccione un empleado</option>
-                                    @for (empleado of empleados; track empleado.id) {
-                                        <option [value]="empleado.id">
-                                            {{ empleado.nombre }} {{ empleado.apellido }}
-                                        </option>
-                                    }
-                                </select>
-                                @if (ventaForm.get('empleadoId')?.invalid && ventaForm.get('empleadoId')?.touched) {
-                                    <div class="text-danger mt-1">Debe seleccionar un empleado</div>
+                                @if (empleadoLogueado) {
+                                    <div class="alert alert-info d-flex align-items-center mb-0">
+                                        <i class="bi bi-person-check-fill me-2"></i>
+                                        <strong>{{ empleadoLogueado.nombre }} {{ empleadoLogueado.apellido }}</strong>
+                                        <small class="ms-2 text-muted">(Legajo: {{ empleadoLogueado.legajo }})</small>
+                                    </div>
+                                    <input type="hidden" formControlName="empleadoId">
+                                } @else {
+                                    <div class="alert alert-warning">
+                                        No se detectó empleado logueado
+                                    </div>
                                 }
                             </div>
 
-                            <!-- Cliente -->
+                            <!-- Cliente (AHORA OPCIONAL) -->
                             <div class="mb-3">
-                                <label for="clienteId" class="form-label">Cliente *</label>
+                                <label for="clienteId" class="form-label">Cliente (opcional)</label>
                                 <select 
                                     class="form-select" 
                                     id="clienteId"
                                     formControlName="clienteId">
-                                    <option value="">Seleccione un cliente</option>
+                                    <option value="">Sin cliente / Venta directa</option>
                                     @for (cliente of clientes; track cliente.id) {
                                         <option [value]="cliente.id">
                                             {{ cliente.nombre }} {{ cliente.apellido }}
                                         </option>
                                     }
                                 </select>
-                                @if (ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched) {
-                                    <div class="text-danger mt-1">Debe seleccionar un cliente</div>
-                                }
+                                <small class="text-muted">
+                                    Deja vacío para ventas sin registro de cliente
+                                </small>
                             </div>
 
                             <!-- Fecha (solo lectura) -->
@@ -179,7 +177,7 @@
                         <button 
                             type="submit" 
                             class="btn btn-primary btn-lg"
-                            [disabled]="ventaForm.invalid || detalles.length === 0">
+                            [disabled]="!empleadoLogueado || detalles.length === 0">
                             <i class="bi bi-check-circle"></i> Guardar Venta
                         </button>
                     </div>

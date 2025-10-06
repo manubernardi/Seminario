@@ -11,7 +11,7 @@
   <tbody>
     <tr *ngFor="let venta of ventas">
       <td>{{ venta.numVenta }}</td>
-      <td>{{ venta.empleadoId }}</td>
+      <td>{{ venta.empleado.nombre }}</td>
       <td>{{ venta.fecha | date: 'short' }}</td>
       <td>{{ venta.total | currency:'ARS' }}</td>
       <td>

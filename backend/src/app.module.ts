@@ -8,6 +8,7 @@ import { VentasModule } from './ventas/ventas.module';
 import { StockModule } from './stock/stock.module';
 import { TallesModule } from './talles/talles.module';
 import { ClientesModule } from './clientes/clientes.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -27,6 +28,7 @@ import { ClientesModule } from './clientes/clientes.module';
       StockModule,
       TallesModule,
       ClientesModule,
+      AuthModule,
       // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
   ],
