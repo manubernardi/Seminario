@@ -17,7 +17,7 @@ export class EmpleadoEntity /* implements EmpleadoI */ {
     legajo!: string;
 
     @Column()
-    telefono!: string;
+    dni!: string;
 
     @ManyToOne(() => RoleEntity, role => role.empleados, { eager: true })
     @JoinColumn({ name: 'rol_id' })

@@ -16,7 +16,7 @@ export class CreateEmpleadoDto {
 
   @IsString()
   @IsNotEmpty()
-  telefono!: string;
+  dni!: string;
 
   @IsNumber()
   @IsNotEmpty()

@@ -37,12 +37,17 @@ export class Login {
 
     // si se marca el checkbox, agrego validadores al password
     this.loginForm.get('supervisor.enabled')?.valueChanges.subscribe(isSupervisor => {
+      // Obtiene el campo de validación del fromGroup
       const passwordCtrl = this.loginForm.get('supervisor.password');
+
+      //Verifica que se haya tocado el checkbox
       if (isSupervisor) {
         passwordCtrl?.setValidators([Validators.required, Validators.minLength(6), Validators.maxLength(20)]);
       } else {
         passwordCtrl?.clearValidators();
       }
+
+      //Actualiza los cambios en el formGroup
       passwordCtrl?.updateValueAndValidity();
     });
   }
