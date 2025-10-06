@@ -18,7 +18,7 @@ export class StockController {
 
     @Patch(':codigo')
     async update(@Param('codigo') codigo: string, @Body() updateData: Partial<PrendaEntity>) {
-        return this.stockService.update(codigo, updateData);
+        return this.stockService.updatePrenda(codigo, updateData);
     }
 
     // GET /stock/:codigo - obtener prenda por código
@@ -56,6 +56,10 @@ export class StockController {
         @Body() ajuste: { cantidad: number; motivo: string }
     ) {
         return await this.stockService.ajustarStock(codigo, ajuste.cantidad, ajuste.motivo);
+    }
+     @Post()
+    async create(@Body() createPrendaDto: CreatePrendaDto) {
+        return await this.stockService.create(createPrendaDto);
     }
 
     // GET /stock/dashboard/stats - estadísticas para dashboard

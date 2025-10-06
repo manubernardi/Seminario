@@ -12,8 +12,12 @@ export class StockService {
     ) {}
 
     async findAll(): Promise<PrendaEntity[]> {
-        return this.prendaRepository.find();
+  return await this.prendaRepository.find({
+    relations: {
+      talle: true  // <-- AGREGÁ ESTO
     }
+  });
+}
 
     async create(createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {
                 // Validar que el código no exista
@@ -27,12 +31,6 @@ export class StockService {
         const newPrenda = this.prendaRepository.create(createPrendaDto);
         return this.prendaRepository.save(newPrenda);
     }
-
-    async update(codigo: string, updateData: Partial<PrendaEntity>): Promise<PrendaEntity | null> {
-        await this.prendaRepository.update(codigo, updateData);
-        return this.prendaRepository.findOne({ where: { codigo } });
-    }
-
 
     // Obtener prenda por código
     async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
