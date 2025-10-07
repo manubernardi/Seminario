@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule, AbstractControl, ValidationErrors } from "@angular/forms";
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,10 +16,11 @@ export class Register {
     private fb: FormBuilder,
     private router: Router){
     this.registerForm = this.fb.group({
-      nombreUsuario: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(30)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      seleccion: ['', Validators.required]
+      nombre: ['', [Validators.required]],
+      apellido: ['',[Validators.required]],
+      dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
+      telefono: ['',[Validators.required, Validators.pattern(/^\d{10}$/)]],
+      rol: ['', Validators.required]
 
     });
   }
@@ -33,6 +34,5 @@ export class Register {
     console.log(this.registerForm.value);
 
     this.router.navigate(['/home']);
-    
   }
 }

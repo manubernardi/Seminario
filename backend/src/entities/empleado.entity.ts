@@ -1,11 +1,14 @@
-import { BaseEntity, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { RoleEntity } from './roles.entity';
 import { VentaEntity } from './venta.entity'
 
 @Entity('empleados')
-export class EmpleadoEntity /* implements EmpleadoI */ {
+export class EmpleadoEntity {
     @PrimaryGeneratedColumn()
-    id!: number;
+    legajo!: number;
+
+    @Column({ unique: true })
+    dni!: string;
 
     @Column()
     nombre!: string;
@@ -13,11 +16,8 @@ export class EmpleadoEntity /* implements EmpleadoI */ {
     @Column()
     apellido!: string;
 
-    @Column({ unique: true })
-    legajo!: string;
-
     @Column()
-    dni!: string;
+    telefono: string;
 
     @ManyToOne(() => RoleEntity, role => role.empleados, { eager: true })
     @JoinColumn({ name: 'rol_id' })

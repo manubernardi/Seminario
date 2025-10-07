@@ -27,10 +27,13 @@ interface Prenda {
   styleUrls: ['./stock.css']
 })
 export class Stock implements OnInit {
+
+  //Inicialización de las variables a usar
   prendas: Prenda[] = [];
   prendasFiltradas: Prenda[] = [];
   talles: Talle[] = [];
   searchTerm: string = '';
+
   prendaForm: FormGroup;
   modoEdicion: boolean = false;
   private apiUrl = 'http://localhost:3000/stock';
@@ -78,6 +81,7 @@ export class Stock implements OnInit {
     });
   }
 
+  //Buscar una o varias prendas por código o descripción 
   buscarPrendas(): void {
     if (!this.searchTerm.trim()) {
       this.prendasFiltradas = this.prendas;
@@ -183,6 +187,7 @@ export class Stock implements OnInit {
     talle_id: Number(this.prendaForm.value.talle_id) // para pasar lo del talle_ID a Talle con letra
     };
 
+    //Sólo si se seleccionó el botón de Editar Prenda
     if (this.modoEdicion) {
       // Actualizar prenda existente
       this.http.put(`${this.apiUrl}/${prendaData.codigo}`, prendaData).subscribe({
@@ -212,10 +217,13 @@ export class Stock implements OnInit {
     }
   }
 
+  //Obtiene el total de stock teniendo en cuenta todas las prendas
   getTotalStock(): number {
+    //Para cada prenda, suma su cantidad a la cantidad total, empezando en 0
     return this.prendas.reduce((total, prenda) => total + prenda.cantidad, 0);
   }
 
+  //Obtiene la cantidad de prendas cuyo stock es menor a 5.
   getPrendasStockBajo(): number {
     return this.prendas.filter(prenda => prenda.cantidad < 5).length;
   }

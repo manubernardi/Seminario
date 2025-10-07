@@ -16,7 +16,7 @@ export class VentaEntity {
     total!: number;
 
     @Column()
-    empleadoId!: number;
+    legajoEmpleado!: number;
 
     @OneToMany(() => DetalleVentaEntity, detalle => detalle.venta, {
         cascade: true,

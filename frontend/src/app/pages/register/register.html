@@ -7,62 +7,63 @@
                 <p class="titulo text-center mt-3">Registrar Nuevo Usuario</p>
                 <form class="form-signin p-2 mb-2" [formGroup]="registerForm" (ngSubmit)="enviar()">
 
-                    <!--NOMBRE DE USUARIO-->
+                    <!--NOMBRE-->
                     <div class="form-group">
-                        <label for="nombreUsuario">Nombre de Usuario</label>
+                        <label for="nombreUsuario">Nombre</label>
                         <input type="text"
                                class="form-control p-3"
-                               id="nombreUsuario"
-                               placeholder="Nombre de Usuario"
-                               formControlName="nombreUsuario">
-                        @if (registerForm.get('nombreUsuario')?.invalid && registerForm.get('nombreUsuario')?.touched) {
-                            <!--Validación específica para nombre requerido-->
-                            @if (registerForm.get('nombreUsuario')?.errors?.['required']) {
-                                <div class="msj-error text-danger mt-2 p-2">El nombre de usuario es obligatorio</div>
-                            }
-                            <!--Validación específica para formato del nombre de usuario-->
-                            @if (registerForm.get('nombreUsuario')?.errors?.['minlength'] || 
-                                registerForm.get('nombreUsuario')?.errors?.['maxlength']) {
-                                <div class="msj-error text-danger mt-2 p-2">El nombre de usuario debe tener entre 6 y 30 caracteres</div>
-                            }
+                               placeholder="Nombre"
+                               formControlName="nombre">
+                        @if (registerForm.get('nombre')?.errors?.['required'] && registerForm.get('nombre')?.touched) {    
+                            <div class="msj-error text-danger mt-2 p-2">El nombre es obligatorio</div>
                         }
                     </div>
 
-                    <!--EMAIL-->
+                    <!--APELLIDO-->
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" 
-                               class="form-control p-3" 
-                               id="email"  
-                               placeholder="Email"
-                               formControlName="email">
-                        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                        <label for="nombreUsuario">Apellido</label>
+                        <input type="text"
+                               class="form-control p-3"
+                               placeholder="Apellido"
+                               formControlName="apellido">
+                        @if (registerForm.get('apellido')?.errors?.['required'] && registerForm.get('apellido')?.touched) {    
+                            <div class="msj-error text-danger mt-2 p-2">El apellido es obligatorio</div>
+                        }
+                    </div>
+
+                    <!--NÚMERO DE DNI-->
+                    <div class="form-group">
+                        <label for="dni">DNI</label>
+                        <input type="text" 
+                               class="form-control p-3"   
+                               placeholder="DNI"
+                               formControlName="dni">
+                        @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
                             <!--Validación específica para email requerido-->
-                            @if (registerForm.get('email')?.errors?.['required']) {
-                                <div class="msj-error text-danger mt-2 p-2">El email es obligatorio</div>
+                            @if (registerForm.get('dni')?.errors?.['required']) {
+                                <div class="msj-error text-danger mt-2 p-2">El DNI es obligatorio</div>
                             }
                             <!--Validación específica para formato de email-->
-                            @if (registerForm.get('email')?.errors?.['email']) {
-                                <div class="msj-error text-danger mt-2 p-2">El formato del email no es válido</div>
+                            @if (registerForm.get('dni')?.errors?.['minLength'] || registerForm.get('dni')?.errors?.['maxLength']) {
+                                <div class="msj-error text-danger mt-2 p-2">El formato del DNI no es válido</div>
                             }
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <input type="password" 
-                               class="form-control p-3" 
-                               id="password" 
-                               placeholder="Contraseña"
-                               formControlName="password">
-                        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-                            <!--Validación específica para contraseña requerida-->
-                            @if (registerForm.get('password')?.errors?.['required']) {
-                                <div class="msj-error text-danger mt-2 p-2">La contraseña es obligatoria</div>
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" 
+                               class="form-control p-3"   
+                               placeholder="Teléfono"
+                               formControlName="telefono">
+                        @if (registerForm.get('telefono')?.invalid && registerForm.get('telefono')?.touched) {
+                            <!--Validación específica para email requerido-->
+                            @if (registerForm.get('telefono')?.errors?.['required']) {
+                                <div class="msj-error text-danger mt-2 p-2">El DNI es obligatorio</div>
                             }
-                            <!--Validación específica para formato de la contraseña-->
-                            @if (registerForm.get('password')?.errors?.['minlength']) {
-                                <div class="msj-error text-danger mt-2 p-2">La contraseña debe tener al menos 6 caracteres</div>
+                            <!--Validación específica para formato de email-->
+                            @if (registerForm.get('telefono')?.errors?.['pattern']) {
+                                <div class="msj-error text-danger mt-2 p-2">El formato del teléfono no es válido</div>
                             }
                         }
                     </div>
