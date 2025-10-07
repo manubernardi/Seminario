@@ -25,9 +25,9 @@ export class VentasService {
 
   async create(createVentaDto: CreateVentaDto): Promise<VentaEntity> {
     // Validar empleado
-    const empleado = await this.empleadoRepository.findOneBy({ id: createVentaDto.empleadoId });
+    const empleado = await this.empleadoRepository.findOneBy({ legajo: createVentaDto.legajoEmpleado});
     if (!empleado) {
-      throw new NotFoundException(`Empleado con ID ${createVentaDto.empleadoId} no encontrado`);
+      throw new NotFoundException(`Empleado con legajo ${createVentaDto.legajoEmpleado} no encontrado`);
     }
 
     // Validar cliente
@@ -75,7 +75,7 @@ export class VentasService {
     const venta = this.ventaRepository.create({
       fecha: new Date(),
       total: total,
-      empleadoId: createVentaDto.empleadoId,
+      legajoEmpleado: createVentaDto.legajoEmpleado,
       empleado: empleado,
       cliente: cliente,
       detalles: detalles as any
@@ -98,18 +98,16 @@ export class VentasService {
     return venta;
   }
 
-  async findByEmpleado(empleadoId: number): Promise<VentaEntity[]> {
+  async findByEmpleado(legajoEmpleado: number): Promise<VentaEntity[]> {
     const empleado = await this.empleadoRepository.findOne({
-      where: { id: empleadoId }
+      where: { legajo: legajoEmpleado }
     });
 
     if (!empleado) {
-      throw new NotFoundException(`Empleado con ID ${empleadoId} no encontrado`);
+      throw new NotFoundException(`Empleado con ID ${legajoEmpleado} no encontrado`);
     }
 
-    return await this.ventaRepository.find({
-      where: { empleadoId },
-    });
+    return await this.ventaRepository.find({});
   }
 
   async findByCliente(clienteId: number): Promise<VentaEntity[]> {

@@ -13,7 +13,7 @@ export class CreateDetalleVentaDto {
 export class CreateVentaDto {
   @IsNumber({}, { message: 'El ID del empleado debe ser un número' })
   @IsNotEmpty({ message: 'El empleado es obligatorio' })
-  empleadoId!: number;
+  legajoEmpleado!: number;
 
   @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
   @IsNotEmpty({ message: 'El cliente es obligatorio' })
