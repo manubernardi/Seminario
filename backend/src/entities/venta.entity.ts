@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { DetalleVentaEntity } from './detalle.venta.entity';
 import { ClienteEntity } from './cliente.entity'
 import { EmpleadoEntity } from './empleado.entity';
@@ -24,8 +24,16 @@ export class VentaEntity {
     })
     detalles!: DetalleVentaEntity;
 
-    @ManyToOne(() => ClienteEntity, cliente => cliente.ventas)
-    cliente!: ClienteEntity;
+    // CLIENTE (opcional - puede ser NULL)
+    @Column({ nullable: true })
+    clienteId?: number;
+
+    @ManyToOne(() => ClienteEntity, (cliente) => cliente.ventas, {
+    nullable: true,
+    onDelete: 'SET NULL'
+    })
+    @JoinColumn({ name: 'clienteId' })
+    cliente?: ClienteEntity;
 
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.ventas)
     empleado!: EmpleadoEntity;

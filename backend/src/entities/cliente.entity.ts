@@ -13,10 +13,10 @@ export class ClienteEntity {
     @Column()
     apellido!: string;
 
-    @Column()
-    telefono!: number;
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    telefono?: string;
 
-    @OneToMany(() => VentaEntity, venta => venta.cliente)
-    ventas!: VentaEntity[];
+    @OneToMany(() => VentaEntity, (venta) => venta.cliente)
+    ventas?: VentaEntity[];
 
 }
