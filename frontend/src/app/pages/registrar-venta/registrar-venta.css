@@ -106,4 +106,25 @@ body {
 
 .text-muted {
     color: #6c757d !important;
+
+.form-select:disabled,
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* Que el input-group no quede aplastado */
+.input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+/* Un poco de margen para separar el checkbox */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 }

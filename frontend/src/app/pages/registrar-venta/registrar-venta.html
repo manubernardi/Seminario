@@ -30,34 +30,44 @@
                                 }
                             </div>
 
-                            <!-- Cliente (OBLIGATORIO CON BOTÓN PARA CREAR NUEVO) -->
+                            <!-- Cliente (Opcional CON BOTÓN PARA CREAR NUEVO) -->
                             <div class="mb-3">
-                                <label for="clienteId" class="form-label">Cliente *</label>
-                                <div class="input-group">
-                                    <select 
-                                        class="form-select" 
-                                        id="clienteId"
-                                        formControlName="clienteId"
-                                        [class.is-invalid]="ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched">
-                                        <option value="">Seleccione un cliente</option>
-                                        @for (cliente of clientes; track cliente.id) {
-                                            <option [value]="cliente.id">
-                                                {{ cliente.nombre }} {{ cliente.apellido }}
-                                            </option>
-                                        }
-                                    </select>
-                                    <button 
-                                        type="button" 
-                                        class="btn btn-success"
-                                        (click)="abrirModalCliente()"
-                                        title="Registrar nuevo cliente">
-                                        <i class="bi bi-person-plus-fill"></i>
-                                    </button>
-                                </div>
-                                @if (ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched) {
-                                    <small class="text-danger">El cliente es obligatorio</small>
-                                }
-                            </div>
+  <label for="clienteId" class="form-label fw-bold">Cliente (opcional)</label>
+
+  <div class="input-group mb-2">
+    <select
+      class="form-select"
+      id="clienteId"
+      formControlName="clienteId"
+      [class.is-invalid]="ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched">
+      <option value="">Seleccione un cliente</option>
+      @for (cliente of clientes; track cliente.id) {
+        <option [value]="cliente.id">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+      }
+    </select>
+
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="abrirModalCliente()"
+      [disabled]="!ventaForm.get('clienteHabilitado')?.value"
+      title="Registrar nuevo cliente">
+      <i class="bi bi-person-plus-fill"></i>
+    </button>
+  </div>
+
+  <div class="form-check mt-2">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      id="habilitarCliente"
+      formControlName="clienteHabilitado">
+    <label class="form-check-label text-muted" for="habilitarCliente">
+      Habilitar selección / registro de cliente
+    </label>
+  </div>
+</div>
+
 
                             <!-- Fecha (solo lectura) -->
                             <div class="mb-3">

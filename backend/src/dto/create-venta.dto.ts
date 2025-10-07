@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsArray, ValidateNested, ArrayMinSize, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsArray, ValidateNested, ArrayMinSize, Min, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateDetalleVentaDto {
@@ -16,8 +16,8 @@ export class CreateVentaDto {
   legajoEmpleado!: number;
 
   @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
-  @IsNotEmpty({ message: 'El cliente es obligatorio' })
-  clienteId!: number;
+  @IsOptional()
+  clienteId?: number;
 
   @IsArray({ message: 'Los detalles deben ser un array' })
   @ArrayMinSize(1, { message: 'Debe haber al menos un detalle de venta' })

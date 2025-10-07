@@ -53,12 +53,12 @@ export class ClientesService {
     }
     
     // Verificar si tiene ventas asociadas
-    if (cliente.ventas && cliente.ventas.length > 0) {
-      throw new BadRequestException(
-        `No se puede eliminar el cliente porque tiene ${cliente.ventas.length} venta(s) registrada(s). ` +
-        `Primero debe eliminar o reasignar las ventas asociadas.`
-      );
-    }
+    //if (cliente.ventas && cliente.ventas.length > 0) {
+      //throw new BadRequestException(
+        //`No se puede eliminar el cliente porque tiene ${cliente.ventas.length} venta(s) registrada(s). ` +
+        //`Primero debe eliminar o reasignar las ventas asociadas.`
+      //);
+    //}
     
     await this.clienteRepository.remove(cliente);
     

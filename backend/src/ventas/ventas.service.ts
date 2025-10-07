@@ -30,11 +30,14 @@ export class VentasService {
       throw new NotFoundException(`Empleado con legajo ${createVentaDto.legajoEmpleado} no encontrado`);
     }
 
-    // Validar cliente
-    const cliente = await this.clienteRepository.findOneBy({ id: createVentaDto.clienteId });
+    // Validar cliente solo si se envió
+    let cliente: ClienteEntity | null = null;
+    if (createVentaDto.clienteId) {
+      cliente = await this.clienteRepository.findOneBy({ id: createVentaDto.clienteId });
     if (!cliente) {
       throw new NotFoundException(`Cliente con ID ${createVentaDto.clienteId} no encontrado`);
     }
+  }
 
     // Validar y calcular detalles
     let total = 0;
@@ -77,11 +80,11 @@ export class VentasService {
       total: total,
       legajoEmpleado: createVentaDto.legajoEmpleado,
       empleado: empleado,
-      cliente: cliente,
+      cliente: cliente ?? undefined,
       detalles: detalles as any
     });
 
-    return await this.ventaRepository.save(venta);
+    return await this.ventaRepository.save(venta as VentaEntity)
   }
 
   async findAll(): Promise<VentaEntity[]> {

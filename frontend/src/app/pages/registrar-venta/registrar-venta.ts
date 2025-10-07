@@ -58,7 +58,8 @@ export class RegistrarVenta implements OnInit {
   ) {
     this.ventaForm = this.fb.group({
       empleadoId: [{ value: '', disabled: true }, Validators.required],
-      clienteId: ['', Validators.required] // AHORA ES OBLIGATORIO
+      clienteId:[{ value: '', disabled: true }],   // empezamos deshabilitado
+      clienteHabilitado: [false]  
     });
 
     this.clienteForm = this.fb.group({
@@ -72,6 +73,17 @@ export class RegistrarVenta implements OnInit {
     this.cargarEmpleadoLogueado();
     this.cargarClientes();
     this.cargarPrendas();
+
+    this.ventaForm.get('clienteHabilitado')?.valueChanges.subscribe(enabled => {
+      const clienteCtrl = this.ventaForm.get('clienteId');
+      if (enabled) {
+        clienteCtrl?.enable({ emitEvent: false });
+      } else {
+        clienteCtrl?.disable({ emitEvent: false });
+        clienteCtrl?.setValue('');
+      }
+    });
+    
   }
 
   cargarEmpleadoLogueado(): void {
@@ -111,9 +123,15 @@ export class RegistrarVenta implements OnInit {
     });
   }
 
+ clienteHabilitado = false;
+
+  
   abrirModalCliente(): void {
-    this.mostrarModalCliente = true;
-    this.clienteForm.reset();
+    const habilitado = this.ventaForm.get('clienteHabilitado')?.value;
+    if (habilitado) {
+      this.mostrarModalCliente = true;
+      this.clienteForm.reset();
+    }
   }
 
   cerrarModalCliente(): void {
