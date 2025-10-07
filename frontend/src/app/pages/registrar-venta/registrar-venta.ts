@@ -9,6 +9,7 @@ interface Cliente {
   id: number;
   nombre: string;
   apellido: string;
+  telefono: number;
 }
 
 interface Prenda {
@@ -35,6 +36,7 @@ interface DetalleVenta {
 })
 export class RegistrarVenta implements OnInit {
   ventaForm: FormGroup;
+  clienteForm: FormGroup;
   clientes: Cliente[] = [];
   prendas: Prenda[] = [];
   detalles: DetalleVenta[] = [];
@@ -43,6 +45,8 @@ export class RegistrarVenta implements OnInit {
   cantidadSeleccionada: number = 1;
   fechaActual: Date = new Date();
   empleadoLogueado: any = null;
+  mostrarModalCliente: boolean = false;
+  guardandoCliente: boolean = false;
 
   private apiUrl = 'http://localhost:3000';
 
@@ -54,7 +58,13 @@ export class RegistrarVenta implements OnInit {
   ) {
     this.ventaForm = this.fb.group({
       empleadoId: [{ value: '', disabled: true }, Validators.required],
-      clienteId: ['']
+      clienteId: ['', Validators.required] // AHORA ES OBLIGATORIO
+    });
+
+    this.clienteForm = this.fb.group({
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      telefono: ['', Validators.required],
     });
   }
 
@@ -97,6 +107,40 @@ export class RegistrarVenta implements OnInit {
       error: (error) => {
         console.error('Error al cargar prendas:', error);
         alert('Error al cargar prendas');
+      }
+    });
+  }
+
+  abrirModalCliente(): void {
+    this.mostrarModalCliente = true;
+    this.clienteForm.reset();
+  }
+
+  cerrarModalCliente(): void {
+    this.mostrarModalCliente = false;
+    this.clienteForm.reset();
+  }
+
+  guardarNuevoCliente(): void {
+    if (this.clienteForm.invalid) {
+      alert('Complete todos los campos obligatorios');
+      return;
+    }
+
+    this.guardandoCliente = true;
+
+    this.http.post<Cliente>(`${this.apiUrl}/clientes`, this.clienteForm.value).subscribe({
+      next: (nuevoCliente) => {
+        this.clientes.push(nuevoCliente);
+        this.ventaForm.patchValue({ clienteId: nuevoCliente.id });
+        alert('Cliente registrado correctamente');
+        this.cerrarModalCliente();
+        this.guardandoCliente = false;
+      },
+      error: (error) => {
+        console.error('Error al guardar cliente:', error);
+        alert(error.error?.message || 'Error al guardar el cliente');
+        this.guardandoCliente = false;
       }
     });
   }
@@ -152,6 +196,11 @@ export class RegistrarVenta implements OnInit {
   }
 
   guardarVenta(): void {
+    if (this.ventaForm.invalid) {
+      alert('Debe seleccionar un cliente');
+      return;
+    }
+
     if (this.detalles.length === 0) {
       alert('Agregue al menos una prenda');
       return;
@@ -162,15 +211,12 @@ export class RegistrarVenta implements OnInit {
 
     const ventaData: any = {
       empleadoId: Number(empleadoId),
+      clienteId: Number(clienteId),
       detalles: this.detalles.map(d => ({
         codigoPrenda: d.codigoPrenda,
         cantidad: d.cantidad
       }))
     };
-
-    if (clienteId) {
-      ventaData.clienteId = Number(clienteId);
-    }
 
     this.http.post(`${this.apiUrl}/ventas`, ventaData).subscribe({
       next: (response) => {
