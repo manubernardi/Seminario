@@ -91,7 +91,7 @@ export class RegistrarVenta implements OnInit {
     
     if (this.empleadoLogueado) {
       this.ventaForm.patchValue({
-        empleadoId: this.empleadoLogueado.id
+        empleadoId: this.empleadoLogueado.legajo
       });
     } else {
       alert('Debe iniciar sesión para registrar ventas');
@@ -226,15 +226,20 @@ export class RegistrarVenta implements OnInit {
 
     const empleadoId = this.ventaForm.get('empleadoId')?.value;
     const clienteId = this.ventaForm.get('clienteId')?.value;
+    const formValues = this.ventaForm.getRawValue();
+
+    console.log('formValues completo:', formValues)
 
     const ventaData: any = {
-      empleadoId: Number(empleadoId),
-      clienteId: Number(clienteId),
+      empleadoLegajo: Number(this.empleadoLogueado?.legajo),
+      clienteId: formValues.clienteId ? Number(formValues.clienteId) : undefined,
       detalles: this.detalles.map(d => ({
-        codigoPrenda: d.codigoPrenda,
-        cantidad: d.cantidad
+      codigoPrenda: d.codigoPrenda,
+      cantidad: d.cantidad
       }))
     };
+
+    console.log('Datos a enviar:', ventaData);
 
     this.http.post(`${this.apiUrl}/ventas`, ventaData).subscribe({
       next: (response) => {
