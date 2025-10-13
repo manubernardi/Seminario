@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 interface Cliente {
@@ -30,7 +30,7 @@ interface DetalleVenta {
 @Component({
   selector: 'app-nueva-venta',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe, DatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe, DatePipe, RouterModule],
   templateUrl: './registrar-venta.html',
   styleUrls: ['./registrar-venta.css']
 })
