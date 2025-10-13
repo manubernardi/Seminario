@@ -1,6 +1,8 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn  } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn  } from "typeorm";
 import { TalleEntity } from "./talle.entity";
 import { DetalleVentaEntity } from "./detalle.venta.entity";
+import { PrendaXTalleEntity } from "./prendaXTalleEntity";
+
 
 @Entity('prendas')
 export class PrendaEntity {
@@ -11,18 +13,13 @@ export class PrendaEntity {
     descripcion!: string;
 
     @Column()
-    precio!: number;
+    precio: number;
 
-    @Column()
-    cantidad!: number;
+    @OneToMany(() => PrendaXTalleEntity, px => px.prenda, { cascade: true, eager: true })
+    prendasXTalles: PrendaXTalleEntity[];
 
-    @Column({ name: 'talle_id' }) 
-    talle_id: number;
-
-    @ManyToOne(() => TalleEntity)
-    @JoinColumn({ name: 'talle_id' })
-    talle!: TalleEntity;
-
-    @ManyToOne(() => DetalleVentaEntity, detalle => detalle.prenda)
-    ventas!: DetalleVentaEntity;
+    get cantidadTotal(): number {
+    if (!this.prendasXTalles) return 0;
+    return this.prendasXTalles.reduce((sum, px) => sum + px.cantidad, 0);
+    }
 }

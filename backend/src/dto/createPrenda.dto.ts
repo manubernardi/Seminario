@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty, Min } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, Min, IsArray, IsOptional} from 'class-validator';
 
 export class CreatePrendaDto {
   @IsString()
@@ -13,11 +13,7 @@ export class CreatePrendaDto {
   @Min(0)
   precio: number;
 
-  @IsNumber()
-  @Min(0)
-  cantidad: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  talle_id: number;
+  @IsOptional()
+  @IsArray()
+  prendasXTalles: { talle_id: number; cantidad: number; prenda_codigo: string }[];
 }

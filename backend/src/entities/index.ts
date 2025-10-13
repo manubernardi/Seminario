@@ -6,4 +6,6 @@ import { PrendaEntity } from "./prenda.entity"
 import { RoleEntity } from "./roles.entity"
 import { TalleEntity } from "./talle.entity"
 import { VentaEntity } from "./venta.entity"
-export const entities = {ClienteEntity, DetalleVentaEntity, EmpleadoEntity, PermissionEntity, PrendaEntity, RoleEntity, TalleEntity, VentaEntity}
+import { PrendaXTalleEntity } from "./prendaXTalleEntity"
+
+export const entities = {ClienteEntity, DetalleVentaEntity, EmpleadoEntity, PermissionEntity, PrendaEntity, RoleEntity, TalleEntity, VentaEntity, PrendaXTalleEntity}

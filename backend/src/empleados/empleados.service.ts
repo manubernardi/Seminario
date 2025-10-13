@@ -13,15 +13,8 @@ export class EmpleadoService {
   ) {}
 
   async create(createEmpleadoDto: CreateEmpleadoDto): Promise<EmpleadoEntity> {
-    try {
       const empleado = this.empleadoRepository.create(createEmpleadoDto);
       return await this.empleadoRepository.save(empleado);
-    } catch (error) {
-      if (error.code === '23505') { // Unique constraint violation
-        throw new ConflictException('El legajo ya existe');
-      }
-      throw error;
-    }
   }
 
   async findAll(): Promise<EmpleadoEntity[]> {

@@ -49,15 +49,15 @@ export class VentasService {
         throw new NotFoundException(`Prenda con código ${detalleDto.codigoPrenda} no encontrada`);
       }
 
-      if (prenda.cantidad < detalleDto.cantidad) {
+      /*if (prenda.cantidad < detalleDto.cantidad) {
         throw new BadRequestException(
           `Stock insuficiente para la prenda ${prenda.descripcion}. Disponible: ${prenda.cantidad}`
         );
-      }
+      }*/
 
       // Actualizar stock
-      prenda.cantidad -= detalleDto.cantidad;
-      await this.prendaRepository.save(prenda);
+      /*prenda.cantidad -= detalleDto.cantidad;
+      await this.prendaRepository.save(prenda);*/
 
       // Crear detalle
       const subtotal = prenda.precio * detalleDto.cantidad;
@@ -142,10 +142,10 @@ export class VentasService {
         where: { codigo: detalle.prenda.codigo }
       });
       
-      if (prenda) {
+      /*if (prenda) {
         prenda.cantidad += detalle.cantidad;
         await this.prendaRepository.save(prenda);
-      }
+      }*/
     }
 
     await this.ventaRepository.remove(venta);

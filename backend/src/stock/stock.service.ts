@@ -3,34 +3,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreatePrendaDto } from '../dto/createPrenda.dto';
+import { CreatePrendaXTalleDto } from '../dto/createPrendaXTalle.dto';
+import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
+import { TalleEntity } from 'src/entities/talle.entity';
 
 @Injectable()
 export class StockService {
     constructor(
     @InjectRepository(PrendaEntity)
     private readonly prendaRepository: Repository<PrendaEntity>,
+    @InjectRepository(PrendaXTalleEntity)
+    private readonly prendaXTalleRepository: Repository<PrendaXTalleEntity>,
+    @InjectRepository(TalleEntity)
+    private readonly TalleRepository: Repository<TalleEntity>,
     ) {}
 
     async findAll(): Promise<PrendaEntity[]> {
   return await this.prendaRepository.find({
     relations: {
-      talle: true  // <-- AGREGÁ ESTO
+      prendasXTalles: true
     }
   });
 }
-
-    async create(createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {
-                // Validar que el código no exista
-        const existente = await this.prendaRepository.findOne({
-            where: { codigo: createPrendaDto.codigo }
-        });
-
-        if (existente) {
-            throw new BadRequestException(`Ya existe una prenda con código ${createPrendaDto.codigo}`);
-        }
-        const newPrenda = this.prendaRepository.create(createPrendaDto);
-        return this.prendaRepository.save(newPrenda);
-    }
 
     // Obtener prenda por código
     async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
@@ -48,28 +42,33 @@ export class StockService {
     }
 
     // Crear nueva prenda
-    async createPrenda(prendaData: Partial<PrendaEntity>): Promise<PrendaEntity> {
-        // Validar que el código no exista
-        const existente = await this.prendaRepository.findOne({
-            where: { codigo: prendaData.codigo }
-        });
 
-        if (existente) {
-            throw new BadRequestException(`Ya existe una prenda con código ${prendaData.codigo}`);
-        }
+async create(dto: CreatePrendaDto): Promise<PrendaEntity> {
+  const prenda = this.prendaRepository.create({
+    codigo: dto.codigo,
+    descripcion: dto.descripcion,
+    precio: dto.precio,
+  });
 
-        // Validar datos requeridos
-        if (!prendaData.codigo || !prendaData.descripcion || !prendaData.precio) {
-            throw new BadRequestException('Código, descripción y precio son requeridos');
-        }
+  if (dto.prendasXTalles && dto.prendasXTalles.length > 0) {
+    prenda.prendasXTalles = [];
 
-        const nuevaPrenda = this.prendaRepository.create({
-            ...prendaData,
-            cantidad: prendaData.cantidad || 0
-        });
+    for (const item of dto.prendasXTalles) {
+      const talle = await this.TalleRepository.findOneBy({ codigo: item.talle_id });
+      if (!talle) {
+        throw new NotFoundException(`Talle ID ${item.talle_id} no encontrado`);
+      }
 
-        return await this.prendaRepository.save(nuevaPrenda);
+      const rel = new PrendaXTalleEntity();
+      rel.talle = talle;
+      rel.cantidad = item.cantidad;
+
+      prenda.prendasXTalles.push(rel);
     }
+  }
+
+  return await this.prendaRepository.save(prenda);
+}
 
     // Actualizar prenda
     async updatePrenda(codigo: string, prendaData: Partial<PrendaEntity>): Promise<PrendaEntity> {
@@ -91,17 +90,17 @@ export class StockService {
     }
 
     // Prendas con stock bajo
-    async getPrendasBajoStock(cantidadMinima: number): Promise<PrendaEntity[]> {
+   /* async getPrendasBajoStock(cantidadMinima: number): Promise<PrendaEntity[]> {
         return await this.prendaRepository
             .createQueryBuilder('prenda')
             .leftJoinAndSelect('prenda.talle', 'talle')
             .where('prenda.cantidad <= :cantidad', { cantidad: cantidadMinima })
             .orderBy('prenda.cantidad', 'ASC')
             .getMany();
-    }
+    }*/
 
     // Ajustar stock
-    async ajustarStock(codigo: string, ajuste: number, motivo: string): Promise<PrendaEntity> {
+    /*async ajustarStock(codigo: string, ajuste: number, motivo: string): Promise<PrendaEntity> {
         const prenda = await this.getPrendaByCodigo(codigo);
         
         const nuevaCantidad = prenda.cantidad + ajuste;
@@ -116,10 +115,10 @@ export class StockService {
         console.log(`Stock ajustado - Código: ${codigo}, Ajuste: ${ajuste}, Motivo: ${motivo}, Nueva cantidad: ${nuevaCantidad}`);
         
         return await this.prendaRepository.save(prenda);
-    }
+    }*/
 
     // Estadísticas para dashboard
-    async getDashboardStats(): Promise<any> {
+    /*async getDashboardStats(): Promise<any> {
         const totalPrendas = await this.prendaRepository.count();
         
         const stockBajo = await this.prendaRepository.count({
@@ -144,7 +143,7 @@ export class StockService {
         };
     }
 
-    // Buscar prendas por descripción
+   */  // Buscar prendas por descripción
     async buscarPrendas(termino: string): Promise<PrendaEntity[]> {
         return await this.prendaRepository
             .createQueryBuilder('prenda')
@@ -155,7 +154,7 @@ export class StockService {
             .getMany();
     }
 
-    // Reducir stock (para cuando se hace una venta)
+   /* // Reducir stock (para cuando se hace una venta)
     async reducirStock(codigo: string, cantidad: number): Promise<PrendaEntity> {
         const prenda = await this.getPrendaByCodigo(codigo);
         
@@ -165,5 +164,5 @@ export class StockService {
 
         prenda.cantidad -= cantidad;
         return await this.prendaRepository.save(prenda);
-    }
+    }*/
 }

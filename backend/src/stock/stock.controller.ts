@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Patch } from '@
 import { StockService } from './stock.service';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreatePrendaDto } from '../dto/createPrenda.dto';
+import { CreatePrendaXTalleDto } from 'src/dto/createPrendaXTalle.dto';
 
 
 @Controller('stock')
@@ -44,29 +45,38 @@ export class StockController {
     }
 
     // GET /stock/bajo-stock/:cantidad - prendas con stock bajo
-    @Get('bajo-stock/:cantidad')
+    /*@Get('bajo-stock/:cantidad')
     async getPrendasBajoStock(@Param('cantidad') cantidad: number) {
         return await this.stockService.getPrendasBajoStock(cantidad);
     }
-
+*/
     // POST /stock/:codigo/ajustar - ajustar stock de una prenda
-    @Post(':codigo/ajustar')
+    /*@Post(':codigo/ajustar')
     async ajustarStock(
         @Param('codigo') codigo: string,
         @Body() ajuste: { cantidad: number; motivo: string }
     ) {
         return await this.stockService.ajustarStock(codigo, ajuste.cantidad, ajuste.motivo);
-    }
-     @Post()
+    }*/
+    @Post()
     async create(@Body() createPrendaDto: CreatePrendaDto) {
-        return await this.stockService.create(createPrendaDto);
+        return this.stockService.create(createPrendaDto);
+
     }
 
+    /*private createPrendaTalle(prendasXTallesDto: { talle_id: number; cantidad: number }[], codigo: string) {
+        return prendasXTallesDto.map(pt => ({
+            talle: { id: pt.talle_id },
+            cantidad: pt.cantidad,
+            prenda: { codigo }
+        }));
+    }*/
+
     // GET /stock/dashboard/stats - estadísticas para dashboard
-    @Get('dashboard/stats')
+   /* @Get('dashboard/stats')
     async getDashboardStats() {
         return await this.stockService.getDashboardStats();
-    }
+    }*/
 
     // GET /stock/buscar - buscar prendas por descripción
     @Get('buscar/:termino')
