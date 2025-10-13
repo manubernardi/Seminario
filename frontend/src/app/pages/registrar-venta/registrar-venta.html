@@ -1,7 +1,10 @@
 <body>
-    <div class="inicio text-white p-4 mb-2">
-        <h4 class="text-center">NUEVA VENTA</h4>
-    </div>
+    <div class="inicio text-white p-4 mb-2" style="position: relative;">
+    <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem;">
+        <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio
+    </button>
+    <h4 class="text-center m-0">NUEVA VENTA</h4>
+</div>
 
     <div class="container-fluid p-4">
         <form [formGroup]="ventaForm" (ngSubmit)="guardarVenta()">
@@ -22,6 +25,7 @@
                                         <strong>{{ empleadoLogueado.nombre }} {{ empleadoLogueado.apellido }}</strong>
                                         <small class="ms-2 text-muted">(Legajo: {{ empleadoLogueado.legajo }})</small>
                                     </div>
+                                    
                                     <input type="hidden" formControlName="empleadoId">
                                 } @else {
                                     <div class="alert alert-warning">
@@ -30,24 +34,44 @@
                                 }
                             </div>
 
-                            <!-- Cliente (AHORA OPCIONAL) -->
+                            <!-- Cliente (Opcional CON BOTÓN PARA CREAR NUEVO) -->
                             <div class="mb-3">
-                                <label for="clienteId" class="form-label">Cliente (opcional)</label>
-                                <select 
-                                    class="form-select" 
-                                    id="clienteId"
-                                    formControlName="clienteId">
-                                    <option value="">Sin cliente / Venta directa</option>
-                                    @for (cliente of clientes; track cliente.id) {
-                                        <option [value]="cliente.id">
-                                            {{ cliente.nombre }} {{ cliente.apellido }}
-                                        </option>
-                                    }
-                                </select>
-                                <small class="text-muted">
-                                    Deja vacío para ventas sin registro de cliente
-                                </small>
-                            </div>
+  <label for="clienteId" class="form-label fw-bold">Cliente (opcional)</label>
+
+  <div class="input-group mb-2">
+    <select
+      class="form-select"
+      id="clienteId"
+      formControlName="clienteId"
+      [class.is-invalid]="ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched">
+      <option value="">Seleccione un cliente</option>
+      @for (cliente of clientes; track cliente.id) {
+        <option [value]="cliente.id">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+      }
+    </select>
+
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="abrirModalCliente()"
+      [disabled]="!ventaForm.get('clienteHabilitado')?.value"
+      title="Registrar nuevo cliente">
+      <i class="bi bi-person-plus-fill"></i>
+    </button>
+  </div>
+
+  <div class="form-check mt-2">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      id="habilitarCliente"
+      formControlName="clienteHabilitado">
+    <label class="form-check-label text-muted" for="habilitarCliente">
+      Habilitar selección / registro de cliente
+    </label>
+  </div>
+</div>
+
 
                             <!-- Fecha (solo lectura) -->
                             <div class="mb-3">
@@ -177,7 +201,7 @@
                         <button 
                             type="submit" 
                             class="btn btn-primary btn-lg"
-                            [disabled]="!empleadoLogueado || detalles.length === 0">
+                            [disabled]="ventaForm.invalid || detalles.length === 0">
                             <i class="bi bi-check-circle"></i> Guardar Venta
                         </button>
                     </div>
@@ -185,4 +209,66 @@
             </div>
         </form>
     </div>
+
+    <!-- MODAL PARA REGISTRAR NUEVO CLIENTE -->
+    @if (mostrarModalCliente) {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Registrar Nuevo Cliente</h5>
+                        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalCliente()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form [formGroup]="clienteForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="nombre"
+                                        [class.is-invalid]="clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Apellido *</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="apellido"
+                                        [class.is-invalid]="clienteForm.get('apellido')?.invalid && clienteForm.get('apellido')?.touched">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Telefono *</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    formControlName="telefono"
+                                    minlength="8"
+                                    maxlength="15"
+                                    [class.is-invalid]="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary" 
+                            (click)="cerrarModalCliente()"
+                            [disabled]="guardandoCliente">
+                            Cancelar
+                        </button>
+                        <button 
+                            type="button" 
+                            class="btn btn-success" 
+                            (click)="guardarNuevoCliente()"
+                            [disabled]="clienteForm.invalid || guardandoCliente">
+                            {{ guardandoCliente ? 'Guardando...' : 'Guardar Cliente' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </body>

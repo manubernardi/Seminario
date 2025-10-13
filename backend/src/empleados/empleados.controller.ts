@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Query,
   HttpStatus,
   HttpCode
@@ -36,38 +35,38 @@ export class EmpleadoController {
   }
 
   @Get('legajo/:legajo')
-  async findByLegajo(@Param('legajo') legajo: string): Promise<EmpleadoEntity> {
+  async findByLegajo(@Param('legajo') legajo: number): Promise<EmpleadoEntity> {
     return await this.empleadoService.findByLegajo(legajo);
   }
 
-  @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<EmpleadoEntity> {
-    return await this.empleadoService.findOne(id);
+  @Get(':dni')
+  async findOne(@Param('dni') dni: string): Promise<EmpleadoEntity> {
+    return await this.empleadoService.findOne(dni);
   }
 
-  @Get(':id/ventas')
+  @Get(':dni/ventas')
   async getVentasPorEmpleado(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('dni') dni: string,
     @Query('fechaInicio') fechaInicio?: string,
     @Query('fechaFin') fechaFin?: string
   ) {
     const inicio = fechaInicio ? new Date(fechaInicio) : undefined;
     const fin = fechaFin ? new Date(fechaFin) : undefined;
     
-    return await this.empleadoService.getVentasPorEmpleado(id, inicio, fin);
+    return await this.empleadoService.getVentasPorEmpleado(dni, inicio, fin);
   }
 
-  @Patch(':id')
+  @Patch(':dni')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('dni') dni: string,
     @Body() updateEmpleadoDto: UpdateEmpleadoDto
   ): Promise<EmpleadoEntity> {
-    return await this.empleadoService.update(id, updateEmpleadoDto);
+    return await this.empleadoService.update(dni, updateEmpleadoDto);
   }
 
-  @Delete(':id')
+  @Delete(':dni')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return await this.empleadoService.remove(id);
+  async remove(@Param('dni') dni: string): Promise<void> {
+    return await this.empleadoService.remove(dni);
   }
 }

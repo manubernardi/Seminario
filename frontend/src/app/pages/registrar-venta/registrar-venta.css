@@ -89,6 +89,25 @@ body {
     background-color: #c82333;
 }
 
+.btn-volver {
+  background-color: #9ad6e2;
+  color: #000000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+
+  
+
+}
+
+.btn-volver:hover {
+  background-color: #023e8a;
+  color: white;
+}
+
 .card {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: none;
@@ -106,4 +125,25 @@ body {
 
 .text-muted {
     color: #6c757d !important;
+
+.form-select:disabled,
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* Que el input-group no quede aplastado */
+.input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+/* Un poco de margen para separar el checkbox */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 }

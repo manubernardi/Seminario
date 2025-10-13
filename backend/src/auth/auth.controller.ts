@@ -34,7 +34,6 @@ export class AuthController {
     return {
       success: true,
       empleado: {
-        id: empleado.id,
         nombre: empleado.nombre,
         apellido: empleado.apellido,
         legajo: empleado.legajo,

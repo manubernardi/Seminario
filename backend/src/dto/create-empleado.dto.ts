@@ -12,7 +12,7 @@ export class CreateEmpleadoDto {
 
   @IsString()
   @IsNotEmpty()
-  legajo!: string;
+  legajo!: number;
 
   @IsString()
   @IsNotEmpty()

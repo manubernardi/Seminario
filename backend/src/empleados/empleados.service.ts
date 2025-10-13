@@ -12,8 +12,10 @@ export class EmpleadoService {
     private readonly empleadoRepository: Repository<EmpleadoEntity>,
   ) {}
 
-  async create(createEmpleadoDto: CreateEmpleadoDto): Promise<EmpleadoEntity> {
-      const empleado = this.empleadoRepository.create(createEmpleadoDto);
+  async create(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
+    try {
+      const empleado = this.empleadoRepository.create({
+      });
       return await this.empleadoRepository.save(empleado);
   }
 
@@ -28,9 +30,9 @@ export class EmpleadoService {
     });
   }
 
-  async findOne(id: number): Promise<EmpleadoEntity> {
+  async findOne(dni: string): Promise<EmpleadoEntity> {
     const empleado = await this.empleadoRepository.findOne({
-      where: { id },
+      where: { dni },
       relations: {
         rol: {
           permissions: true
@@ -45,13 +47,13 @@ export class EmpleadoService {
     });
 
     if (!empleado) {
-      throw new NotFoundException(`Empleado con ID ${id} no encontrado`);
+      throw new NotFoundException(`Empleado con DNI ${dni} no encontrado`);
     }
 
     return empleado;
   }
 
-  async findByLegajo(legajo: string): Promise<EmpleadoEntity> {
+  async findByLegajo(legajo: number): Promise<EmpleadoEntity> {
     const empleado = await this.empleadoRepository.findOne({
       where: { legajo },
       relations: {
@@ -68,7 +70,7 @@ export class EmpleadoService {
     return empleado;
   }
 
-  async update(id: number, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
+  async update(id: string, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
     const empleado = await this.findOne(id);
     
     try {
@@ -82,8 +84,8 @@ export class EmpleadoService {
     }
   }
 
-  async remove(id: number): Promise<void> {
-    const empleado = await this.findOne(id);
+  async remove(dni: string): Promise<void> {
+    const empleado = await this.findOne(dni);
     await this.empleadoRepository.remove(empleado);
   }
 
@@ -98,15 +100,15 @@ export class EmpleadoService {
     .getMany();
 }
 
-  async getVentasPorEmpleado(empleadoId: number, fechaInicio?: Date, fechaFin?: Date) {
-    const whereCondition: any = { empleado: { id: empleadoId } };
+  async getVentasPorEmpleado(empleadoDni: string, fechaInicio?: Date, fechaFin?: Date) {
+    const whereCondition: any = { empleado: { dni: empleadoDni } };
     
     if (fechaInicio && fechaFin) {
       whereCondition.fecha = Between(fechaInicio, fechaFin);
     }
 
     return await this.empleadoRepository.findOne({
-      where: { id: empleadoId },
+      where: { dni: empleadoDni },
       relations: {
         ventas: {
           cliente: true,
