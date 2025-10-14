@@ -4,20 +4,21 @@ import { IsString, IsNotEmpty, IsNumber, IsPhoneNumber } from 'class-validator';
 export class CreateEmpleadoDto {
   @IsString()
   @IsNotEmpty()
-  nombre!: string;
+  nombre: string;
 
   @IsString()
   @IsNotEmpty()
-  apellido!: string;
+  apellido: string;
 
   @IsString()
   @IsNotEmpty()
-  dni!: string;
+  dni: string;
+
 
   @IsNotEmpty()
   telefono: string;
 
   @IsNumber()
   @IsNotEmpty()
-  rolId!: number; 
+  rol_id: number; 
 }

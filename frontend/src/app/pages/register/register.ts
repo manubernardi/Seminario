@@ -4,12 +4,21 @@ import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, Reacti
 import { Router } from '@angular/router';
 import { UsuariosService } from '../../services/usuarios.service';
 
+export interface RegistroDto{
+    nombre: string;
+    apellido: string;
+    dni: string;
+    telefono: string;
+    rol_id: number;
+}
 @Component({
   selector: 'register',
   imports: [ɵInternalFormsSharedModule, ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
+
+
 
 export class Register {
   registerForm: FormGroup;
@@ -30,7 +39,7 @@ export class Register {
     '',
     [Validators.required, Validators.pattern('^[0-9]{10,15}$')],
   ],
-  cargo: ['', Validators.required], 
+  rol_id: ['', Validators.required], 
 });
   }
 
@@ -39,10 +48,13 @@ enviar(): void {
     this.registerForm.markAllAsTouched();
     return;
   }
-
-  const nuevoUsuario = this.registerForm.value;
-
-  this.usuarioService.nuevoUsuario(nuevoUsuario).subscribe({
+  const registroDto: RegistroDto = this.registerForm.value
+  const payload: RegistroDto = {
+    ...registroDto,
+    rol_id: Number(registroDto.rol_id)  // ⭐ Conversión explícita
+  };
+  console.log(payload)
+  this.usuarioService.nuevoUsuario(payload).subscribe({
     next: (response) => {
       alert('Usuario registrado correctamente');
       console.log('Respuesta del backend:', response);

@@ -3,20 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap} from 'rxjs/operators';
 
-export interface RegistroDto{
-    nombre: string;
-    apellido: string;
-    dni: number;
-    rol: string;
-}
 
 export interface EmpleadoBackend{
     nombre: string;
     apellido: string;
-    dni: number;
-    rol: string;
-    legajo: number;
-    rolId: number;
+    dni: string;
+    telefono: string;
+    rol_id: number;
+    
 }
 
 @Injectable({
@@ -28,7 +22,8 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) {}
 
-  nuevoUsuario(body: RegistroDto): Observable<EmpleadoBackend> {
+  nuevoUsuario(body: EmpleadoBackend): Observable<EmpleadoBackend> {
+    console.log("Service front" , body)
     return this.http.post<EmpleadoBackend>(this.apiUrl, body).pipe(
       catchError(error => {
         console.error('Error al registrar usuario:', error);

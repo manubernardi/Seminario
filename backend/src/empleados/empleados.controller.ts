@@ -11,7 +11,7 @@ import {
   HttpCode
 } from '@nestjs/common';
 import { EmpleadoService } from './empleados.service';
-import { CreateEmpleadoDto } from 'src/dto/create-empleado.dto';
+import { CreateEmpleadoDto } from '../dto/createEmpleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
 import { EmpleadoEntity } from '../entities/empleado.entity';
 
@@ -21,6 +21,7 @@ export class EmpleadoController {
 
   @Post()
   async create(@Body() createEmpleadoDto: CreateEmpleadoDto): Promise<EmpleadoEntity> {
+    console.log("Controller", createEmpleadoDto)
     return await this.empleadoService.create(createEmpleadoDto);
   }
 

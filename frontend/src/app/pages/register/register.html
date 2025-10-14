@@ -39,11 +39,11 @@
                                placeholder="DNI"
                                formControlName="dni">
                         @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
-                            <!--Validación específica para email requerido-->
+                            <!--Validación específica para dni requerido-->
                             @if (registerForm.get('dni')?.errors?.['required']) {
                                 <div class="msj-error text-danger mt-2 p-2">El DNI es obligatorio</div>
                             }
-                            <!--Validación específica para formato de email-->
+                            <!--Validación específica para formato de dni-->
                             @if (registerForm.get('dni')?.errors?.['minLength'] || registerForm.get('dni')?.errors?.['maxLength']) {
                                 <div class="msj-error text-danger mt-2 p-2">El formato del DNI no es válido</div>
                             }
@@ -70,26 +70,26 @@
 
                     <!-- CARGO -->
                     <div class="form-group">
-                    <label for="cargo">Cargo</label>
+                    <label for="rol_id">Rol</label>
                     <div>
                         <input
                         type="radio"
-                        id="vendedor"
-                        value="vendedor"
-                        formControlName="cargo" />
+                        id="Vendedor"
+                        [value]="1"
+                        formControlName="rol_id" />
                         <label for="vendedor">Vendedor</label>
                     </div>
                     <div>
                         <input
                         type="radio"
-                        id="encargado"
-                        value="encargado"
-                        formControlName="cargo" />
+                        id="Comprador"
+                        [value]="2"
+                        formControlName="rol_id" />
                         <label for="encargado">Encargado de Compras</label>
                     </div>
 
                     <!-- Mensaje de error -->
-                    @if (registerForm.get('cargo')?.invalid && registerForm.get('cargo')?.touched) {
+                    @if (registerForm.get('rol_id')?.invalid && registerForm.get('rol_id')?.touched) {
                         <div class="msj-error text-danger mt-2 p-2">
                         Debe seleccionar un cargo.
                         </div>

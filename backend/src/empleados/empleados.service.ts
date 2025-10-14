@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Not, Repository } from 'typeorm';
 import { EmpleadoEntity } from '../entities/empleado.entity';
-import { CreateEmpleadoDto } from '../dto/create-empleado.dto';
+import { CreateEmpleadoDto } from '../dto/createEmpleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
 
 @Injectable()
@@ -12,9 +12,11 @@ export class EmpleadoService {
     private readonly empleadoRepository: Repository<EmpleadoEntity>,
   ) {}
 
-  async create(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
-    try {
-      const empleado = this.empleadoRepository.create({ ...data });
+  async create(data: CreateEmpleadoDto): Promise<any> {
+      console.log("Service", data)
+   try {
+      const empleado = this.empleadoRepository.create(data);
+    
       return await this.empleadoRepository.save(empleado);
     } catch (error) {
       if (error.code === '23505') {
