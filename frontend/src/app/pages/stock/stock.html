@@ -1,228 +1,223 @@
-<body>
-    <div class="inicio text-white p-4 mb-2">
-        <h4 class="text-center">GESTIÓN DE STOCK</h4>
+
+    <div class="inicio text-white p-4 mb-2 total-display">
+    <button class="btn-volver" routerLink="/home">
+    <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio</button>
+    <h4 class="text-center">STOCK</h4>
     </div>
 
-    <div class="container-fluid p-4">
-        <!-- Barra de búsqueda y botones -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="input-group w-50">
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Buscar por código o descripción..."
-                    [(ngModel)]="searchTerm"
-                    (input)="buscarPrendas()">
-                <button class="btn btn-primary" type="button">
-                    <i class="bi bi-search"></i>
-                </button>
+  <!-- 🔹 Barra de búsqueda 
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control w-50"
+      placeholder="Buscar por código o descripción..."
+      [(ngModel)]="searchTerm"
+      (input)="buscarPrendas()"
+    />
+    <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
+      + Nueva Prenda
+    </button>
+  </div>-->
+
+  <!-- 🔹 Tabla de stock -->
+  <div class="table-responsive shadow-sm">
+    <table class="table table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock Total</th>
+          <th>Talles y Cantidades</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prenda of prendas">
+          <td>{{ prenda.codigo }}</td>
+          <td>{{ prenda.descripcion }}</td>
+          <td>${{ prenda.precio | number: '1.2-2' }}</td>
+
+          <!-- Stock total -->
+          <td>
+            <span
+              [ngClass]="{
+                'text-danger fw-bold': prenda.cantidadTotal === 0,
+                'text-warning': prenda.cantidadTotal < 5 && prenda.cantidadTotal > 0,
+                'text-success': prenda.cantidadTotal >= 5
+              }"
+            >
+              {{ prenda.cantidadTotal || 0 }}
+            </span>
+          </td>
+         <td>
+            <div class="d-flex flex-wrap gap-2">
+              <div *ngFor="let prendaXTalle of prenda.prendasXTalles" class="talle-card border rounded p-2">
+                <div class="text-center mb-2">
+                  <strong>{{ getTalleDescripcion(prendaXTalle.talle_id) }}</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="fw-bold">{{ prendaXTalle.cantidad }}</span>
+                </div>
+                <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
+                    <button
+                    class="btn btn-sm btn-outline-success"
+                    (click)="ajustarStock(prenda.codigo, 1, prendaXTalle.talle_id)"
+                    >
+                    +
+                    </button>
+                    <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="ajustarStock(prenda.codigo, -1, prendaXTalle.talle_id)"
+                    >
+                    -
+                    </button>
+                </div>
+                </div>
             </div>
-            <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
-                <i class="bi bi-plus-circle"></i> Nueva Prenda
+            </td>
+
+          <!-- Botones -->
+          <td class="text-center">
+            <button
+              class="btn btn-sm btn-primary me-2"
+              (click)="editarPrenda(prenda)"
+            >
+              Editar
             </button>
-        </div>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="eliminarPrenda(prenda)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-        <!-- Tabla de prendas -->
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered">
-                <thead class="table-header">
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Código</th>
-                        <th>Descripción</th>
-                        <th>Talle</th>
-                        <th>Precio</th>
-                        <th>Stock Actual</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (prendas.length === 0) {
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <p class="text-muted">No hay prendas en stock</p>
-                            </td>
-                        </tr>
-                    }
-                    @for (prenda of prendasFiltradas; track prenda.codigo) {
-                        <tr [class.stock-bajo]="prenda.cantidad < 5">
-                            <td class="text-center">
-                                <!-- TODO: Reemplazar con la ruta de la imagen cuando esté disponible -->
-                                <!-- <img [src]="prenda.imagen" alt="{{prenda.descripcion}}" class="prenda-img"> -->
-                                <div class="placeholder-img">
-                                    <i class="bi bi-image"></i>
-                                </div>
-                            </td>
-                            <td>{{ prenda.codigo }}</td>
-                            <td>{{ prenda.descripcion }}</td>
-                            <td>{{ prenda.talle?.descripcion || 'N/A' }}</td>
-                            <td>${{ prenda.precio | number:'1.2-2' }}</td>
-                            <td>
-                                <span [class.badge-warning]="prenda.cantidad < 5" 
-                                      [class.badge-success]="prenda.cantidad >= 5"
-                                      class="badge">
-                                    {{ prenda.cantidad }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button 
-                                        class="btn btn-sm btn-success" 
-                                        title="Sumar stock"
-                                        (click)="ajustarStock(prenda, 1)">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                    <button 
-                                        class="btn btn-sm btn-warning" 
-                                        title="Restar stock"
-                                        (click)="ajustarStock(prenda, -1)"
-                                        [disabled]="prenda.cantidad === 0">
-                                        <i class="bi bi-dash"></i>
-                                    </button>
-                                    <button 
-                                        class="btn btn-sm btn-info" 
-                                        title="Editar"
-                                        (click)="editarPrenda(prenda)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button 
-                                        class="btn btn-sm btn-danger" 
-                                        title="Eliminar"
-                                        (click)="eliminarPrenda(prenda)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
 
-        <!-- Estadísticas rápidas -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card stat-card">
-                    <div class="card-body text-center">
-                        <h5>Total de Prendas</h5>
-                        <h2>{{ prendas.length }}</h2>
-                    </div>
+<!-- 🔹 Modal Crear / Editar Prenda -->
+<div
+  class="modal fade"
+  id="modalPrenda"
+  tabindex="-1"
+  aria-labelledby="modalPrendaLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalPrendaLabel">
+          {{ modoEdicion ? 'Editar Prenda' : 'Nueva Prenda' }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Código</label>
+            <input
+              type="text"
+              formControlName="codigo"
+              class="form-control"
+              [readonly]="modoEdicion"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" formControlName="descripcion" class="form-control" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input
+              type="number"
+              formControlName="precio"
+              class="form-control"
+              min="0"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Prenda por Talle</label>
+            <div class="d-flex flex-wrap gap-2">
+              <div *ngFor="let talleForm of prendasXTallesForm; let i = index" [formGroup]="talleForm" class="talle-card border rounded p-2">
+                <div class="text-center mb-2">
+                  <label>{{ getTalleDescripcion(talles[i]?.codigo ?? 0) }}</label>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card">
-                    <div class="card-body text-center">
-                        <h5>Stock Total</h5>
-                        <h2>{{ getTotalStock() }}</h2>
-                    </div>
+                <div class="mb-3" [formGroup]="talleForm">
+                  <label class="form-label">Cantidad</label>
+                  <input
+                    type="number"
+                    formControlName="cantidad"
+                    class="form-control"
+                    min="0"
+                  />
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card stock-bajo-card">
-                    <div class="card-body text-center">
-                        <h5>Stock Bajo (&lt;5)</h5>
-                        <h2>{{ getPrendasStockBajo() }}</h2>
-                    </div>
                 </div>
+              </div>
             </div>
+          </div>
+        
+        
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="prendaForm.invalid"
+          >
+            {{ modoEdicion ? 'Guardar Cambios' : 'Crear Prenda' }}
+          </button>
+        </form>
+    </div>
+  </div>
+</div>
+
+ <!-- 🔹 Dashboard de estadísticas -->
+  <div class="row text-center mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5>Total de Prendas</h5>
+          <h3 class="fw-bold text-primary">
+            {{ dashboardStats?.totalPrendas || 0 }}
+          </h3>
         </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5>Stock Bajo (&lt; 5)</h5>
+          <h3 class="fw-bold text-warning">
+            {{ dashboardStats?.stockBajo || 0 }}
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5>Sin Stock</h5>
+          <h3 class="fw-bold text-danger">
+            {{ dashboardStats?.sinStock || 0 }}
+          </h3>
+        </div>
+      </div>
     </div>
 
-    <!-- Modal para Nueva/Editar Prenda -->
-    <div class="modal fade" id="modalPrenda" tabindex="-1" aria-labelledby="modalPrendaLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalPrendaLabel">
-                        {{ modoEdicion ? 'Editar Prenda' : 'Nueva Prenda' }}
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="codigo" class="form-label">Código *</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="codigo"
-                                formControlName="codigo"
-                                [readonly]="modoEdicion"
-                                placeholder="Ej: P001">
-                            @if (prendaForm.get('codigo')?.invalid && prendaForm.get('codigo')?.touched) {
-                                <div class="text-danger mt-1">El código es obligatorio</div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción *</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="descripcion"
-                                formControlName="descripcion"
-                                placeholder="Ej: Remera negra">
-                            @if (prendaForm.get('descripcion')?.invalid && prendaForm.get('descripcion')?.touched) {
-                                <div class="text-danger mt-1">La descripción es obligatoria</div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="precio" class="form-label">Precio *</label>
-                            <input 
-                                type="number" 
-                                class="form-control" 
-                                id="precio"
-                                formControlName="precio"
-                                placeholder="0.00">
-                            @if (prendaForm.get('precio')?.invalid && prendaForm.get('precio')?.touched) {
-                                <div class="text-danger mt-1">El precio debe ser mayor a 0</div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="cantidad" class="form-label">Cantidad *</label>
-                            <input 
-                                type="number" 
-                                class="form-control" 
-                                id="cantidad"
-                                formControlName="cantidad"
-                                placeholder="0">
-                            @if (prendaForm.get('cantidad')?.invalid && prendaForm.get('cantidad')?.touched) {
-                                <div class="text-danger mt-1">La cantidad debe ser mayor o igual a 0</div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="talle_id" class="form-label">Talle *</label>
-                            <select 
-                                class="form-select" 
-                                id="talle_id"
-                                formControlName="talle_id">
-                                <option value="">Seleccione un talle</option>
-                                @for (talle of talles; track talle.codigo) {
-                                    <option [value]="talle.codigo">{{ talle.descripcion }}</option>
-                                }
-                            </select>
-                            @if (prendaForm.get('talle_id')?.invalid && prendaForm.get('talle_id')?.touched) {
-                                <div class="text-danger mt-1">Debe seleccionar un talle</div>
-                            }
-                        </div>
-
-                        <!-- TODO: Agregar campo para imagen cuando esté implementado -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button 
-                            type="submit" 
-                            class="btn btn-primary"
-                            [disabled]="prendaForm.invalid">
-                            {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-</body>

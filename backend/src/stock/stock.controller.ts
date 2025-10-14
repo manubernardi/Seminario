@@ -1,77 +1,78 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Patch } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreatePrendaDto } from '../dto/createPrenda.dto';
 
-
 @Controller('stock')
 export class StockController {
-    constructor(private readonly stockService: StockService) {}
+  constructor(private readonly stockService: StockService) {}
 
-    // GET /stock - ver todas las prendas
-    @Get()
-    async findAll() {
-        return this.stockService.findAll();
-    }
+  // 🔹 GET /stock → obtener todas las prendas con sus talles y stock total
+  @Get()
+  async findAll(): Promise<PrendaEntity[]> {
+    return await this.stockService.findAll();
+  }
 
-    // (Método duplicado eliminado)
+  // 🔹 GET /stock/:codigo → obtener una prenda por su código
+  @Get(':codigo')
+  async getPrendaByCodigo(@Param('codigo') codigo: string): Promise<PrendaEntity> {
+    return await this.stockService.getPrendaByCodigo(codigo);
+  }
 
-    @Patch(':codigo')
-    async update(@Param('codigo') codigo: string, @Body() updateData: Partial<PrendaEntity>) {
-        return this.stockService.updatePrenda(codigo, updateData);
-    }
+  // 🔹 GET /stock/:codigo/stock-total → obtener stock total de una prenda
+  @Get(':codigo/stock-total')
+  async getStockTotal(@Param('codigo') codigo: string): Promise<number> {
+    return await this.stockService.getTotalStock(codigo);
+  }
 
-    // GET /stock/:codigo - obtener prenda por código
-    @Get(':codigo')
-    async getPrendaByCodigo(@Param('codigo') codigo: string) {
-        return await this.stockService.getPrendaByCodigo(codigo);
-    }
+  // 🔹 POST /stock → crear una nueva prenda
+  @Post()
+  async create(@Body() createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {
+    return await this.stockService.create(createPrendaDto);
+  }
 
+  // 🔹 PUT /stock/:codigo → actualizar una prenda existente
+  @Put(':codigo')
+  async updatePrenda(
+    @Param('codigo') codigo: string,
+    @Body() prendaData: Partial<PrendaEntity>,
+  ): Promise<PrendaEntity> {
+    return await this.stockService.updatePrenda(codigo, prendaData);
+  }
 
-    // PUT /stock/:codigo - actualizar prenda
-    @Put(':codigo')
-    async updatePrenda(
-        @Param('codigo') codigo: string, 
-        @Body() prendaData: Partial<PrendaEntity>
-    ) {
-        return await this.stockService.updatePrenda(codigo, prendaData);
-    }
+  // 🔹 PATCH /stock/:codigo → actualización parcial
+  @Patch(':codigo')
+  async patchPrenda(
+    @Param('codigo') codigo: string,
+    @Body() updateData: Partial<PrendaEntity>,
+  ): Promise<PrendaEntity> {
+    return await this.stockService.updatePrenda(codigo, updateData);
+  }
 
-    // DELETE /stock/:codigo - eliminar prenda
-    @Delete(':codigo')
-    async deletePrenda(@Param('codigo') codigo: string) {
-        return await this.stockService.deletePrenda(codigo);
-    }
+  // 🔹 DELETE /stock/:codigo → eliminar una prenda
+  @Delete(':codigo')
+  async deletePrenda(@Param('codigo') codigo: string): Promise<{ mensaje: string }> {
+    return await this.stockService.deletePrenda(codigo);
+     }
 
-    // GET /stock/bajo-stock/:cantidad - prendas con stock bajo
-    @Get('bajo-stock/:cantidad')
-    async getPrendasBajoStock(@Param('cantidad') cantidad: number) {
-        return await this.stockService.getPrendasBajoStock(cantidad);
-    }
+  // 🔹 POST /stock/:codigo/ajustar → ajustar stock (sumar/restar cantidad)
+  @Post(':codigo/ajustar')
+  async ajustarStock(
+    @Param('codigo') codigo: string,
+    @Body() ajuste: { talle_id: number; cantidad: number; motivo?: string },
+  ) {
+    return await this.stockService.ajustarStock(codigo, ajuste.talle_id, ajuste.cantidad);
+  }
 
-    // POST /stock/:codigo/ajustar - ajustar stock de una prenda
-    @Post(':codigo/ajustar')
-    async ajustarStock(
-        @Param('codigo') codigo: string,
-        @Body() ajuste: { cantidad: number; motivo: string }
-    ) {
-        return await this.stockService.ajustarStock(codigo, ajuste.cantidad, ajuste.motivo);
-    }
-     @Post()
-    async create(@Body() createPrendaDto: CreatePrendaDto) {
-        return await this.stockService.create(createPrendaDto);
-    }
+  // 🔹 GET /stock/dashboard/stats → estadísticas del dashboard
+  @Get('dashboard/stats')
+  async getDashboardStats() {
+    return await this.stockService.getDashboardStats();
+  }
 
-    // GET /stock/dashboard/stats - estadísticas para dashboard
-    @Get('dashboard/stats')
-    async getDashboardStats() {
-        return await this.stockService.getDashboardStats();
-    }
-
-    // GET /stock/buscar - buscar prendas por descripción
-    @Get('buscar/:termino')
-    async buscarPrendas(@Param('termino') termino: string) {
-        return await this.stockService.buscarPrendas(termino);
-    }
+  // 🔹 GET /stock/buscar/:termino → buscar prendas por código o descripción
+  @Get('buscar/:termino')
+  async buscarPrendas(@Param('termino') termino: string) {
+    return await this.stockService.buscarPrendas(termino);
+  }
 }
-

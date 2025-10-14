@@ -10,9 +10,6 @@ export class RoleEntity {
     @Column()
     nombre!: string;
 
-    @Column() 
-    descripcion!: string;
-
     @OneToMany(() => EmpleadoEntity, empleado => empleado.rol)
     empleados!: EmpleadoEntity[];
 

@@ -68,21 +68,38 @@
                         }
                     </div>
 
+                    <!-- CARGO -->
                     <div class="form-group">
-                        <label for="cargo">Cargo</label>
-                        <div>
-                            <input type="radio" name="cargo" value="vendedor" formControlName="seleccion">
-                        <label>Vendedor</label>
+                    <label for="cargo">Cargo</label>
+                    <div>
+                        <input
+                        type="radio"
+                        id="vendedor"
+                        value="vendedor"
+                        formControlName="cargo" />
+                        <label for="vendedor">Vendedor</label>
+                    </div>
+                    <div>
+                        <input
+                        type="radio"
+                        id="encargado"
+                        value="encargado"
+                        formControlName="cargo" />
+                        <label for="encargado">Encargado de Compras</label>
+                    </div>
+
+                    <!-- Mensaje de error -->
+                    @if (registerForm.get('cargo')?.invalid && registerForm.get('cargo')?.touched) {
+                        <div class="msj-error text-danger mt-2 p-2">
+                        Debe seleccionar un cargo.
                         </div>
-                        <div>
-                            <input type="radio" name="cargo" value="vendedor" formControlName="seleccion">
-                            <label>Encargado de Compras</label>
-                        </div>
+                    }
                     </div>
                     
                     <button type="submit" 
                             class="btn btn-primary p-3 w-100"
-                            [disabled]="registerForm.invalid">Aceptar
+                            [disabled]=registerForm.invalid
+                            >Aceptar
                     </button>
                 </form>
         </div>

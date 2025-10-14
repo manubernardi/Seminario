@@ -1,7 +1,10 @@
 <body>
-    <div class="inicio text-white p-4 mb-2">
-        <h4 class="text-center">NUEVA VENTA</h4>
-    </div>
+    <div class="inicio text-white p-4 mb-2" style="position: relative;">
+    <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem;">
+        <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio
+    </button>
+    <h4 class="text-center m-0">NUEVA VENTA</h4>
+</div>
 
     <div class="container-fluid p-4">
         <form [formGroup]="ventaForm" (ngSubmit)="guardarVenta()">
@@ -22,6 +25,7 @@
                                         <strong>{{ empleadoLogueado.nombre }} {{ empleadoLogueado.apellido }}</strong>
                                         <small class="ms-2 text-muted">(Legajo: {{ empleadoLogueado.legajo }})</small>
                                     </div>
+                                    
                                     <input type="hidden" formControlName="empleadoId">
                                 } @else {
                                     <div class="alert alert-warning">
@@ -98,39 +102,65 @@
                         </div>
                         <div class="card-body">
                             <div class="row align-items-end">
+                                <!-- Selección de prenda -->
                                 <div class="col-md-6">
-                                    <label for="prendaSelect" class="form-label">Prenda</label>
+                                    <label class="form-label">Prenda</label>
                                     <select 
-                                        class="form-select" 
-                                        id="prendaSelect"
+                                        class="form-select"
                                         [(ngModel)]="prendaSeleccionada"
                                         [ngModelOptions]="{standalone: true}"
-                                        (change)="onPrendaChange()">
+                                        (change)="onPrendaChange()"
+                                        >
+
                                         <option [ngValue]="null">Seleccione una prenda</option>
                                         @for (prenda of prendas; track prenda.codigo) {
                                             <option [ngValue]="prenda">
-                                                {{ prenda.codigo }} - {{ prenda.descripcion }} (${{ prenda.precio }}) - Stock: {{ prenda.cantidad }}
+                                                {{prenda.codigo}} - {{ prenda.descripcion }} (${{ prenda.precio }})
                                             </option>
                                         }
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="cantidadInput" class="form-label">Cantidad</label>
-                                    <input 
-                                        type="number" 
-                                        class="form-control" 
-                                        id="cantidadInput"
+                                <!-- Seleccion de Talle-->
+                                <div class="col-md-3" *ngIf="prendaSeleccionada">
+                                    <label class="form-label">Talle</label>
+                                    <select
+                                        class="form-select"
+                                        [(ngModel)]="talleSeleccionado"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        (change)="onTalleChange()"
+                                    >
+                                        <option [ngValue]="null">Seleccione un talle</option>
+                                        <ng-container *ngFor="let talle of prendaSeleccionada.prendasXTalles"> 
+
+                                                <option *ngIf ="talle.cantidad > 0" [ngValue]="talle">
+                                                    {{(getTalleDescripcion(talle.talle_id)) }} (Stock: {{ talle.cantidad }})
+                                                </option>
+                                        
+                                        </ng-container>
+                    
+                                    </select>
+                                </div>
+                                <!-- Cantidad -->
+                                <div class="col-md-3" *ngIf="talleSeleccionado">
+                                    <label class="form-label">Cantidad</label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
                                         [(ngModel)]="cantidadSeleccionada"
                                         [ngModelOptions]="{standalone: true}"
                                         min="1"
-                                        [max]="prendaSeleccionada?.cantidad || 0">
+                                        [max]="talleSeleccionado?.cantidad || 0"
+                                        [disabled]="!talleSeleccionado" 
+                                    />
                                 </div>
+
+                                <!-- Botón Agregar -->
                                 <div class="col-md-3">
                                     <button 
                                         type="button" 
                                         class="btn btn-success w-100"
                                         (click)="agregarPrenda()"
-                                        [disabled]="!prendaSeleccionada || cantidadSeleccionada <= 0">
+                                        [disabled]="!prendaSeleccionada || !talleSeleccionado || cantidadSeleccionada <= 0">
                                         <i class="bi bi-plus-circle"></i> Agregar
                                     </button>
                                 </div>
@@ -155,6 +185,7 @@
                                             <tr>
                                                 <th>Código</th>
                                                 <th>Descripción</th>
+                                                <th>Talle</th>
                                                 <th>Precio Unit.</th>
                                                 <th>Cantidad</th>
                                                 <th>Subtotal</th>
@@ -166,6 +197,7 @@
                                                 <tr>
                                                     <td>{{ detalle.codigoPrenda }}</td>
                                                     <td>{{ detalle.descripcion }}</td>
+                                                    <td>{{ detalle.talleDescripcion }}</td>
                                                     <td>${{ detalle.precio | number:'1.2-2' }}</td>
                                                     <td>{{ detalle.cantidad }}</td>
                                                     <td>${{ detalle.subtotal | number:'1.2-2' }}</td>

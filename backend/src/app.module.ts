@@ -24,14 +24,13 @@ import { AuthModule } from './auth/auth.module';
         entities,
       }),
        VentasModule,
-      EmpleadoModule,  // <-- Agregá estos
+      EmpleadoModule,  
       StockModule,
       TallesModule,
       ClientesModule,
       AuthModule,
-      // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
-  ],
+    ],
   controllers: [AppController],
   providers: [AppService],
 })

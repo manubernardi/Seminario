@@ -2,8 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+
+interface Talle {
+  codigo: number;
+  descripcion: string;
+}
 
 interface Cliente {
   id: number;
@@ -11,18 +16,24 @@ interface Cliente {
   apellido: string;
   telefono: number;
 }
+interface PrendaXTalle {
+  talle_id: number;
+  cantidad: number;
+  
+}
 
 interface Prenda {
   codigo: string;
   descripcion: string;
   precio: number;
-  cantidad: number;
+  prendasXTalles: PrendaXTalle[];
 }
 
 interface DetalleVenta {
   codigoPrenda: string;
   descripcion: string;
   precio: number;
+  talleDescripcion?: string;
   cantidad: number;
   subtotal: number;
 }
@@ -30,7 +41,7 @@ interface DetalleVenta {
 @Component({
   selector: 'app-nueva-venta',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe, DatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe, DatePipe, RouterModule],
   templateUrl: './registrar-venta.html',
   styleUrls: ['./registrar-venta.css']
 })
@@ -40,13 +51,14 @@ export class RegistrarVenta implements OnInit {
   clientes: Cliente[] = [];
   prendas: Prenda[] = [];
   detalles: DetalleVenta[] = [];
-  
+  talleSeleccionado: PrendaXTalle | null = null;
   prendaSeleccionada: Prenda | null = null;
   cantidadSeleccionada: number = 1;
   fechaActual: Date = new Date();
   empleadoLogueado: any = null;
   mostrarModalCliente: boolean = false;
   guardandoCliente: boolean = false;
+  talles: any[] = []; // Estan fijos en memoria
 
   private apiUrl = 'http://localhost:3000';
 
@@ -73,6 +85,7 @@ export class RegistrarVenta implements OnInit {
     this.cargarEmpleadoLogueado();
     this.cargarClientes();
     this.cargarPrendas();
+    this.cargarTalles();
 
     this.ventaForm.get('clienteHabilitado')?.valueChanges.subscribe(enabled => {
       const clienteCtrl = this.ventaForm.get('clienteId');
@@ -91,7 +104,7 @@ export class RegistrarVenta implements OnInit {
     
     if (this.empleadoLogueado) {
       this.ventaForm.patchValue({
-        empleadoId: this.empleadoLogueado.id
+        empleadoId: this.empleadoLogueado.legajo
       });
     } else {
       alert('Debe iniciar sesión para registrar ventas');
@@ -114,7 +127,9 @@ export class RegistrarVenta implements OnInit {
   cargarPrendas(): void {
     this.http.get<Prenda[]>(`${this.apiUrl}/stock`).subscribe({
       next: (data) => {
-        this.prendas = data.filter(p => p.cantidad > 0);
+        // Solo las prendas con stock > 0 en algun talle
+        this.prendas = data;
+        console.log(this.prendas);
       },
       error: (error) => {
         console.error('Error al cargar prendas:', error);
@@ -122,6 +137,17 @@ export class RegistrarVenta implements OnInit {
       }
     });
   }
+
+  cargarTalles(): void {
+    this.http.get<Talle[]>(`${this.apiUrl}/talles`).subscribe({
+      next: (data) => {
+        this.talles=data;
+      },
+      error: (error) => {
+        console.error('Error al cargar talles:', error)
+      }
+  })
+}
 
  clienteHabilitado = false;
 
@@ -165,45 +191,55 @@ export class RegistrarVenta implements OnInit {
 
   onPrendaChange(): void {
     this.cantidadSeleccionada = 1;
+    this.talleSeleccionado = null;
+  }
+
+  onTalleChange(): void {
+    if(this.talleSeleccionado){
+      console.log(this.talleSeleccionado)
+    }
   }
 
   agregarPrenda(): void {
-    if (!this.prendaSeleccionada || this.cantidadSeleccionada <= 0) {
-      return;
-    }
-
-    if (this.cantidadSeleccionada > this.prendaSeleccionada.cantidad) {
-      alert(`Solo hay ${this.prendaSeleccionada.cantidad} unidades disponibles`);
-      return;
-    }
-
-    const detalleExistente = this.detalles.find(d => d.codigoPrenda === this.prendaSeleccionada!.codigo);
-    
-    if (detalleExistente) {
-      const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
-      
-      if (nuevaCantidad > this.prendaSeleccionada.cantidad) {
-        alert(`Solo hay ${this.prendaSeleccionada.cantidad} unidades disponibles`);
-        return;
-      }
-      
-      detalleExistente.cantidad = nuevaCantidad;
-      detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
-    } else {
-      const detalle: DetalleVenta = {
-        codigoPrenda: this.prendaSeleccionada.codigo,
-        descripcion: this.prendaSeleccionada.descripcion,
-        precio: this.prendaSeleccionada.precio,
-        cantidad: this.cantidadSeleccionada,
-        subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
-      };
-      
-      this.detalles.push(detalle);
-    }
-
-    this.prendaSeleccionada = null;
-    this.cantidadSeleccionada = 1;
+  if (!this.prendaSeleccionada || !this.talleSeleccionado) {
+    alert('Debe seleccionar una prenda y un talle')
+    return;
   }
+  if (this.cantidadSeleccionada > this.talleSeleccionado.cantidad) {
+    alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
+    return;
+  }
+  const codigoPrenda = this.prendaSeleccionada.codigo;
+  const descripcion = `${this.prendaSeleccionada.descripcion} - ${this.getTalleDescripcion(this.talleSeleccionado.talle_id)}`;
+
+  const detalleExistente = this.detalles.find(
+    d => d.codigoPrenda === codigoPrenda && d.descripcion === descripcion
+  );
+
+  if (detalleExistente) {
+    const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
+    if (nuevaCantidad > this.talleSeleccionado.cantidad) {
+      alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
+      return;
+    }
+    detalleExistente.cantidad = nuevaCantidad;
+    detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
+  } else {
+    this.detalles.push({
+      codigoPrenda, 
+      descripcion,
+      precio: this.prendaSeleccionada.precio,
+      talleDescripcion: this.getTalleDescripcion(this.talleSeleccionado.talle_id) || `Talle ${this.talleSeleccionado.talle_id}`,
+      cantidad: this.cantidadSeleccionada,
+      subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
+    });
+  }
+
+  this.prendaSeleccionada = null;
+  this.talleSeleccionado = null;
+  this.cantidadSeleccionada = 1;
+}
+
 
   eliminarDetalle(index: number): void {
     this.detalles.splice(index, 1);
@@ -226,15 +262,20 @@ export class RegistrarVenta implements OnInit {
 
     const empleadoId = this.ventaForm.get('empleadoId')?.value;
     const clienteId = this.ventaForm.get('clienteId')?.value;
+    const formValues = this.ventaForm.getRawValue();
+
+    console.log('formValues completo:', formValues)
 
     const ventaData: any = {
-      empleadoId: Number(empleadoId),
-      clienteId: Number(clienteId),
+      empleadoLegajo: Number(this.empleadoLogueado?.legajo),
+      clienteId: formValues.clienteId ? Number(formValues.clienteId) : undefined,
       detalles: this.detalles.map(d => ({
-        codigoPrenda: d.codigoPrenda,
-        cantidad: d.cantidad
+      codigoPrenda: d.codigoPrenda,
+      cantidad: d.cantidad
       }))
     };
+
+    console.log('Datos a enviar:', ventaData);
 
     this.http.post(`${this.apiUrl}/ventas`, ventaData).subscribe({
       next: (response) => {
@@ -256,5 +297,10 @@ export class RegistrarVenta implements OnInit {
     } else {
       this.router.navigate(['/ventas']);
     }
+  }
+  getTalleDescripcion(talle_id: number): string {
+    const talle = this.talles.find(t => t.codigo === talle_id);
+    console.log(talle);
+    return talle ? talle.descripcion : 'Desconocido';
   }
 }

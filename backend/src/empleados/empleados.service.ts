@@ -14,11 +14,10 @@ export class EmpleadoService {
 
   async create(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
     try {
-      const empleado = this.empleadoRepository.create({
-      });
+      const empleado = this.empleadoRepository.create({ ...data });
       return await this.empleadoRepository.save(empleado);
     } catch (error) {
-      if (error.code === '23505') { // Unique constraint violation
+      if (error.code === '23505') {
         throw new ConflictException('El legajo ya existe');
       }
       throw error;
