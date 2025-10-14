@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Equal, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { VentaEntity } from '../entities/venta.entity';
 import { DetalleVentaEntity } from '../entities/detalle.venta.entity';
 import { EmpleadoEntity } from '../entities/empleado.entity';
 import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreateVentaDto} from '../dto/create-venta.dto';
+import { PrendaXTalleEntity } from 'src/entities/prendaXTalleEntity';
 
 @Injectable()
 export class VentasService {
@@ -21,21 +22,22 @@ export class VentasService {
     private clienteRepository: Repository<ClienteEntity>,
     @InjectRepository(PrendaEntity)
     private prendaRepository: Repository<PrendaEntity>,
+    @InjectRepository(PrendaXTalleEntity)
+    private prendaXTalleRepository: Repository<PrendaXTalleEntity>
   ) {}
 
-  async create(createVentaDto: CreateVentaDto): Promise<VentaEntity> {
+  async create(venta: CreateVentaDto): Promise<VentaEntity> {
     // Validar empleado
-    const empleado = await this.empleadoRepository.findOneBy({ legajo: createVentaDto.empleadoLegajo});
+    const empleado = await this.empleadoRepository.findOneBy({ legajo: venta.empleadoLegajo});
     if (!empleado) {
-      throw new NotFoundException(`Empleado con legajo ${createVentaDto.empleadoLegajo} no encontrado`);
+      throw new NotFoundException(`Empleado con legajo ${venta.empleadoLegajo} no encontrado`);
     }
     
     // Validar cliente solo si se envió
-    let cliente: ClienteEntity | null = null;
-    if (createVentaDto.clienteId) {
-      cliente = await this.clienteRepository.findOneBy({ id: createVentaDto.clienteId });
+    if (venta.clienteId) {
+      let cliente = await this.clienteRepository.findOneBy({ id: venta.clienteId });
       if (!cliente) {
-        throw new NotFoundException(`Cliente con ID ${createVentaDto.clienteId} no encontrado`);
+        throw new NotFoundException(`Cliente con ID ${venta.clienteId} no encontrado`);
       }
     }
     
@@ -43,7 +45,7 @@ export class VentasService {
     let total = 0;
     const detalles: DetalleVentaEntity[] = [];
     
-    for (const detalleDto of createVentaDto.detalles) {
+    for (const detalleDto of venta.detalles) {
       const prenda = await this.prendaRepository.findOne({
         where: { codigo: detalleDto.codigoPrenda }
       });
@@ -52,15 +54,23 @@ export class VentasService {
         throw new NotFoundException(`Prenda con código ${detalleDto.codigoPrenda} no encontrada`);
       }
 
-      /*if (prenda.cantidad < detalleDto.cantidad) {
+      const prendaXTalle = await this.prendaXTalleRepository.findOne({
+        where: {
+          prenda_codigo: prenda.codigo,
+          talle_id: detalleDto.talleId
+        }})
+
+      if (!prendaXTalle) throw new NotFoundException(`La prenda ${detalleDto.codigoPrenda} no tiene talle con id ${detalleDto.talleId}`)
+
+      if (prendaXTalle.cantidad < detalleDto.cantidad) {
         throw new BadRequestException(
-          `Stock insuficiente para la prenda ${prenda.descripcion}. Disponible: ${prenda.cantidad}`
+          `Stock insuficiente para la prenda ${prenda.descripcion}. Disponible: ${prendaXTalle.cantidad}`
         );
-      }*/
+      }
 
       // Actualizar stock
-      /*prenda.cantidad -= detalleDto.cantidad;
-      await this.prendaRepository.save(prenda);*/
+      prendaXTalle.actualizarCantidad(-detalleDto.cantidad);
+      await this.prendaXTalleRepository.save(prendaXTalle);
 
       // Crear detalle
       const subtotal = prenda.precio * detalleDto.cantidad;
@@ -68,7 +78,6 @@ export class VentasService {
         cantidad: detalleDto.cantidad,
         subtotal: subtotal,
         prenda: prenda
-        // NO incluyas 'venta' acá todavía
       });
       
       detalles.push(detalle);
@@ -79,12 +88,12 @@ export class VentasService {
     const nuevaVenta = this.ventaRepository.create({
       fecha: new Date(),
       total: total,
-      empleadoLegajo: createVentaDto.empleadoLegajo,
-      clienteId: createVentaDto.clienteId,
+      empleadoLegajo: venta.empleadoLegajo,
+      clienteId: venta.clienteId,
       detalles: detalles  // El cascade: true se encarga de guardar esto
     });
     
-    // Guardar TODO de una vez
+    // Guardar TODO 
     const ventaGuardada = await this.ventaRepository.save(nuevaVenta);
     
     return ventaGuardada;
@@ -132,7 +141,7 @@ export class VentasService {
   async getTotalVentas(): Promise<{ total: number; cantidad: number }> {
     const ventas = await this.ventaRepository.find();
 
-    const total = ventas.reduce((acc, venta) => acc + venta.total, 0);
+    const total = ventas.reduce((acc, venta) => acc + Number(venta.total), 0);
     const cantidad = ventas.length;
     return { total, cantidad };
   }
@@ -141,15 +150,24 @@ export class VentasService {
     const venta = await this.findOne(numVenta);
 
     // Restaurar stock de las prendas
-    for (const detalle of venta.detalles as any) {
+    for (const detalle of venta.detalles) {
       const prenda = await this.prendaRepository.findOne({
         where: { codigo: detalle.prenda.codigo }
       });
       
-      /*if (prenda) {
-        prenda.cantidad += detalle.cantidad;
-        await this.prendaRepository.save(prenda);
-      }*/
+      if (!prenda) throw new NotFoundException(`La prenda con código ${detalle.prenda.codigo} no existe`);
+
+      const prendaXTalle = await this.prendaXTalleRepository.findOne({
+        where: {
+          prenda_codigo: prenda.codigo,
+          talle_id: detalle.talle.codigo
+        }
+      })
+
+      if (!prendaXTalle) throw new NotFoundException(`La Prenda elegida no tiene ese talle`)
+
+      prendaXTalle.actualizarCantidad(detalle.cantidad);
+      await this.prendaXTalleRepository.save(prendaXTalle);
     }
 
     await this.ventaRepository.remove(venta);

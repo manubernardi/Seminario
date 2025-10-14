@@ -8,10 +8,13 @@ export class CreateDetalleVentaDto {
   @IsNumber({}, { message: 'La cantidad debe ser un número' })
   @Min(1, { message: 'La cantidad debe ser al menos 1' })
   cantidad: number;
+
+  @IsNotEmpty({ message: 'El talle de la prenda es obligatorio'})
+  talleId: number;
 }
 
 export class CreateVentaDto {
-  @IsNumber()  // <- CAMBIÁ ESTO
+  @IsNumber() 
   @IsNotEmpty({ message: 'El empleado es obligatorio' })
   empleadoLegajo: number;  //
   

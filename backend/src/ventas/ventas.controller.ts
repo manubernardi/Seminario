@@ -20,8 +20,10 @@ export class VentasController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createVentaDto: CreateVentaDto): Promise<VentaEntity> {
-    return await this.ventasService.create(createVentaDto);
+  async create(@Body() data: CreateVentaDto): Promise<VentaEntity> {
+    console.log('Información en POST: ');
+    console.log(data);
+    return await this.ventasService.create(data);
   }
 
   @Get()

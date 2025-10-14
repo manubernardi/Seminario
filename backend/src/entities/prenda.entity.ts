@@ -4,6 +4,7 @@ import { DetalleVentaEntity } from "./detalle.venta.entity";
 import { PrendaXTalleEntity } from "./prendaXTalleEntity";
 import { IsOptional } from "class-validator";
 
+import { DetalleCompraEntity } from "./detalle.compra.entity";
 
 @Entity('prendas')
 export class PrendaEntity {

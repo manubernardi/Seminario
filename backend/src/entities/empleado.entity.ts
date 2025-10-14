@@ -1,6 +1,7 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { RoleEntity } from './roles.entity';
 import { VentaEntity } from './venta.entity'
+import { CompraEntity } from './compra.entity';
 
 @Entity('empleados')
 export class EmpleadoEntity {
@@ -24,5 +25,8 @@ export class EmpleadoEntity {
     rol!: RoleEntity;
 
     @OneToMany(() => VentaEntity, ventas => ventas.empleado)
-    ventas!: VentaEntity[];
+    ventas?: VentaEntity[];
+
+    @OneToMany(()=> CompraEntity, compra => compra.empleado)
+    compras?: CompraEntity[];
 }
