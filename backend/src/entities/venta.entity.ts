@@ -24,7 +24,6 @@ export class VentaEntity {
     })
     detalles!: DetalleVentaEntity;
 
-    // CLIENTE (opcional - puede ser NULL)
     @Column({ nullable: true })
     clienteId?: number;
 
