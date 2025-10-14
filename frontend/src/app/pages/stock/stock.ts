@@ -3,6 +3,7 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { StockService, DashboardStats } from '../../services/stock.service';
+import { RouterLink } from '@angular/router';
 
 declare var bootstrap: any;
 
@@ -27,7 +28,7 @@ interface Prenda {
 @Component({
   selector: 'app-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DecimalPipe, RouterLink],
   templateUrl: './stock.html',
   styleUrls: ['./stock.css']
 })

@@ -1,6 +1,11 @@
-<div class="container mt-4">
-<h2 class="mb-4">Gestión de Stock</h2>
-  <!-- 🔹 Barra de búsqueda -->
+
+    <div class="inicio text-white p-4 mb-2 total-display">
+    <button class="btn-volver" routerLink="/home">
+    <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio</button>
+    <h4 class="text-center">STOCK</h4>
+    </div>
+
+  <!-- 🔹 Barra de búsqueda 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <input
       type="text"
@@ -12,11 +17,11 @@
     <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
       + Nueva Prenda
     </button>
-  </div>
+  </div>-->
 
   <!-- 🔹 Tabla de stock -->
   <div class="table-responsive shadow-sm">
-    <table class="table table-hover align-middle">
+    <table class="table table-striped">
       <thead class="table-light">
         <tr>
           <th>Código</th>
@@ -91,7 +96,7 @@
       </tbody>
     </table>
   </div>
-</div>
+
 
 <!-- 🔹 Modal Crear / Editar Prenda -->
 <div

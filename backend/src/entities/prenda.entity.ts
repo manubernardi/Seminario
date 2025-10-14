@@ -16,7 +16,7 @@ export class PrendaEntity {
     @Column()
     precio: number;
 
-    @OneToMany(() => PrendaXTalleEntity, px => px.prenda, { cascade: true, eager: true })
+    @OneToMany(() => PrendaXTalleEntity, px => px.prenda, { cascade: true, eager: true, onDelete: 'CASCADE' })
     prendasXTalles: PrendaXTalleEntity[];
 
     @IsOptional()

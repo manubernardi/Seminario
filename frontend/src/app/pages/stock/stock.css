@@ -179,3 +179,14 @@ body {
 .talle-card:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.btn-volver {
+  background-color: #9ad6e2;
+  color: #000000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}

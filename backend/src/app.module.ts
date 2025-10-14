@@ -24,7 +24,7 @@ import { AuthModule } from './auth/auth.module';
         entities,
       }),
        VentasModule,
-      EmpleadoModule,  // <-- Agregá estos
+      EmpleadoModule,  
       StockModule,
       TallesModule,
       ClientesModule,

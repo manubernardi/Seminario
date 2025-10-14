@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap} from 'rxjs/operators';
 
 export interface RegistroDto{
@@ -28,8 +28,13 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) {}
 
-  nuevoUsuario(body: RegistroDto): Observable<EmpleadoBackend>{
-    return this.http.post<any>(this.apiUrl, body);
+  nuevoUsuario(body: RegistroDto): Observable<EmpleadoBackend> {
+    return this.http.post<EmpleadoBackend>(this.apiUrl, body).pipe(
+      catchError(error => {
+        console.error('Error al registrar usuario:', error);
+        return throwError(() => new Error('Error al registrar usuario. Intenta nuevamente.'));
+      })
+    );
   }
- 
 }
+ 
