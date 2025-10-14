@@ -33,7 +33,7 @@ interface DetalleVenta {
   codigoPrenda: string;
   descripcion: string;
   precio: number;
-  talleDescripcion?: string;
+  talleId: number;
   cantidad: number;
   subtotal: number;
 }
@@ -201,44 +201,44 @@ export class RegistrarVenta implements OnInit {
   }
 
   agregarPrenda(): void {
-  if (!this.prendaSeleccionada || !this.talleSeleccionado) {
-    alert('Debe seleccionar una prenda y un talle')
-    return;
-  }
-  if (this.cantidadSeleccionada > this.talleSeleccionado.cantidad) {
-    alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
-    return;
-  }
-  const codigoPrenda = this.prendaSeleccionada.codigo;
-  const descripcion = `${this.prendaSeleccionada.descripcion} - ${this.getTalleDescripcion(this.talleSeleccionado.talle_id)}`;
-
-  const detalleExistente = this.detalles.find(
-    d => d.codigoPrenda === codigoPrenda && d.descripcion === descripcion
-  );
-
-  if (detalleExistente) {
-    const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
-    if (nuevaCantidad > this.talleSeleccionado.cantidad) {
+    if (!this.prendaSeleccionada || !this.talleSeleccionado) {
+      alert('Debe seleccionar una prenda y un talle')
+      return;
+    }
+    if (this.cantidadSeleccionada > this.talleSeleccionado.cantidad) {
       alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
       return;
     }
-    detalleExistente.cantidad = nuevaCantidad;
-    detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
-  } else {
-    this.detalles.push({
-      codigoPrenda, 
-      descripcion,
-      precio: this.prendaSeleccionada.precio,
-      talleDescripcion: this.getTalleDescripcion(this.talleSeleccionado.talle_id) || `Talle ${this.talleSeleccionado.talle_id}`,
-      cantidad: this.cantidadSeleccionada,
-      subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
-    });
-  }
+    const codigoPrenda = this.prendaSeleccionada.codigo;
+    const descripcion = `${this.prendaSeleccionada.descripcion} - ${this.getTalleDescripcion(this.talleSeleccionado.talle_id)}`;
 
-  this.prendaSeleccionada = null;
-  this.talleSeleccionado = null;
-  this.cantidadSeleccionada = 1;
-}
+    const detalleExistente = this.detalles.find(
+      d => d.codigoPrenda === codigoPrenda && d.descripcion === descripcion
+    );
+
+    if (detalleExistente) {
+      const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
+      if (nuevaCantidad > this.talleSeleccionado.cantidad) {
+        alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
+        return;
+      }
+      detalleExistente.cantidad = nuevaCantidad;
+      detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
+    } else {
+      this.detalles.push({
+        codigoPrenda, 
+        descripcion,
+        precio: this.prendaSeleccionada.precio,
+        talleId: this.talleSeleccionado.talle_id,
+        cantidad: this.cantidadSeleccionada,
+        subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
+      });
+    }
+
+    this.prendaSeleccionada = null;
+    this.talleSeleccionado = null;
+    this.cantidadSeleccionada = 1;
+  }
 
 
   eliminarDetalle(index: number): void {
@@ -260,8 +260,6 @@ export class RegistrarVenta implements OnInit {
       return;
     }
 
-    const empleadoId = this.ventaForm.get('empleadoId')?.value;
-    const clienteId = this.ventaForm.get('clienteId')?.value;
     const formValues = this.ventaForm.getRawValue();
 
     console.log('formValues completo:', formValues)
@@ -271,7 +269,8 @@ export class RegistrarVenta implements OnInit {
       clienteId: formValues.clienteId ? Number(formValues.clienteId) : undefined,
       detalles: this.detalles.map(d => ({
       codigoPrenda: d.codigoPrenda,
-      cantidad: d.cantidad
+      cantidad: d.cantidad,
+      talleId: d.talleId
       }))
     };
 
@@ -298,9 +297,9 @@ export class RegistrarVenta implements OnInit {
       this.router.navigate(['/ventas']);
     }
   }
+
   getTalleDescripcion(talle_id: number): string {
     const talle = this.talles.find(t => t.codigo === talle_id);
-    console.log(talle);
     return talle ? talle.descripcion : 'Desconocido';
   }
 }

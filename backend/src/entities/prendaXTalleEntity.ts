@@ -2,6 +2,7 @@ import {Column, Entity, JoinColumn, PrimaryColumn, ManyToOne} from "typeorm";
 import { PrendaEntity } from "./prenda.entity";
 import { TalleEntity } from "./talle.entity";
 import {Exclude} from "class-transformer"; 
+import { BadRequestException } from "@nestjs/common";
 
 @Entity('prendas_talles')
 export class PrendaXTalleEntity {
@@ -22,4 +23,11 @@ export class PrendaXTalleEntity {
 
     @Column()
     cantidad: number;
+
+    actualizarCantidad(ajuste: number): void {
+        const nuevaCantidad: number = this.cantidad + ajuste; 
+        if (nuevaCantidad < 0) throw new BadRequestException('El stock no puede ser negativo');
+
+        this.cantidad = nuevaCantidad;
+    }
 }

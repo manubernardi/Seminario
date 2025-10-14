@@ -21,4 +21,5 @@ export class DetalleVentaEntity{
 
     @ManyToOne(() => PrendaEntity)
     prenda!: PrendaEntity;
+    
 }

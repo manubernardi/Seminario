@@ -197,7 +197,7 @@
                                                 <tr>
                                                     <td>{{ detalle.codigoPrenda }}</td>
                                                     <td>{{ detalle.descripcion }}</td>
-                                                    <td>{{ detalle.talleDescripcion }}</td>
+                                                    <td>{{ getTalleDescripcion(detalle.talleId) }}</td>
                                                     <td>${{ detalle.precio | number:'1.2-2' }}</td>
                                                     <td>{{ detalle.cantidad }}</td>
                                                     <td>${{ detalle.subtotal | number:'1.2-2' }}</td>
