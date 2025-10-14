@@ -9,7 +9,6 @@ import { StockModule } from './stock/stock.module';
 import { TallesModule } from './talles/talles.module';
 import { ClientesModule } from './clientes/clientes.module';
 import { AuthModule } from './auth/auth.module';
-import { PrendaTalleModule } from './prenda_talle/prenda_talle.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -30,10 +29,8 @@ import { PrendaTalleModule } from './prenda_talle/prenda_talle.module';
       TallesModule,
       ClientesModule,
       AuthModule,
-      // Importa los módulos de pedidos y pagos
       TypeOrmModule.forFeature(Object.values(entities)),
-      PrendaTalleModule,
-  ],
+    ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -6,6 +6,7 @@ import { CreatePrendaDto } from '../dto/createPrenda.dto';
 import { CreatePrendaXTalleDto } from '../dto/createPrendaXTalle.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from 'src/entities/talle.entity';
+import { error } from 'console';
 
 @Injectable()
 export class StockService {
@@ -18,28 +19,33 @@ export class StockService {
     private readonly TalleRepository: Repository<TalleEntity>,
     ) {}
 
-    async findAll(): Promise<PrendaEntity[]> {
-  return await this.prendaRepository.find({
+async findAll(): Promise<PrendaEntity[]> {
+  const prendas = await this.prendaRepository.find({
     relations: {
       prendasXTalles: true
     }
   });
+
+return prendas.map((prenda) => ({
+    ...prenda,
+    cantidadTotal: prenda.prendasXTalles?.reduce(
+      (total, item) => total + (item.cantidad || 0),
+      0
+    ) || 0,
+  }));
 }
 
     // Obtener prenda por código
-    async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
-        const prenda = await this.prendaRepository
-            .createQueryBuilder('prenda')
-            .leftJoinAndSelect('prenda.talle', 'talle')
-            .where('prenda.codigo = :codigo', { codigo })
-            .getOne();
-
-        if (!prenda) {
-            throw new NotFoundException(`Prenda con código ${codigo} no encontrada`);
-        }
-
-        return prenda;
+async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
+    const prenda = await this.prendaRepository.findOne({
+        where: { codigo },
+        relations: { prendasXTalles: true }
+    });
+    if (!prenda) {
+        throw new NotFoundException(`Prenda con código ${codigo} no encontrada`);
     }
+    return prenda;
+}
 
     // Crear nueva prenda
 
@@ -70,99 +76,122 @@ async create(dto: CreatePrendaDto): Promise<PrendaEntity> {
   return await this.prendaRepository.save(prenda);
 }
 
-    // Actualizar prenda
-    async updatePrenda(codigo: string, prendaData: Partial<PrendaEntity>): Promise<PrendaEntity> {
-        const prenda = await this.getPrendaByCodigo(codigo);
-        
-        // Actualizar campos
-        Object.assign(prenda, prendaData);
-        
-        return await this.prendaRepository.save(prenda);
-    }
+// Actualizar prenda
+async updatePrenda(codigo: string, prendaData: Partial<PrendaEntity>): Promise<PrendaEntity> {
+    const prenda = await this.getPrendaByCodigo(codigo);
+    // Actualizar campos
+    Object.assign(prenda, prendaData);
+    return await this.prendaRepository.save(prenda);
+}
 
     // Eliminar prenda
-    async deletePrenda(codigo: string): Promise<{ mensaje: string }> {
-        const prenda = await this.getPrendaByCodigo(codigo);
-        
-        await this.prendaRepository.remove(prenda);
-        
-        return { mensaje: `Prenda ${codigo} eliminada correctamente` };
-    }
+async deletePrenda(codigo: string): Promise<{ mensaje: string }> {
+    const prenda = await this.getPrendaByCodigo(codigo);
+    
+    await this.prendaRepository.remove(prenda);
+    
+    return { mensaje: `Prenda ${codigo} eliminada correctamente` };
+}
 
     // Prendas con stock bajo
-   /* async getPrendasBajoStock(cantidadMinima: number): Promise<PrendaEntity[]> {
+   /*async getPrendasBajoStock(cantidadMinima: number): Promise<PrendaEntity[]> {
         return await this.prendaRepository
             .createQueryBuilder('prenda')
             .leftJoinAndSelect('prenda.talle', 'talle')
             .where('prenda.cantidad <= :cantidad', { cantidad: cantidadMinima })
             .orderBy('prenda.cantidad', 'ASC')
             .getMany();
-    }*/
-
+    }
+*/
     // Ajustar stock
-    /*async ajustarStock(codigo: string, ajuste: number, motivo: string): Promise<PrendaEntity> {
-        const prenda = await this.getPrendaByCodigo(codigo);
-        
-        const nuevaCantidad = prenda.cantidad + ajuste;
-        
-        if (nuevaCantidad < 0) {
-            throw new BadRequestException('La cantidad resultante no puede ser negativa');
-        }
+async ajustarStock(codigo: string, ajuste: number, talle_id: number): Promise<PrendaXTalleEntity> {
+    const prenda = await this.getPrendaByCodigo(codigo);
+    const prendaXTalle = await this.prendaXTalleRepository.findOneBy({ prenda_codigo: codigo, talle_id });
+    if (!prendaXTalle) {
+        throw new NotFoundException(`La prenda ${codigo} no tiene stock para el talle ID ${talle_id}`);
+    }
 
-        prenda.cantidad = nuevaCantidad;
-        
-        // Aquí podrías agregar un log de movimientos de stock
-        console.log(`Stock ajustado - Código: ${codigo}, Ajuste: ${ajuste}, Motivo: ${motivo}, Nueva cantidad: ${nuevaCantidad}`);
-        
-        return await this.prendaRepository.save(prenda);
-    }*/
+    const nuevaCantidad = prendaXTalle.cantidad + ajuste;
+
+    if (nuevaCantidad < 0) {
+        throw new BadRequestException('La cantidad resultante no puede ser negativa');
+    }
+
+    prendaXTalle.cantidad = nuevaCantidad;
+    return await this.prendaXTalleRepository.save(prendaXTalle);
+}
 
     // Estadísticas para dashboard
-    /*async getDashboardStats(): Promise<any> {
-        const totalPrendas = await this.prendaRepository.count();
-        
-        const stockBajo = await this.prendaRepository.count({
-            where: { cantidad: 5 } // Menos de 5 unidades
-        });
+async getDashboardStats(): Promise<any> {
+    let totalPrendas = 0;
+    for (const prenda of await this.prendaRepository.find()) {
+        totalPrendas += await this.getTotalStock(prenda.codigo);
+    }
 
-        const sinStock = await this.prendaRepository.count({
-            where: { cantidad: 0 }
-        });
+    let stockBajo = 0;
+    for (const prenda of await this.prendaRepository.find()) {
+        if (await this.getTotalStock(prenda.codigo) < 5) stockBajo++;
+    }
 
-        const valorTotalInventario = await this.prendaRepository
+
+    let sinStock = 0;
+    for (const prenda of await this.prendaRepository.find()) {
+        if (await this.getTotalStock(prenda.codigo) === 0) sinStock++;
+    }
+
+        /*const valorTotalInventario = await this.prendaRepository
             .createQueryBuilder('prenda')
             .select('SUM(prenda.precio * prenda.cantidad)', 'total')
-            .getRawOne();
+            .getRawOne();*/
 
         return {
             totalPrendas,
             stockBajo,
             sinStock,
-            valorTotalInventario: parseFloat(valorTotalInventario.total) || 0,
+           //    valorTotalInventario: parseFloat(valorTotalInventario.total) || 0,
             fechaActualizacion: new Date().toISOString()
         };
     }
-
-   */  // Buscar prendas por descripción
-    async buscarPrendas(termino: string): Promise<PrendaEntity[]> {
-        return await this.prendaRepository
-            .createQueryBuilder('prenda')
-            .leftJoinAndSelect('prenda.talle', 'talle')
-            .where('prenda.descripcion ILIKE :termino', { termino: `%${termino}%` })
-            .orWhere('prenda.codigo ILIKE :termino', { termino: `%${termino}%` })
-            .orderBy('prenda.descripcion', 'ASC')
-            .getMany();
+    async getTotalStock(prenda_codigo: string): Promise<number> {
+        let stock = 0;
+        for (const talle of await this.TalleRepository.find()) {
+            const prendaXTalle = await this.prendaXTalleRepository.findOneBy({ prenda_codigo, talle_id: talle.codigo });
+            if (prendaXTalle) {
+                stock += prendaXTalle.cantidad;
+            }
+        }
+        return stock;
     }
 
-   /* // Reducir stock (para cuando se hace una venta)
-    async reducirStock(codigo: string, cantidad: number): Promise<PrendaEntity> {
-        const prenda = await this.getPrendaByCodigo(codigo);
         
-        if (prenda.cantidad < cantidad) {
-            throw new BadRequestException(`Stock insuficiente. Disponible: ${prenda.cantidad}, Solicitado: ${cantidad}`);
-        }
+    
 
-        prenda.cantidad -= cantidad;
-        return await this.prendaRepository.save(prenda);
-    }*/
+     // Buscar prendas por descripción
+async buscarPrendas(termino: string): Promise<PrendaEntity[]> {
+    return await this.prendaRepository
+        .createQueryBuilder('prenda')
+        .leftJoinAndSelect('prenda.talle', 'talle')
+        .where('prenda.descripcion ILIKE :termino', { termino: `%${termino}%` })
+        .orWhere('prenda.codigo ILIKE :termino', { termino: `%${termino}%` })
+        .orderBy('prenda.descripcion', 'ASC')
+        .getMany();
+}
+
+   // Reducir stock (para cuando se hace una venta)
+async reducirStock(codigo: string, talle_id: number, cantidad: number): Promise<PrendaXTalleEntity> {
+    const prenda = await this.prendaRepository.findOne({
+        where: { codigo },
+        relations: { prendasXTalles: true }
+    });
+    const prendaXTalle = await this.prendaXTalleRepository.findOneBy({ prenda_codigo: codigo, talle_id });
+    if (!prendaXTalle) {
+        throw new NotFoundException(`La prenda ${codigo} no tiene stock para el talle ID ${talle_id}`);
+    }
+    if (prendaXTalle.cantidad < cantidad) {
+        throw new BadRequestException(`Stock insuficiente. Disponible: ${prendaXTalle.cantidad}, Solicitado: ${cantidad}`);
+    }
+
+    prendaXTalle.cantidad -= cantidad;
+    return await this.prendaXTalleRepository.save(prendaXTalle);
+}
 }

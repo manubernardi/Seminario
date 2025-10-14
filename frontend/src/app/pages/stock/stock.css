@@ -169,3 +169,13 @@ body {
 .table {
     margin-bottom: 0;
 }
+
+.talle-card {
+    width: 100px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.talle-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
