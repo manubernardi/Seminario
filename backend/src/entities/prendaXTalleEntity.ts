@@ -2,6 +2,7 @@ import {Column, Entity, JoinColumn, PrimaryColumn, ManyToOne} from "typeorm";
 import { PrendaEntity } from "./prenda.entity";
 import { TalleEntity } from "./talle.entity";
 import {Exclude} from "class-transformer"; 
+
 @Entity('prendas_talles')
 export class PrendaXTalleEntity {
     @PrimaryColumn()
@@ -10,19 +11,15 @@ export class PrendaXTalleEntity {
     @PrimaryColumn()
     talle_id: number;
 
-    @ManyToOne(() => PrendaEntity)
+    @ManyToOne(() => PrendaEntity, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'prenda_codigo' })
     @Exclude()
     prenda: PrendaEntity;
 
-    @ManyToOne(() => TalleEntity)
+    @ManyToOne(() => TalleEntity, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'talle_id' })
     talle: TalleEntity;
 
     @Column()
     cantidad: number;
-
-
-
-
 }

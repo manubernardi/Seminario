@@ -1,14 +1,16 @@
-import { Entity, ManyToOne, Column } from "typeorm";
+import { Entity, ManyToOne, Column, PrimaryGeneratedColumn } from "typeorm";
 import { CompraEntity } from "./compra.entity";
 import { PrendaEntity } from "./prenda.entity";
 
 @Entity()
 export class DetalleCompraEntity{
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne(()=> CompraEntity, compra => compra.detalles)
     compra: CompraEntity
 
-    @ManyToOne(()=> PrendaEntity, prenda => prenda.compras)
+    @ManyToOne(()=> PrendaEntity)
     prenda: PrendaEntity;
 
     @Column()
