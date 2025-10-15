@@ -20,6 +20,10 @@ export class EmpleadoEntity {
     @Column()
     telefono: string;
 
+     
+    @Column() 
+    rol_id: number;
+
     @ManyToOne(() => RoleEntity, role => role.empleados, { eager: true })
     @JoinColumn({ name: 'rol_id' })
     rol!: RoleEntity;

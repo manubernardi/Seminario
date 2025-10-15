@@ -39,7 +39,7 @@ export class Register {
     '',
     [Validators.required, Validators.pattern('^[0-9]{10,15}$')],
   ],
-  rol_id: ['', Validators.required], 
+  rol_id: [null, Validators.required], 
 });
   }
 
@@ -49,22 +49,26 @@ enviar(): void {
     return;
   }
   const registroDto: RegistroDto = this.registerForm.value
+  console.log('Datos del form:', registroDto);
+  console.log('Tipo de rol_id:', typeof registroDto.rol_id);
+
   const payload: RegistroDto = {
     ...registroDto,
     rol_id: Number(registroDto.rol_id)  // ⭐ Conversión explícita
   };
-  console.log(payload)
+  console.log('Payload que se envía:', payload)
+
   this.usuarioService.nuevoUsuario(payload).subscribe({
     next: (response) => {
       alert('Usuario registrado correctamente');
       console.log('Respuesta del backend:', response);
       this.registerForm.reset();
+      this.router.navigate(['/home']);
     },
     error: (err) => {
       alert(err.message || 'Error al registrar usuario');
     }
   });
-   this.router.navigate(['/home']);
   }
    
 }
