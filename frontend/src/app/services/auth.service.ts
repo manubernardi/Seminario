@@ -8,7 +8,9 @@ export interface EmpleadoAuth {
   id: number;
   nombre: string;
   apellido: string;
-  legajo: string;
+  legajo: number;
+  dni: string;
+  telefono: string;
   rol: {
     id: number;
     nombre: string;
@@ -59,6 +61,10 @@ export class AuthService {
     const empleado = this.getEmpleadoLogueado();
     return empleado?.id || null;
   }
+
+  getDni(): string | null {
+    return localStorage.getItem('dni');
+  } 
 
   isAuthenticated(): boolean {
     return this.getEmpleadoLogueado() !== null;
