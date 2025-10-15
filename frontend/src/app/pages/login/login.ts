@@ -85,6 +85,9 @@ export class Login {
   this.authService.login(data).subscribe({
     next: response => {
       console.log('Login exitoso:', response);
+      localStorage.setItem('empleadoDni', response.empleado.dni);  // <- Solo el DNI
+      localStorage.setItem('empleado', JSON.stringify(response.empleado));  // <- El objeto completo
+      
       this.router.navigate(['/home']);
     },
     error: err => {

@@ -17,6 +17,12 @@ export class PrendaEntity {
     @Column()
     precio: number;
 
+    @Column({ default: true })  // Para borrar prendas, porque si borramos una prenda literal, 
+    // y esa prenda fue vendida, habria que borrar toda la venta y perderiamos esa info, 
+    // entonces la marcamos como inactiva en vez de borrarla como tal
+    
+    activo: boolean;
+
     @OneToMany(() => PrendaXTalleEntity, px => px.prenda, { cascade: true, eager: true, onDelete: 'CASCADE' })
     prendasXTalles: PrendaXTalleEntity[];
 

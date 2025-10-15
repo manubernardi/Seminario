@@ -21,6 +21,7 @@ export class StockService {
 
 async findAll(): Promise<PrendaEntity[]> {
   const prendas = await this.prendaRepository.find({
+    where: { activo: true },
     relations: {
       prendasXTalles: true
     }
@@ -38,7 +39,7 @@ return prendas.map((prenda) => ({
     // Obtener prenda por código
 async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
     const prenda = await this.prendaRepository.findOne({
-        where: { codigo },
+        where: { codigo, activo: true },
         relations: { prendasXTalles: true }
     });
     if (!prenda) {
@@ -88,9 +89,10 @@ async updatePrenda(codigo: string, prendaData: Partial<PrendaEntity>): Promise<P
 async deletePrenda(codigo: string): Promise<{ mensaje: string }> {
     const prenda = await this.getPrendaByCodigo(codigo);
     
-    await this.prendaRepository.remove(prenda);
+    prenda.activo = false;
+    await this.prendaRepository.save(prenda);
     
-    return { mensaje: `Prenda ${codigo} eliminada correctamente` };
+    return { mensaje: `Prenda ${codigo} dada de baja correctamente` };
 }
 
     // Prendas con stock bajo

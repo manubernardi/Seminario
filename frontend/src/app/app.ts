@@ -20,15 +20,20 @@ export class App implements OnInit {
   }
 
   verificarSesion() {
-    const empleado = localStorage.getItem('empleado'); // o como lo guardes
+    const dni = localStorage.getItem('empleadoDni');
+     console.log('🔍 empleado guardado:', dni);
 
     
-    if (empleado) {
-      this.usuarioService.verificarEmpleado(empleado).subscribe({
+    if (dni) {
+      console.log('📡 Llamando a verificar empleado...');
+      this.usuarioService.verificarEmpleado(dni).subscribe({
         next: (response) => {
           console.log('✅ Sesión válida:', response);
         },
         error: (err) => {
+          console.log('❌ Error completo:', err);
+          console.log('❌ URL llamada:', err.url);  // <- ESTO ES CLAVE
+          console.log('❌ Status:', err.status);
           console.log('❌ Empleado no existe o fue eliminado');
           alert('Tu sesión ha expirado. El empleado fue eliminado del sistema.');
           localStorage.clear();

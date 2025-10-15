@@ -32,7 +32,7 @@ export class UsuariosService {
     );
   }
   verificarEmpleado(dni: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/auth/verificar/${dni}`);
+  return this.http.get(`http://localhost:3000/auth/verificar/${dni}`);
   }
 }
  
