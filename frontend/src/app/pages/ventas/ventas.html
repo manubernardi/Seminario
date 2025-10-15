@@ -11,6 +11,7 @@
       <th>Fecha</th>
       <th>Empleado</th>
       <th>Total</th>
+      <th>Cliente</th>
       <th>Detalles</th>
     </tr>
   </thead>
@@ -21,6 +22,7 @@
       <td>{{ venta.fecha | date: 'short' }}</td>
       <td>{{ venta.empleado.nombre }}</td>
       <td>{{ venta.total | currency:'ARS' }}</td>
+      <td>{{ venta.cliente?.nombre }} {{ venta.cliente?.apellido }}</td>
       <td>
         <div>
           <button class="btn-detalles" (click)="verDetalles(venta)">Ver Detalles</button>
