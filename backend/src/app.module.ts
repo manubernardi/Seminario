@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
         database: 'gestion',
         username: 'postgres',
         password: 'postgres',
-        synchronize: true,
+        synchronize: false,
         dropSchema: false,
         entities,
       }),
