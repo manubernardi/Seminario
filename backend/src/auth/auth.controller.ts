@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Get, Param} from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -42,6 +42,24 @@ export class AuthController {
           id: empleado.rol.id,
           nombre: empleado.rol.nombre
         }
+      }
+    };
+  }
+  @Get('verificar/:dni')
+  async verificarEmpleado(@Param('dni') dni: string) {
+    const empleado = await this.authService.validateEmpleado(dni);
+    
+    if (!empleado) {
+      throw new HttpException('Empleado no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      existe: true,
+      empleado: {
+        nombre: empleado.nombre,
+        apellido: empleado.apellido,
+        legajo: empleado.legajo,
+        dni: empleado.dni
       }
     };
   }

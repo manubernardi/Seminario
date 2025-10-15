@@ -31,5 +31,8 @@ export class UsuariosService {
       })
     );
   }
+  verificarEmpleado(dni: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/auth/verificar/${dni}`);
+  }
 }
  
