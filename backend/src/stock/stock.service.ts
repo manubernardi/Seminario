@@ -5,7 +5,7 @@ import { PrendaEntity } from '../entities/prenda.entity';
 import { CreatePrendaDto } from '../dto/createPrenda.dto';
 import { CreatePrendaXTalleDto } from '../dto/createPrendaXTalle.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
-import { TalleEntity } from 'src/entities/talle.entity';
+import { TalleEntity } from '../entities/talle.entity';
 import { error } from 'console';
 
 @Injectable()
