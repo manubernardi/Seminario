@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
 import { EmpleadoEntity } from './empleado.entity';
 import { DetalleCompraEntity } from './detalle.compra.entity';
 
@@ -11,7 +11,11 @@ export class CompraEntity{
     @Column()
     fecha: Date;
 
-    @ManyToOne(()=> EmpleadoEntity, empleado => empleado.compras)
+    @Column()  // <- AGREGÁ ESTO
+    empleadoLegajo: number;
+    
+    @ManyToOne(() => EmpleadoEntity, empleado => empleado.compras)
+    @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
     empleado: EmpleadoEntity;
 
     @Column()
