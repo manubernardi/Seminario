@@ -8,6 +8,7 @@ import { VentasModule } from './ventas/ventas.module';
 import { StockModule } from './stock/stock.module';
 import { TallesModule } from './talles/talles.module';
 import { ClientesModule } from './clientes/clientes.module';
+import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
       TallesModule,
       ClientesModule,
       AuthModule,
+      ComprasModule,
       TypeOrmModule.forFeature(Object.values(entities)),
     ],
   controllers: [AppController],

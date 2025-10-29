@@ -211,20 +211,22 @@ export class RegistrarVenta implements OnInit {
     }
     const codigoPrenda = this.prendaSeleccionada.codigo;
     const descripcion = `${this.prendaSeleccionada.descripcion} - ${this.getTalleDescripcion(this.talleSeleccionado.talle_id)}`;
-
     const detalleExistente = this.detalles.find(
       d => d.codigoPrenda === codigoPrenda && d.descripcion === descripcion
     );
+    
+    
 
-    if (detalleExistente) {
+   /* if (detalleExistente) {
       const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
       if (nuevaCantidad > this.talleSeleccionado.cantidad) {
         alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
         return;
       }
+     
       detalleExistente.cantidad = nuevaCantidad;
       detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
-    } else {
+    }*/ 
       this.detalles.push({
         codigoPrenda, 
         descripcion,
@@ -233,11 +235,13 @@ export class RegistrarVenta implements OnInit {
         cantidad: this.cantidadSeleccionada,
         subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
       });
-    }
-
+      this.talleSeleccionado.cantidad -= this.cantidadSeleccionada;
+    
+    
     this.prendaSeleccionada = null;
     this.talleSeleccionado = null;
     this.cantidadSeleccionada = 1;
+    
   }
 
 

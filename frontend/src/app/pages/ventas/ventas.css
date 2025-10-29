@@ -11,6 +11,9 @@
   gap: 2rem;
 
 }
+.inicio {
+    background-color: var(--primary-color);
+}
 
 .navbar-title {
   margin: 0;
@@ -47,7 +50,7 @@ h2 {
 
 /* Estilos para la tabla */
 table {
-  width: 100%;
+  width: 95%;
   border-collapse: collapse;
   margin: 1rem auto;
   font-family: Arial, sans-serif;
@@ -55,6 +58,7 @@ table {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+ ;
 }
 
 thead {

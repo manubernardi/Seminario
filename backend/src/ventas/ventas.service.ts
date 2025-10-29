@@ -7,7 +7,7 @@ import { EmpleadoEntity } from '../entities/empleado.entity';
 import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreateVentaDto} from '../dto/create-venta.dto';
-import { PrendaXTalleEntity } from 'src/entities/prendaXTalleEntity';
+import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 
 @Injectable()
 export class VentasService {
