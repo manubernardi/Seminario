@@ -20,18 +20,12 @@ export class VentaEntity {
     })
     detalles: DetalleVentaEntity[];
     
-    @Column({ nullable: true })
-    clienteId?: number;
-    
     @ManyToOne(() => ClienteEntity, (cliente) => cliente.ventas, {
         nullable: true,
         onDelete: 'SET NULL'
     })
     @JoinColumn({ name: 'clienteId' })
     cliente?: ClienteEntity;
-    
-    @Column()
-    empleadoLegajo: number;
     
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.ventas)
     @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
