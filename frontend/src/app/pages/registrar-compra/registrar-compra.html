@@ -1,1 +1,193 @@
-<p>registrar-compra works!</p>
+<!-- nueva-compra.component.html -->
+<div class="container-fluid p-4">
+  <!-- Header -->
+  <div class="inicio text-white p-4 mb-3" style="position: relative;">
+    <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem; z-index: 10;">
+      <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio
+    </button>
+    <h4 class="text-center m-0">NUEVA COMPRA</h4>
+  </div>
+
+  <div class="row">
+    <!-- Columna izquierda: Formulario -->
+    <div class="col-md-7">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Información de la Compra</h5>
+
+          <!-- Empleado -->
+          <div class="mb-3">
+            <label class="form-label">Empleado *</label>
+            @if (empleadoLogueado) {
+              <div class="alert alert-info d-flex align-items-center mb-0">
+                <i class="bi bi-person-check-fill me-2"></i>
+                <strong>{{ empleadoLogueado.nombre }} {{ empleadoLogueado.apellido }}</strong>
+                <small class="ms-2 text-muted">(Legajo: {{ empleadoLogueado.legajo }})</small>
+              </div>
+            } @else {
+              <div class="alert alert-warning">
+                No se detectó empleado logueado
+              </div>
+            }
+          </div>
+
+          <!-- Proveedor -->
+          <form [formGroup]="compraForm">
+            <div class="mb-3">
+              <label for="proveedorId" class="form-label">Proveedor *</label>
+              <select 
+                class="form-select" 
+                id="proveedorId" 
+                formControlName="proveedorId">
+                <option value="">Seleccione un proveedor</option>
+                @for (proveedor of proveedores; track proveedor.id) {
+                  <option [value]="proveedor.id">
+                    {{ proveedor.razonSocial }}
+                  </option>
+                }
+              </select>
+              @if (compraForm.get('proveedorId')?.invalid && compraForm.get('proveedorId')?.touched) {
+                <div class="text-danger mt-1">
+                  Debe seleccionar un proveedor
+                </div>
+              }
+            </div>
+          </form>
+
+          <hr>
+
+          <!-- Agregar detalles -->
+          <h5 class="mb-3">Agregar Productos</h5>
+          <form [formGroup]="detalleForm">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="codigoPrenda" class="form-label">Prenda *</label>
+                <select 
+                  class="form-select" 
+                  id="codigoPrenda" 
+                  formControlName="codigoPrenda"
+                  (change)="onPrendaChange($event)">
+                  <option value="">Seleccione...</option>
+                  @for (prenda of prendas; track prenda.codigo) {
+                    <option [value]="prenda.codigo">
+                      {{ prenda.codigo }} - {{ prenda.descripcion }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <label for="talleId" class="form-label">Talle *</label>
+                <select 
+                  class="form-select" 
+                  id="talleId" 
+                  formControlName="talleId">
+                  <option value="">Seleccione...</option>
+                  @for (talle of talles; track talle.codigo) {
+                    <option [value]="talle.codigo">
+                      {{ talle.descripcion }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-2 mb-3">
+                <label for="cantidad" class="form-label">Cantidad *</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="cantidad" 
+                  formControlName="cantidad"
+                  min="1">
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <label for="precioUnitario" class="form-label">Precio Unit. *</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="precioUnitario" 
+                  formControlName="precioUnitario"
+                  min="0"
+                  step="0.01">
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              class="btn btn-primary w-100"
+              (click)="agregarDetalle()"
+              [disabled]="detalleForm.invalid">
+              <i class="bi bi-plus-circle"></i> Agregar Producto
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Resumen -->
+    <div class="col-md-5">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Resumen de la Compra</h5>
+
+          @if (detalles.length === 0) {
+            <div class="alert alert-secondary text-center">
+              <i class="bi bi-cart-x fs-1"></i>
+              <p class="mb-0 mt-2">No hay productos agregados</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Talle</th>
+                    <th>Cant.</th>
+                    <th>P.Unit</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (detalle of detalles; track $index) {
+                    <tr>
+                      <td>
+                        <small>{{ detalle.descripcionPrenda }}</small>
+                      </td>
+                      <td>{{ detalle.descripcionTalle }}</td>
+                      <td>{{ detalle.cantidad }}</td>
+                      <td>${{ detalle.precioUnitario }}</td>
+                      <td><strong>${{ detalle.subtotal }}</strong></td>
+                      <td>
+                        <button 
+                          class="btn btn-sm btn-danger"
+                          (click)="eliminarDetalle($index)">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Total:</h5>
+              <h4 class="mb-0 text-primary">${{ montoTotal.toFixed(2) }}</h4>
+            </div>
+
+            <button 
+              class="btn btn-success w-100 btn-lg"
+              (click)="guardarCompra()"
+              [disabled]="compraForm.invalid || detalles.length === 0">
+              <i class="bi bi-check-circle"></i> Registrar Compra
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
