@@ -21,9 +21,11 @@ export class PrendaXTalleEntity {
     @JoinColumn({ name: 'talle_id' })
     talle: TalleEntity;
 
-    @Column()
+    @Column({ type: 'int', default: 0 })
     cantidad: number;
 
+
+    //MÉTODOS
     actualizarCantidad(ajuste: number): void {
         const nuevaCantidad: number = this.cantidad + ajuste; 
         if (nuevaCantidad < 0) throw new BadRequestException('El stock no puede ser negativo');

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { VentaEntity } from './venta.entity';
 import { PrendaEntity } from './prenda.entity';
 import { TalleEntity } from './talle.entity';
@@ -17,13 +17,13 @@ export class DetalleVentaEntity{
     @Column()
     cantidad!: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     subtotal!: number;
 
-    @ManyToOne(() => PrendaEntity)
+    @ManyToOne(() => PrendaEntity, { nullable: false, onDelete: 'RESTRICT' })
     prenda!: PrendaEntity;
 
-    @ManyToOne(()=> TalleEntity)
+    @ManyToOne(()=> TalleEntity, { nullable: false, onDelete: 'RESTRICT' })
     talle!: TalleEntity;
     
 }

@@ -21,7 +21,7 @@ import { ProveedoresModule } from './proveedores/proveedores.module';
         database: 'gestion',
         username: 'postgres',
         password: 'postgres',
-        synchronize: false,
+        synchronize: true,
         dropSchema: false,
         entities,
       }),

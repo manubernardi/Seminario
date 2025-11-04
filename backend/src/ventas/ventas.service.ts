@@ -88,8 +88,8 @@ export class VentasService {
     const nuevaVenta = this.ventaRepository.create({
       fecha: new Date(),
       total: total,
-      empleadoLegajo: venta.empleadoLegajo,
-      clienteId: venta.clienteId,
+      empleado: { legajo: venta.empleadoLegajo },
+      cliente: venta.clienteId ? { id: venta.clienteId } : undefined,
       detalles: detalles  // El cascade: true se encarga de guardar esto
     });
     

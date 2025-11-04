@@ -64,5 +64,11 @@ export const routes: Routes = [
     component: Proveedores,
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always'
+  },
+  { 
+    path: 'registrar-compras', 
+    component: Clientes,
+    canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always'
   }
 ];
