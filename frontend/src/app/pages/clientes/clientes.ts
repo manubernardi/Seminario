@@ -1,40 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-
-interface Cliente {
-  id: number;
-  nombre: string;
-  apellido: string;
-  telefono?: string;
-}
+import { ClientesService, Cliente } from '../../services/clientes.service';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './clientes.html',
-  styleUrl: './clientes.css'
+  styleUrls: ['./clientes.css']
 })
-export class Clientes implements OnInit {
+export class ClientesComponent implements OnInit {
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
   clienteForm: FormGroup;
-  
-  mostrarModal: boolean = false;
-  modoEdicion: boolean = false;
+
+  mostrarModal = false;
+  modoEdicion = false;
   clienteEditando: Cliente | null = null;
-  guardando: boolean = false;
-  
-  busqueda: string = '';
-  
-  private apiUrl = 'http://localhost:3000/clientes';
+  guardando = false;
+  busqueda = '';
 
   constructor(
-    private fb: FormBuilder,
-    private http: HttpClient
+    private clienteService: ClientesService,
+    private fb: FormBuilder
   ) {
     this.clienteForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -48,30 +38,23 @@ export class Clientes implements OnInit {
   }
 
   cargarClientes(): void {
-    this.http.get<Cliente[]>(this.apiUrl).subscribe({
+    this.clienteService.cargarClientes().subscribe({
       next: (data) => {
         this.clientes = data;
-        this.clientesFiltrados = data;
+        this.filtrarClientes();
       },
-      error: (error) => {
-        console.error('Error al cargar clientes:', error);
-        alert('Error al cargar clientes');
-      }
+      error: (error) => console.error('Error al cargar clientes:', error)
     });
   }
 
   filtrarClientes(): void {
     const termino = this.busqueda.toLowerCase().trim();
-    
-    if (!termino) {
-      this.clientesFiltrados = this.clientes;
-      return;
-    }
-
-    this.clientesFiltrados = this.clientes.filter(cliente =>
-      cliente.nombre.toLowerCase().includes(termino) ||
-      cliente.apellido.toLowerCase().includes(termino)
-    );
+    this.clientesFiltrados = !termino
+      ? this.clientes
+      : this.clientes.filter(c =>
+          c.nombre.toLowerCase().includes(termino) ||
+          c.apellido.toLowerCase().includes(termino)
+        );
   }
 
   abrirModalNuevo(): void {
@@ -96,20 +79,19 @@ export class Clientes implements OnInit {
 
   guardarCliente(): void {
     if (this.clienteForm.invalid) {
-      alert('Complete todos los campos obligatorios correctamente');
+      alert('Complete todos los campos obligatorios');
       return;
     }
 
     this.guardando = true;
+    const clienteData = this.clienteForm.value;
 
     if (this.modoEdicion && this.clienteEditando) {
-      // Actualizar cliente existente
-      this.http.patch<Cliente>(`${this.apiUrl}/${this.clienteEditando.id}`, this.clienteForm.value).subscribe({
+      // Actualizar cliente
+      this.clienteService.actualizarCliente(this.clienteEditando.id, clienteData).subscribe({
         next: (clienteActualizado) => {
           const index = this.clientes.findIndex(c => c.id === clienteActualizado.id);
-          if (index !== -1) {
-            this.clientes[index] = clienteActualizado;
-          }
+          if (index !== -1) this.clientes[index] = clienteActualizado;
           this.filtrarClientes();
           alert('Cliente actualizado correctamente');
           this.cerrarModal();
@@ -117,23 +99,23 @@ export class Clientes implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar cliente:', error);
-          alert(error.error?.message || 'Error al actualizar el cliente');
+          alert('Error al actualizar el cliente');
           this.guardando = false;
         }
       });
     } else {
       // Crear nuevo cliente
-      this.http.post<Cliente>(this.apiUrl, this.clienteForm.value).subscribe({
+      this.clienteService.crearCliente(clienteData).subscribe({
         next: (nuevoCliente) => {
           this.clientes.push(nuevoCliente);
           this.filtrarClientes();
-          alert('Cliente registrado correctamente');
+          alert('Cliente creado correctamente');
           this.cerrarModal();
           this.guardando = false;
         },
         error: (error) => {
-          console.error('Error al guardar cliente:', error);
-          alert(error.error?.message || 'Error al guardar el cliente');
+          console.error('Error al crear cliente:', error);
+          alert('Error al crear el cliente');
           this.guardando = false;
         }
       });
@@ -141,11 +123,9 @@ export class Clientes implements OnInit {
   }
 
   eliminarCliente(cliente: Cliente): void {
-    if (!confirm(`¿Está seguro de eliminar al cliente ${cliente.nombre} ${cliente.apellido}?`)) {
-      return;
-    }
+    if (!confirm(`¿Está seguro de eliminar a ${cliente.nombre} ${cliente.apellido}?`)) return;
 
-    this.http.delete(`${this.apiUrl}/${cliente.id}`).subscribe({
+    this.clienteService.eliminarCliente(cliente.id).subscribe({
       next: () => {
         this.clientes = this.clientes.filter(c => c.id !== cliente.id);
         this.filtrarClientes();
@@ -153,7 +133,7 @@ export class Clientes implements OnInit {
       },
       error: (error) => {
         console.error('Error al eliminar cliente:', error);
-        alert(error.error?.message || 'Error al eliminar el cliente');
+        alert('Error al eliminar el cliente');
       }
     });
   }
