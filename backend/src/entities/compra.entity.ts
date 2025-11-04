@@ -11,11 +11,15 @@ export class CompraEntity{
     @Column()
     fecha: Date;
 
-    @Column()  // <- AGREGÁ ESTO
+    @Column() 
     empleadoLegajo: number;
     
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.compras)
     @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
+
+
+
+
     empleado: EmpleadoEntity;
 
     @Column()

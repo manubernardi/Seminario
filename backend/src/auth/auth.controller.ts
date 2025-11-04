@@ -8,6 +8,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: { dni: string; isSupervisor?: boolean }) {
     const { dni, isSupervisor } = body;
+    console.log('Datos recibidos en login:', body);
 
     // Validar que el DNI esté presente
     if (!dni) {

@@ -10,6 +10,7 @@ import { TallesModule } from './talles/talles.module';
 import { ClientesModule } from './clientes/clientes.module';
 import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
+import { ProveedoresModule } from './proveedores/proveedores.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -20,8 +21,8 @@ import { AuthModule } from './auth/auth.module';
         database: 'gestion',
         username: 'postgres',
         password: 'postgres',
-        synchronize: true,
-        dropSchema: true,
+        synchronize: false,
+        dropSchema: false,
         entities,
       }),
        VentasModule,
@@ -31,6 +32,7 @@ import { AuthModule } from './auth/auth.module';
       ClientesModule,
       AuthModule,
       ComprasModule,
+      ProveedoresModule,
       TypeOrmModule.forFeature(Object.values(entities)),
     ],
   controllers: [AppController],
