@@ -18,3 +18,18 @@ app-root {
   min-height: 100vh;
 }
 
+.btn-volver {
+  background-color: #9ad6e2;
+  color: #000000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-volver:hover {
+  background-color: #023e8a;
+  color: white;
+}

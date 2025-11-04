@@ -10,7 +10,7 @@ export class Proveedores {
   constructor(private proveedoresService: ProveedoresService) {  }
 
   ngOnInit() {
-    this.proveedoresService.getProveedores().subscribe(data => {
+    this.proveedoresService.obtenerProveedores().subscribe(data => {
       console.log(data);
     });
   }   

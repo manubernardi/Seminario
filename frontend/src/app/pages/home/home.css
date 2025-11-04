@@ -19,7 +19,7 @@ body {
 }
 .grid-opciones {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(6, 1fr);
   grid-column-gap: 10px;
   grid-row-gap: 10px;
@@ -51,6 +51,8 @@ body {
 .clientes { grid-area: 4 / 2 / 6 / 4; }
 .nueva-compra { grid-area: 4 / 4 / 6 / 6; }
 .ver-compras { grid-area: 4 / 6 / 6 / 8; }
+.nuevo-empleado {grid-area: 2 / 8 / 4 / 10;}
+.ver-proveedores {grid-area: 4 / 8 / 6 / 10;}
 
 i.bi {
   font-size: 2rem;

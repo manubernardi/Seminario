@@ -1,195 +1,194 @@
+<div class="inicio text-white p-4 mb-2 total-display">
+  <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem;">
+  <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio</button>
+  <h4 class="text-center">STOCK</h4>
+</div>
 
-    <div class="inicio text-white p-4 mb-2 total-display">
-    <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem;">
-    <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio</button>
-    <h4 class="text-center">STOCK</h4>
-    </div>
+<!-- Barra de búsqueda -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <input
+    type="text"
+    class="form-control w-50"
+    placeholder="Buscar por código o descripción..."
+    [(ngModel)]="searchTerm"
+    (input)="buscarPrendas()"
+  />
+  <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
+    + Nueva Prenda
+  </button>
+</div>
 
-  <!-- 🔹 Barra de búsqueda -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <input
-      type="text"
-      class="form-control w-50"
-      placeholder="Buscar por código o descripción..."
-      [(ngModel)]="searchTerm"
-      (input)="buscarPrendas()"
-    />
-    <button class="btn btn-success" (click)="abrirModalNuevaPrenda()">
-      + Nueva Prenda
-    </button>
-  </div>
+<!-- Tabla de stock -->
+<div class="table-responsive shadow-sm">
+  <table class="table table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Stock Total</th>
+        <th>Talles y Cantidades</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let prenda of prendas">
+        <td>{{ prenda.codigo }}</td>
+        <td>{{ prenda.descripcion }}</td>
+        <td>${{ prenda.precio | number: '1.2-2' }}</td>
 
-  <!-- 🔹 Tabla de stock -->
-  <div class="table-responsive shadow-sm">
-    <table class="table table-striped">
-      <thead class="table-light">
-        <tr>
-          <th>Código</th>
-          <th>Descripción</th>
-          <th>Precio</th>
-          <th>Stock Total</th>
-          <th>Talles y Cantidades</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let prenda of prendas">
-          <td>{{ prenda.codigo }}</td>
-          <td>{{ prenda.descripcion }}</td>
-          <td>${{ prenda.precio | number: '1.2-2' }}</td>
-
-          <!-- Stock total -->
-          <td>
-            <span
-              [ngClass]="{
-                'text-danger fw-bold': prenda.cantidadTotal === 0,
-                'text-warning': prenda.cantidadTotal < 5 && prenda.cantidadTotal > 0,
-                'text-success': prenda.cantidadTotal >= 5
-              }"
-            >
-              {{ prenda.cantidadTotal || 0 }}
-            </span>
-          </td>
-         <td>
-            <div class="d-flex flex-wrap gap-2">
-              <div *ngFor="let prendaXTalle of prenda.prendasXTalles" class="talle-card border rounded p-2">
-                <div class="text-center mb-2">
-                  <strong>{{ getTalleDescripcion(prendaXTalle.talle_id) }}</strong>
-                </div>
-                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-                    <span class="fw-bold">{{ prendaXTalle.cantidad }}</span>
-                </div>
-                <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
-                    <button
-                    class="btn btn-sm btn-outline-success"
-                    (click)="ajustarStock(prenda.codigo, 1, prendaXTalle.talle_id)"
-                    >
-                    +
-                    </button>
-                    <button
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="ajustarStock(prenda.codigo, -1, prendaXTalle.talle_id)"
-                    >
-                    -
-                    </button>
-                </div>
-                </div>
-            </div>
-            </td>
-
-          <!-- Botones -->
-          <td class="text-center">
-            <button
-              class="btn btn-sm btn-primary me-2"
-              (click)="editarPrenda(prenda)"
-            >
-              Editar
-            </button>
-            <button
-              class="btn btn-sm btn-danger"
-              (click)="eliminarPrenda(prenda)"
-            >
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-
-<!-- 🔹 Modal Crear / Editar Prenda -->
-<div
-  class="modal fade"
-  id="modalPrenda"
-  tabindex="-1"
-  aria-labelledby="modalPrendaLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalPrendaLabel">
-          {{ modoEdicion ? 'Editar Prenda' : 'Nueva Prenda' }}
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-
-      <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Código</label>
-            <input
-              type="text"
-              formControlName="codigo"
-              class="form-control"
-              [readonly]="modoEdicion"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <input type="text" formControlName="descripcion" class="form-control" />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Precio</label>
-            <input
-              type="number"
-              formControlName="precio"
-              class="form-control"
-              min="0"
-            />
-          </div>
-          
-
-          <div class="mb-3">
-            <label class="form-label">Prenda por Talle</label>
-            <div class="d-flex flex-wrap gap-2">
-              <div *ngFor="let talleForm of prendasXTallesForm; let i = index" [formGroup]="talleForm" class="talle-card border rounded p-2">
-                <div class="text-center mb-2">
-                  <label>{{ getTalleDescripcion(talles[i]?.codigo ?? 0) }}</label>
-                </div>
-                <div class="mb-3" [formGroup]="talleForm">
-                  <label class="form-label">Cantidad</label>
-                  <input
-                    type="number"
-                    formControlName="cantidad"
-                    class="form-control"
-                    min="0"
-                  />
-                </div>
-                </div>
+        <!-- Stock total -->
+        <td>
+          <span
+            [ngClass]="{
+              'text-danger fw-bold': prenda.cantidadTotal === 0,
+              'text-warning': prenda.cantidadTotal < 5 && prenda.cantidadTotal > 0,
+              'text-success': prenda.cantidadTotal >= 5
+            }"
+          >
+            {{ prenda.cantidadTotal || 0 }}
+          </span>
+        </td>
+        <td>
+          <div class="d-flex flex-wrap gap-2">
+            <div *ngFor="let prendaXTalle of prenda.prendasXTalles" class="talle-card border rounded p-2">
+              <div class="text-center mb-2">
+                <strong>{{ getTalleDescripcion(prendaXTalle.talle_id) }}</strong>
+              </div>
+              <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                  <span class="fw-bold">{{ prendaXTalle.cantidad }}</span>
+              </div>
+              <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
+                  <button
+                  class="btn btn-sm btn-outline-success"
+                  (click)="ajustarStock(prenda.codigo, 1, prendaXTalle.talle_id)"
+                  >
+                  +
+                  </button>
+                  <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="ajustarStock(prenda.codigo, -1, prendaXTalle.talle_id)"
+                  >
+                  -
+                  </button>
+              </div>
               </div>
           </div>
+          </td>
+
+        <!-- Botones -->
+        <td class="text-center">
+          <button
+            class="btn btn-sm btn-primary me-2"
+            (click)="editarPrenda(prenda)"
+          >
+            Editar
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="eliminarPrenda(prenda)"
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- Modal de Crear o Editar Prenda -->
+<div
+class="modal fade"
+id="modalPrenda"
+tabindex="-1"
+aria-labelledby="modalPrendaLabel"
+aria-hidden="true"
+>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="modalPrendaLabel">
+        {{ modoEdicion ? 'Editar Prenda' : 'Nueva Prenda' }}
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      ></button>
+    </div>
+
+    <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Código</label>
+          <input
+            type="text"
+            formControlName="codigo"
+            class="form-control"
+            [readonly]="modoEdicion"
+          />
         </div>
-            
+
+        <div class="mb-3">
+          <label class="form-label">Descripción</label>
+          <input type="text" formControlName="descripcion" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Precio</label>
+          <input
+            type="number"
+            formControlName="precio"
+            class="form-control"
+            min="0"
+          />
+        </div>
+        
+
+        <div class="mb-3">
+          <label class="form-label">Prenda por Talle</label>
+          <div class="d-flex flex-wrap gap-2">
+            <div *ngFor="let talleForm of prendasXTallesForm; let i = index" [formGroup]="talleForm" class="talle-card border rounded p-2">
+              <div class="text-center mb-2">
+                <label>{{ getTalleDescripcion(talles[i]?.codigo ?? 0) }}</label>
+              </div>
+              <div class="mb-3" [formGroup]="talleForm">
+                <label class="form-label">Cantidad</label>
+                <input
+                  type="number"
+                  formControlName="cantidad"
+                  class="form-control"
+                  min="0"
+                />
+              </div>
+              </div>
+            </div>
+        </div>
+      </div>
           
         
-        
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="prendaForm.invalid"
-          >
-            {{ modoEdicion ? 'Guardar Cambios' : 'Crear Prenda' }}
-          </button>
-          </form>
-        </div>
-      </div>    
-    </div>  
+      
+      
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="prendaForm.invalid"
+        >
+          {{ modoEdicion ? 'Guardar Cambios' : 'Crear Prenda' }}
+        </button>
+        </form>
+      </div>
+    </div>    
+  </div>  
     
 
  <!-- 🔹 Dashboard de estadísticas -->
@@ -224,4 +223,4 @@
         </div>
       </div>
     </div>
-
+  </div>

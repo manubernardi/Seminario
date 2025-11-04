@@ -23,24 +23,6 @@
   padding-right: 5rem;
 }
 
-.btn-volver {
-  background-color: #9ad6e2;
-  color: #000000;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s;
-
-  
-
-}
-
-.btn-volver:hover {
-  background-color: #023e8a;
-  color: white;
-}
 h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;

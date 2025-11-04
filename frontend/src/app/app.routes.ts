@@ -16,7 +16,6 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   
-  // 👇 TODAS estas rutas ahora están protegidas
   { 
     path: 'home', 
     component: Home,
