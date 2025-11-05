@@ -79,6 +79,7 @@ cerrarModal(): void {
 
     this.guardando = true;
     const proveedorData = this.proveedorForm.value;
+    console.log(proveedorData);
 
     if (this.modoEdicion && this.proveedorEditando) {
       // Actualizar proveedor
@@ -104,7 +105,8 @@ cerrarModal(): void {
         telefono: proveedorData.telefono,
         mail: proveedorData.mail
       };
-      this.proveedoresService.crearProveedor(createProveedorDto).subscribe({
+      console.log(createProveedorDto);
+      this.proveedoresService.nuevoProveedor(createProveedorDto).subscribe({
         next: (nuevoProveedor) => {
           this.proveedores.push(nuevoProveedor);
           this.filtrarProveedores();
@@ -120,6 +122,19 @@ cerrarModal(): void {
       });
     }
   }
-
-
+  eliminarProveedor(proveedor: Proveedor): void {
+    if (confirm(`¿Está seguro de eliminar al proveedor "${proveedor.razonSocial}"?`)) {
+      this.proveedoresService.eliminarProveedor(proveedor.id).subscribe({
+        next: () => {
+          this.proveedores = this.proveedores.filter(p => p.id !== proveedor.id);
+          this.filtrarProveedores();
+          alert('Proveedor eliminado correctamente');
+        },
+        error: (error) => {
+          console.error('Error al eliminar proveedor:', error);
+          alert('Error al eliminar el proveedor');
+        }
+      });
+    }
+  }
 }

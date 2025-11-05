@@ -1,0 +1,164 @@
+
+<body>
+    <div class="inicio text-white p-4 mb-2">
+        <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem;">
+        <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio</button>
+        <h4 class="text-center">GESTIÓN DE PROVEEDORES</h4>
+    </div>
+
+     <!-- Barra de búsqueda y botón en la misma línea -->
+    <div class="d-flex gap-3 mb-4 align-items-center">
+        <!-- Barra de búsqueda (ocupa el espacio restante) -->
+        <div class="flex-grow-1">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    placeholder="Buscar por nombre o apellido"
+                    [(ngModel)]="busqueda"
+                    (input)="filtrarProveedores()">
+            </div>
+        </div>
+        
+        <!-- Botón Nuevo Cliente -->
+        <button class="btn btn-success btn-lg" (click)="abrirModalNuevo()">
+            <i class="bi bi-person-plus-fill"></i> Nuevo Cliente
+        </button>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <div class="card">
+        <div class="card-body">
+            @if (proveedoresFiltrados.length === 0 && busqueda) {
+                <div class="text-center py-5">
+                    <i class="bi bi-search" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No se encontraron proveedores con "{{ busqueda }}"</p>
+                </div>
+            } @else if (proveedoresFiltrados.length === 0) {
+                <div class="text-center py-5">
+                    <i class="bi bi-people" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No hay proveedores registrados</p>
+                    <button class="btn btn-primary" (click)="abrirModalNuevo()">
+                        Registrar primer proveedor
+                    </button>
+                </div>
+            } @else {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Razón Social</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+                                <tr>
+                                    <td>{{ proveedor.razonSocial }}</td>
+                                    <td>{{ proveedor.telefono || '-' }}</td>
+                                    <td>{{ proveedor.mail || '-' }}</td>
+                                    <td>
+                                        <button 
+                                            class="btn btn-sm btn-primary me-2"
+                                            (click)="abrirModalEditar(proveedor)"
+                                            title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        <button 
+                                            class="btn btn-sm btn-danger"
+                                            (click)="eliminarProveedor(proveedor)"
+                                            title="Eliminar">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+
+
+                <div class="mt-3 text-muted">
+                    Mostrando {{ proveedoresFiltrados.length }} de {{ proveedores.length }} proveedor(es)
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MODAL PARA CREAR/EDITAR PROVEEDOR -->
+    @if (mostrarModal) {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" [class.bg-primary]="!modoEdicion" [class.bg-warning]="modoEdicion">
+                        <h5 class="modal-title text-white">
+                            {{ modoEdicion ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form [formGroup]="proveedorForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Razón Social</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="razonSocial"
+                                        [class.is-invalid]="proveedorForm.get('razonSocial')?.invalid && proveedorForm.get('razonSocial')?.touched">
+                                    @if (proveedorForm.get('razonSocial')?.invalid && proveedorForm.get('razonSocial')?.touched) {
+                                        <div class="invalid-feedback">La razón social es obligatoria</div>
+                                    }
+                                </div>
+                                </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="telefono"
+                                        placeholder="Ej: 3512345678">
+                                </div>
+                            </div>
+                                <div class="row">
+                                   <label class="form-label">Mail</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="mail"
+                                        [class.is-invalid]="proveedorForm.get('mail')?.invalid && proveedorForm.get('mail')?.touched">
+                                    @if (proveedorForm.get('mail')?.invalid && proveedorForm.get('mail')?.touched) {
+                                        <div class="invalid-feedback">El mail es obligatorio</div>
+                                    }
+                                </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary" 
+                            (click)="cerrarModal()"
+                            [disabled]="guardando">
+                            Cancelar
+                        </button>
+                        <button 
+                            type="button" 
+                            [class]="modoEdicion ? 'btn btn-warning' : 'btn btn-success'"
+                            (click)="guardarProveedor()"
+                            [disabled]="proveedorForm.invalid || guardando">
+                            <i [class]="modoEdicion ? 'bi bi-check-circle' : 'bi bi-save'"></i>
+                            {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Guardar') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</body>

@@ -8,8 +8,8 @@ import { Ventas } from '../app/pages/ventas/ventas';
 import { VerCompras } from '../app/pages/ver-compras/ver-compras';
 import { RegistrarCompra } from '../app/pages/registrar-compra/registrar-compra';
 import { RegistrarVenta } from '../app/pages/registrar-venta/registrar-venta';
-import { Clientes } from '../app/pages/clientes/clientes';
-import { Proveedores } from './pages/proveedores/proveedores';
+import { ClientesComponent } from '../app/pages/clientes/clientes';
+import { ProveedoresComponent } from './pages/proveedores/proveedores';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -55,20 +55,20 @@ export const routes: Routes = [
   },
   { 
     path: 'clientes', 
-    component: Clientes,
+    component: ClientesComponent,
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'proveedores',
-    component: Proveedores,
+    component: ProveedoresComponent,
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always'
   },
-  { 
+ /* { 
     path: 'registrar-compras', 
-    component: Clientes,
+    component: ClientesComponent,
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always'
-  }
+  } */
 ];
