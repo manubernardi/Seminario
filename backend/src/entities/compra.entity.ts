@@ -6,7 +6,7 @@ import { DetalleCompraEntity } from './detalle.compra.entity';
 export class CompraEntity{
 
     @PrimaryGeneratedColumn()
-    NumCompra: number;
+    numCompra: number;
 
     @Column()
     fecha: Date;
@@ -16,10 +16,6 @@ export class CompraEntity{
     
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.compras)
     @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
-
-
-
-
     empleado: EmpleadoEntity;
 
     @Column()

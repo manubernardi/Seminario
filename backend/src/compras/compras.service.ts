@@ -1,5 +1,4 @@
-// compras.service.ts
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompraEntity } from '../entities/compra.entity';
@@ -112,7 +111,7 @@ export class ComprasService {
       detalles: detalles
     });
 
-    // Guardar todo junto (cascade hace el resto)
+    // Guardar todo junto 
     const compraGuardada = await this.compraRepository.save(nuevaCompra);
     return compraGuardada;
   }
@@ -125,7 +124,7 @@ export class ComprasService {
 
   async findOne(numCompra: number): Promise<CompraEntity> {
     const compra = await this.compraRepository.findOne({
-      where: { NumCompra: numCompra },
+      where: { numCompra: numCompra },
       relations: ['empleado', 'detalles', 'detalles.prenda']
     });
 
