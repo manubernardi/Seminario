@@ -63,7 +63,6 @@ export class Stock implements OnInit {
     this.cargarDashboardStats();
   }
 
-  // 📊 Carga de estadísticas del dashboard
   cargarDashboardStats(): void {
     this.stockService.getDashboardStats().subscribe({
       next: (data) => (this.dashboardStats = data),
@@ -71,7 +70,6 @@ export class Stock implements OnInit {
     });
   }
 
-  // 👕 Cargar prendas
   cargarPrendas(): void {
     this.stockService.getPrendas().subscribe({
       next: (data) => {
@@ -87,7 +85,6 @@ export class Stock implements OnInit {
     });
   }
 
-  // 📏 Cargar talles
   cargarTalles(): void {
     this.stockService.getTalles().subscribe({
       next: (data) => (this.talles = data),
@@ -95,7 +92,6 @@ export class Stock implements OnInit {
     });
   }
 
-  // 🔍 Buscar prenda
   buscarPrendas(): void {
     const termino = this.searchTerm.trim().toLowerCase();
     this.prendasFiltradas = termino
@@ -107,7 +103,6 @@ export class Stock implements OnInit {
       : this.prendas;
   }
 
-  // 🔧 Ajustar stock
   ajustarStock(prenda_codigo: string, talle_id: number, delta: number): void {
     this.stockService.ajustarStock(prenda_codigo, talle_id, delta).subscribe({
       next: (actualizado) => {
@@ -121,7 +116,6 @@ export class Stock implements OnInit {
     });
   }
 
-  // ✏️ Editar prenda
   editarPrenda(prenda: Prenda): void {
     this.modoEdicion = true;
     this.prendaForm.patchValue({
@@ -139,7 +133,6 @@ export class Stock implements OnInit {
     this.abrirModal();
   }
 
-  // ❌ Eliminar prenda
   eliminarPrenda(prenda: Prenda): void {
     if (!confirm(`¿Seguro que deseas eliminar ${prenda.descripcion}?`)) return;
 
@@ -156,7 +149,6 @@ export class Stock implements OnInit {
     });
   }
 
-  // ➕ Nueva prenda
   abrirModalNuevaPrenda(): void {
     this.modoEdicion = false;
     this.prendaForm.reset({ codigo: '', descripcion: '', precio: 0 });
@@ -169,7 +161,6 @@ export class Stock implements OnInit {
     this.abrirModal();
   }
 
-  // 💾 Guardar (crear/editar)
   guardarPrenda(): void {
     if (this.prendaForm.invalid) {
       Object.values(this.prendaForm.controls).forEach(control => control.markAsTouched());
@@ -213,17 +204,14 @@ export class Stock implements OnInit {
     });
   }
 
-  // 📦 Obtener total de stock (si lo necesitas individualmente)
   getStockTotal(codigo: string): Observable<number> {
     return this.stockService.getStockTotal(codigo);
   }
 
-  // 🧮 Filtrar prendas con stock bajo
   getPrendasStockBajo(): number {
     return this.prendas.filter(p => p.cantidadTotal < 5).length;
   }
 
-  // 🪟 Modal helpers
   private abrirModal(): void {
     const modalElement = document.getElementById('modalPrenda');
     if (modalElement) {
@@ -236,8 +224,11 @@ export class Stock implements OnInit {
     if (this.modalInstance) this.modalInstance.hide();
   }
   
-  getTalleDescripcion(talle_id: number): string {
-    const talle = this.talles.find(t => t.codigo === talle_id);
+  getTalleDescripcion(codigo: number): string {
+    if (codigo == null) { 
+      return 'Desconocido';
+    }
+    const talle = this.talles.find(t => t.codigo === codigo);
     return talle ? talle.descripcion : 'Desconocido';
   }
 

@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './ver-compras.css'
 })
 export class VerCompras {
-
+  compras: any[] = [];
 }
