@@ -11,6 +11,7 @@ export class ProveedoresController {
     }
     @Post()
     async create(createProveedorDto: CreateProveedorDto) {
+        console.log(createProveedorDto);
         return this.proveedoresService.create(createProveedorDto);
     }
 
