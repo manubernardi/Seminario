@@ -132,7 +132,7 @@ async getDashboardStats(): Promise<any> {
 
     let stockBajo = 0;
     for (const prenda of await this.prendaRepository.find()) {
-        if (await this.getTotalStock(prenda.codigo) < 5) stockBajo++;
+        if (await this.getTotalStock(prenda.codigo) < 5 && await this.getTotalStock(prenda.codigo) > 0) stockBajo++;
     }
 
 
