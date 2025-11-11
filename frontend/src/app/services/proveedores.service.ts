@@ -36,7 +36,7 @@ export class ProveedoresService {
 
   // Crear nuevo proveedor
   nuevoProveedor(proveedorDto: CreateProveedorDto): Observable<any> {
-    console.log(proveedorDto);
+    console.log("Service Front", proveedorDto);
     return this.http.post(this.apiUrl, proveedorDto);
   }
 

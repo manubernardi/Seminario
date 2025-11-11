@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ProveedoresService} from '../../services/proveedores.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 interface Proveedor{
   id: number;
   razonSocial: string;
@@ -15,7 +16,7 @@ interface CreateProveedorDto{
 }
 @Component({
   selector: 'app-proveedores',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './proveedores.html',
   styleUrl: './proveedores.css'
 })
@@ -105,7 +106,7 @@ cerrarModal(): void {
         telefono: proveedorData.telefono,
         mail: proveedorData.mail
       };
-      console.log(createProveedorDto);
+      console.log("Controller",   createProveedorDto);
       this.proveedoresService.nuevoProveedor(createProveedorDto).subscribe({
         next: (nuevoProveedor) => {
           this.proveedores.push(nuevoProveedor);

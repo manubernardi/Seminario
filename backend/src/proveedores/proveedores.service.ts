@@ -19,4 +19,7 @@ export class ProveedoresService {
         const proveedor = this.proveedoresRepository.create(createProveedorDto);
         return this.proveedoresRepository.save(proveedor);
     }
+    async remove(id: number): Promise<void> {
+        await this.proveedoresRepository.delete(id);
+    }
 }
