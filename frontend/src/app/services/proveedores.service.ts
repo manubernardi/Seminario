@@ -42,7 +42,7 @@ export class ProveedoresService {
 
   // Actualizar proveedor
   actualizarProveedor(id: number, proveedorDto: Partial<CreateProveedorDto>): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}`, proveedorDto);
+    return this.http.put(`${this.apiUrl}/${id}`, proveedorDto);
   }
 
   // Eliminar proveedor

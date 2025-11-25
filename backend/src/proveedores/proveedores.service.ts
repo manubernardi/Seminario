@@ -10,7 +10,7 @@ export class ProveedoresService {
         @InjectRepository(ProveedorEntity)
         private readonly proveedoresRepository: Repository<ProveedorEntity>,
     ) {}
-
+    
     async findAll() {
         return this.proveedoresRepository.find();
     }
@@ -19,6 +19,12 @@ export class ProveedoresService {
         const proveedor = this.proveedoresRepository.create(createProveedorDto);
         return this.proveedoresRepository.save(proveedor);
     }
+
+    async update(id: number, dto: CreateProveedorDto) {
+        await this.proveedoresRepository.update(id, dto);
+        return this.proveedoresRepository.findOne({ where: { id } });
+    }
+
     async remove(id: number): Promise<void> {
         await this.proveedoresRepository.delete(id);
     }
