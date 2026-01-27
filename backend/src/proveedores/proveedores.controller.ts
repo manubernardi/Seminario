@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Patch } from '@nestjs/common';
 import { ProveedoresService } from './proveedores.service'; 
 import { CreateProveedorDto } from '../dto/create-proveedor.dto';
 @Controller('proveedores')
@@ -17,6 +17,11 @@ export class ProveedoresController {
     @Delete(':id')
     remove(@Body('id') id: number) {
         return this.proveedoresService.remove(id);
+    }
+    @Patch(':id')
+    update(id: number, @Body() updateProveedorDto: Partial<CreateProveedorDto>) {
+        console.log("Controller Back Edit", updateProveedorDto, id);
+        return this.proveedoresService.update(id, updateProveedorDto);
     }
 
     

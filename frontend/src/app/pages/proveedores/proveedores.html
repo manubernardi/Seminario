@@ -23,13 +23,13 @@
             </div>
         </div>
         
-        <!-- Botón Nuevo Cliente -->
+        <!-- Botón Nuevo Proveedor -->
         <button class="btn btn-success btn-lg" (click)="abrirModalNuevo()">
             <i class="bi bi-person-plus-fill"></i> Nuevo Proveedor
         </button>
     </div>
 
-    <!-- Tabla de clientes -->
+    <!-- Tabla de proveedores -->
     <div class="card">
         <div class="card-body">
             @if (proveedoresFiltrados.length === 0 && busqueda) {
@@ -37,7 +37,7 @@
                     <i class="bi bi-search" style="font-size: 4rem; color: #ccc;"></i>
                     <p class="text-muted mt-3">No se encontraron proveedores con "{{ busqueda }}"</p>
                 </div>
-            } @else if (proveedoresFiltrados.length === 0) {
+            } @else if (proveedores.length === 0) {
                 <div class="text-center py-5">
                     <i class="bi bi-people" style="font-size: 4rem; color: #ccc;"></i>
                     <p class="text-muted mt-3">No hay proveedores registrados</p>
@@ -52,11 +52,12 @@
                             <tr>
                                 <th>Razón Social</th>
                                 <th>Teléfono</th>
+                                <th>Mail</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+                            @for (proveedor of proveedores; track proveedor.id) {
                                 <tr>
                                     <td>{{ proveedor.razonSocial }}</td>
                                     <td>{{ proveedor.telefono || '-' }}</td>

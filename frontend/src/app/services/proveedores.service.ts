@@ -42,6 +42,7 @@ export class ProveedoresService {
 
   // Actualizar proveedor
   actualizarProveedor(id: number, proveedorDto: Partial<CreateProveedorDto>): Observable<any> {
+    console.log("Service Front Edit", proveedorDto, id);
     return this.http.patch(`${this.apiUrl}/${id}`, proveedorDto);
   }
 

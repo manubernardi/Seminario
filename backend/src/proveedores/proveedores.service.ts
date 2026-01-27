@@ -22,4 +22,8 @@ export class ProveedoresService {
     async remove(id: number): Promise<void> {
         await this.proveedoresRepository.delete(id);
     }
-}
+    async update(id: number, updateProveedorDto: Partial<CreateProveedorDto>): Promise<ProveedorEntity | null> {
+        await this.proveedoresRepository.update(id, updateProveedorDto);
+        return this.proveedoresRepository.findOneBy({ id });
+    }
+}   

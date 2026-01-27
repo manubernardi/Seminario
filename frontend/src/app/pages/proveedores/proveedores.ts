@@ -42,12 +42,12 @@ export class ProveedoresComponent{
 
   ngOnInit() {
     this.proveedoresService.obtenerProveedores().subscribe(data => {
+      this.proveedores = data;
       console.log(data);
     });
   }   
   filtrarProveedores(): void {
     const termino = this.busqueda.toLowerCase().trim();
-    
     if (!termino) {
       this.proveedoresFiltrados = this.proveedores;
       return;
@@ -80,14 +80,16 @@ cerrarModal(): void {
 
     this.guardando = true;
     const proveedorData = this.proveedorForm.value;
-    console.log(proveedorData);
-
+    const updateData: Partial<CreateProveedorDto> = this.proveedorForm.value;
     if (this.modoEdicion && this.proveedorEditando) {
       // Actualizar proveedor
-      this.proveedoresService.actualizarProveedor(this.proveedorEditando.id, proveedorData).subscribe({
-        next: (proveedorActualizado) => {
-          const index = this.proveedores.findIndex(c => c.id === proveedorActualizado.id);
-          if (index !== -1) this.proveedores[index] = proveedorActualizado;
+      const id = this.proveedorEditando.id;
+      console.log("id a editar", id);
+      this.proveedoresService.actualizarProveedor(id, updateData).subscribe({
+        next: (proveedorData) => {
+          console.log("Proveedor actualizado", proveedorData);
+          const index = this.proveedores.findIndex(c => c.id === proveedorData.id);
+          if (index !== -1) this.proveedores[index] = proveedorData;
           this.filtrarProveedores();
           alert('Proveedor actualizado correctamente');
           this.cerrarModal();
