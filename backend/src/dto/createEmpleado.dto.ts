@@ -1,4 +1,3 @@
-// create-empleado.dto.ts
 import { IsString, IsNotEmpty, IsNumber, IsPhoneNumber } from 'class-validator';
 
 export class CreateEmpleadoDto {

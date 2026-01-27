@@ -152,7 +152,7 @@ aria-hidden="true"
           <div class="d-flex flex-wrap gap-2">
             <div *ngFor="let talleForm of prendasXTallesForm; let i = index" [formGroup]="talleForm" class="talle-card border rounded p-2">
               <div class="text-center mb-2">
-                <label>{{ getTalleDescripcion(talles[i]?.codigo ?? 0) }}</label>
+                <label>{{ getTalleDescripcion(talles[i].codigo) }}</label>
               </div>
               <div class="mb-3" [formGroup]="talleForm">
                 <label class="form-label">Cantidad</label>

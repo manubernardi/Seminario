@@ -41,11 +41,15 @@ export class ProveedoresComponent{
   
 
   ngOnInit() {
-    this.proveedoresService.obtenerProveedores().subscribe(data => {
+  this.proveedoresService.obtenerProveedores().subscribe({
+    next: (data) => {
       this.proveedores = data;
-      console.log(data);
-    });
-  }   
+      this.proveedoresFiltrados = data;
+    },
+    error: (err) => console.error(err)
+  });
+}
+
   filtrarProveedores(): void {
     const termino = this.busqueda.toLowerCase().trim();
     if (!termino) {
