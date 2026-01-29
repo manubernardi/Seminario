@@ -5,8 +5,13 @@
     <button class="btn-volver" routerLink="/home" style="position: absolute; left: 1rem; z-index: 10;">
       <i class="bi bi-arrow-left"></i> 🏠 Volver al Inicio
     </button>
+
+
     <h4 class="text-center m-0">NUEVA COMPRA</h4>
   </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+  </div>
+
 
   <div class="row">
     <!-- Columna izquierda: Formulario -->
@@ -57,7 +62,7 @@
           <hr>
 
           <!-- Agregar detalles -->
-          <h5 class="mb-3">Agregar Productos</h5>
+          <h5 class="mb-3">Reponer Productos</h5>
           <form [formGroup]="detalleForm">
             <div class="row">
               <div class="col-md-4 mb-3">
@@ -111,6 +116,7 @@
                   min="0"
                   step="0.01">
               </div>
+              
             </div>
 
             <button 
@@ -121,7 +127,67 @@
               <i class="bi bi-plus-circle"></i> Agregar Producto
             </button>
           </form>
+
+    <h5 class="mb-3">Nuevo producto</h5>
+    <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
+        <div class="mb-3">
+          <label class="form-label">Código</label>
+          <input
+            type="text"
+            formControlName="codigo"
+            class="form-control"
+            [readonly]="modoEdicion"
+          />
         </div>
+
+        <div class="mb-3">
+          <label class="form-label">Descripción</label>
+          <input type="text" formControlName="descripcion" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Precio</label>
+          <input
+            type="number"
+            formControlName="precio"
+            class="form-control"
+            min="0"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Prenda por Talle</label>
+          <div class="d-flex flex-wrap gap-2">
+            <div *ngFor="let talle of talles; let i = index"
+                [formGroup]="prendasXTallesForm[i]"
+                class="talle-card border rounded p-2">
+              <div class="text-center mb-2" fw-bold>
+                {{ talle.descripcion }} 
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Cantidad</label>
+                <input
+                  type="number"
+                  formControlName="cantidad"
+                  class="form-control"
+                  min="0"
+                />
+              </div>
+              </div>
+              </div>
+              </div>
+            
+        
+        <button 
+          type="button" 
+          class="btn btn-primary w-100"
+          (click)="guardarPrenda()"
+          [disabled]="prendaForm.invalid">
+          <i class="bi bi-plus-circle"></i> Agregar Producto
+        </button>
+    </form>
+    </div> 
+
       </div>
     </div>
 
@@ -189,5 +255,6 @@
         </div>
       </div>
     </div>
+  
+  </div>  
   </div>
-</div>

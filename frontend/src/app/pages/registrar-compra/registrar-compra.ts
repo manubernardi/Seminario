@@ -6,11 +6,37 @@ import { Router, RouterModule } from '@angular/router';
 import { ComprasService, CreateDetalleCompraDto } from '../../services/compras.service';
 import { ProveedoresService, Proveedor } from '../../services/proveedores.service';
 import { StockService } from '../../services/stock.service';
+interface Talle {
+  codigo: number;
+  descripcion: string;
+}
 
+interface PrendaXTalle {
+  talle_id: number;
+  cantidad: number;
+}
+
+interface Prenda {
+  codigo: string;
+  descripcion: string;
+  precio: number;
+  cantidadTotal: number;
+  prendasXTalles: PrendaXTalle[];
+}
+export interface DetalleCompra {
+  codigoPrenda: string;
+  descripcionPrenda: string;
+  talleId: number;
+  descripcionTalle: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+}
 interface DetalleConInfo extends CreateDetalleCompraDto {
   descripcionPrenda: string;
   descripcionTalle: string;
   subtotal: number;
+
 }
 
 @Component({
@@ -23,11 +49,16 @@ interface DetalleConInfo extends CreateDetalleCompraDto {
 export class RegistrarCompra implements OnInit {
   compraForm: FormGroup;
   detalleForm: FormGroup;
-  
+  prendas: Prenda[] = [];
+  prendaXTalles: PrendaXTalle[] = [];
+  prendasFiltradas: Prenda[] = [];
+  talles: Talle[] = [];
+  searchTerm: string = '';
+  prendaForm: FormGroup;
+  prendasXTallesForm: FormGroup[] = [];
+  modoEdicion = false;
   empleadoLogueado: any = null;
   proveedores: Proveedor[] = [];
-  prendas: any[] = [];
-  talles: any[] = [];
   
   detalles: DetalleConInfo[] = [];
   montoTotal = 0;
@@ -38,6 +69,7 @@ export class RegistrarCompra implements OnInit {
     private proveedoresService: ProveedoresService,
     private stockService: StockService,
     private router: Router
+
   ) {
     this.compraForm = this.fb.group({
       proveedorId: ['', Validators.required]
@@ -49,6 +81,17 @@ export class RegistrarCompra implements OnInit {
       cantidad: [1, [Validators.required, Validators.min(1)]],
       precioUnitario: [0, [Validators.required, Validators.min(0)]]
     });
+      this.prendaForm = this.fb.group({
+      codigo: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      precio: [0, [Validators.required, Validators.min(0.01)]],
+    });
+    this.prendasXTallesForm = this.talles.map(talle =>
+    this.fb.group({
+      talle_id: [talle.codigo, Validators.required],
+      cantidad: [0, [Validators.required, Validators.min(0)]]
+    })
+  );    
   }
 
   ngOnInit() {
@@ -56,6 +99,7 @@ export class RegistrarCompra implements OnInit {
     this.cargarProveedores();
     this.cargarPrendas();
     this.cargarTalles();
+    
   }
 
   cargarEmpleadoLogueado() {
@@ -94,6 +138,13 @@ export class RegistrarCompra implements OnInit {
     this.stockService.getTalles().subscribe({
       next: (response: any) => {
         this.talles = response; 
+          this.prendasXTallesForm = this.talles.map(t =>
+          this.fb.group({
+            cantidad: [0]
+          })
+        );
+
+        console.log('Talles cargados:', this.talles);
 
       },
       error: (err) => {
@@ -168,7 +219,7 @@ export class RegistrarCompra implements OnInit {
       next: (response) => {
         console.log('✅ Compra registrada:', response);
         alert('Compra registrada exitosamente');
-        this.router.navigate(['/compras']);
+        this.router.navigate(['/ver-compras']);
       },
       error: (err) => {
         console.error('❌ Error al registrar compra:', err);
@@ -188,4 +239,78 @@ export class RegistrarCompra implements OnInit {
       });
     }
   }
+
+  
+guardarPrenda() {
+
+  if (this.prendaForm.invalid) return;
+
+  const prenda = {
+    codigo: this.prendaForm.value.codigo,
+    descripcion: this.prendaForm.value.descripcion,
+    precio: this.prendaForm.value.precio,
+    prendasXTalles: this.prendasXTallesForm.map((f, i) => ({
+      talle_id: this.talles[i].codigo,
+      cantidad: f.value.cantidad,
+      prenda_codigo: this.prendaForm.value.codigo
+    }))
+  };
+
+  this.stockService.crearPrenda(prenda).subscribe(resp => {
+
+    // 🔥 agregar al selector
+    this.prendas.push(resp);
+
+    // 🔥 agregar al resumen
+    this.agregarNuevaPrendaAlResumen(resp);
+
+    this.prendaForm.reset();
+  });
+}
+  
+  getTalleDescripcion(codigo: number): string {
+    console.log("Buscando talle para código:", codigo);
+    if (codigo == null) { 
+      return 'Desconocido';
+    }
+    const talle = this.talles.find(t => t.codigo === codigo);
+    console.log("Talle encontrado:", talle);
+    return talle ? talle.descripcion : 'Desconocido';
+  }
+
+  ordenarTalles(prendasXTalles: PrendaXTalle[]): PrendaXTalle[] {
+    if (!prendasXTalles) return [];
+    return prendasXTalles.sort((a, b) => {
+      return a.talle_id - b.talle_id;
+    });
+  }
+agregarNuevaPrendaAlResumen(prenda: Prenda) {
+
+  prenda.prendasXTalles.forEach((pt: PrendaXTalle) => {
+
+    if (pt.cantidad > 0) {
+
+      const talle = this.talles.find(t => t.codigo == pt.talle_id);
+
+
+      if (talle) {
+        const detalle: DetalleCompra = {
+          codigoPrenda: prenda.codigo,
+          descripcionPrenda: prenda.descripcion,
+          talleId: talle.codigo,
+          descripcionTalle: talle.descripcion,
+          cantidad: pt.cantidad,
+          precioUnitario: prenda.precio,
+          subtotal: pt.cantidad * prenda.precio
+        };
+
+        this.detalles.push(detalle);
+      }
+    }
+  });
+
+  this.calcularTotal();
+}
+
+  
 }

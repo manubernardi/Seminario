@@ -14,13 +14,7 @@ export class ProveedoresController {
         console.log("Controller Back",createProveedorDto);
         return this.proveedoresService.create(createProveedorDto);
     }
-    @Put(':id')
-    update(
-         @Param('id', ParseIntPipe) id: number,
-         @Body() dto: CreateProveedorDto
-    ) {
-         return this.proveedoresService.update(id, dto);
-    }
+
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.proveedoresService.remove(id);

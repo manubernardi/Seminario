@@ -24,6 +24,7 @@ export class StockService {
   }
 
   crearPrenda(data: any): Observable<any> {
+    console.log('Datos enviados para crear prenda:', data);
     return this.http.post(this.apiUrl, data);
   }
 
