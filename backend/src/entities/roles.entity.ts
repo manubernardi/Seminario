@@ -9,10 +9,7 @@ export class RoleEntity {
 
     @Column()
     nombre!: string;
-
-    @OneToMany(() => EmpleadoEntity, empleado => empleado.rol)
-    empleados!: EmpleadoEntity[];
-
+    
     @ManyToMany(()=> PermissionEntity, permission => permission.roles, { eager: true })
     @JoinTable({ name: 'roles_permissions' })
     permissions!: PermissionEntity[];
