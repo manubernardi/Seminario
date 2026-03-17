@@ -13,4 +13,5 @@ export class RoleEntity {
     @ManyToMany(()=> PermissionEntity, permission => permission.roles, { eager: true })
     @JoinTable({ name: 'roles_permissions' })
     permissions!: PermissionEntity[];
+    
 }  
