@@ -30,12 +30,11 @@
         nombre: ['', Validators.required],
         apellido: ['', Validators.required],
         dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
-        telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
         rol_id: [null, Validators.required],
         contraseña: ['']
       });
           this.registerForm.get('rol_id')?.valueChanges.subscribe(value => {
-      const passwordControl = this.registerForm.get('conntraseña');
+      const passwordControl = this.registerForm.get('contraseña');
       if (value === 1) {
         passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
       } else {
@@ -47,7 +46,7 @@
   }
 
   get esSupervisor(): boolean {
-    return this.registerForm.get('rol_id')?.value === 'Supervisor';
+    return this.registerForm.get('rol_id')?.value === 1;
   }
 
   
