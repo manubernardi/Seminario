@@ -52,32 +52,22 @@
                         }
                     </div>
 
-                    <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" 
-                               class="form-control p-3"   
-                               placeholder="Teléfono"
-                               formControlName="telefono">
-                        @if (registerForm.get('telefono')?.invalid && registerForm.get('telefono')?.touched) {
-                            <!--Validación específica para email requerido-->
-                            @if (registerForm.get('telefono')?.errors?.['required']) {
-                                <div class="msj-error text-danger mt-2 p-2">El DNI es obligatorio</div>
-                            }
-                            <!--Validación específica para formato de email-->
-                            @if (registerForm.get('telefono')?.errors?.['pattern']) {
-                                <div class="msj-error text-danger mt-2 p-2">El formato del teléfono no es válido</div>
-                            }
-                        }
-                    </div>
-
                     <!-- CARGO -->
                     <div class="form-group">
                     <label for="rol_id">Rol</label>
                     <div>
                         <input
                         type="radio"
-                        id="Vendedor"
+                        id="Supervisor"
                         [value]="1"
+                        formControlName="rol_id" />
+                        <label for="supervisor">Supervisor</label>
+                    </div>
+                    <div>
+                       <input
+                        type="radio"
+                        id="Vendedor"
+                        [value]="2"
                         formControlName="rol_id" />
                         <label for="vendedor">Vendedor</label>
                     </div>
@@ -85,18 +75,34 @@
                         <input
                         type="radio"
                         id="Comprador"
-                        [value]="2"
+                        [value]="3"
                         formControlName="rol_id" />
                         <label for="encargado">Encargado de Compras</label>
                     </div>
+                    </div>
 
+                    
+                    @if (registerForm.get('rol_id')?.value === 1){
+                        <div class = form-group>
+                            <label>Contraseña</label>
+                            <input type="contraseña" formControlName="contraseña" />
+
+                            @if (registerForm.get('contraseña')?.invalid && registerForm.get('contraseña')?.touched) {
+                            <div>
+                                La contraseña es obligatoria
+                            </div>
+                            }
+                        
+                        </div>
+                    }   
+                    
                     <!-- Mensaje de error -->
                     @if (registerForm.get('rol_id')?.invalid && registerForm.get('rol_id')?.touched) {
                         <div class="msj-error text-danger mt-2 p-2">
                         Debe seleccionar un cargo.
                         </div>
                     }
-                    </div>
+
                     
                     <button type="submit" 
                             class="btn btn-primary p-3 w-100"

@@ -1,38 +1,56 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from "@angular/forms";
-import { Router } from '@angular/router';
-import { UsuariosService } from '../../services/usuarios.service';
+  import { Component } from '@angular/core';
+  import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from "@angular/forms";
+  import { Router } from '@angular/router';
+  import { UsuariosService } from '../../services/usuarios.service';
 
-export interface RegistroDto{
-    nombre: string;
-    apellido: string;
-    dni: string;
-    telefono: string;
-    rol_id: number;
-}
-@Component({
-  selector: 'register',
-  imports: [ɵInternalFormsSharedModule, ReactiveFormsModule],
-  templateUrl: './register.html',
-  styleUrl: './register.css'
-})
+  export interface RegistroDto{
+      nombre: string;
+      apellido: string;
+      dni: string;
+      telefono: string;
+      rol_id: number;
+      contraseña: string
+  }
+  @Component({
+    selector: 'register',
+    imports: [ɵInternalFormsSharedModule, ReactiveFormsModule],
+    templateUrl: './register.html',
+    styleUrl: './register.css'
+  })
 
-export class Register {
-  registerForm: FormGroup;
-  error = '';
+  export class Register {
+    registerForm: FormGroup;
+    error = '';
 
-  constructor(
-    private usuarioService: UsuariosService,
-    private fb: FormBuilder,
-    private router: Router){
-    this.registerForm = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
-      telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
-      rol_id: [null, Validators.required], 
+    constructor(
+      private usuarioService: UsuariosService,
+      private fb: FormBuilder,
+      private router: Router){
+      this.registerForm = this.fb.group({
+        nombre: ['', Validators.required],
+        apellido: ['', Validators.required],
+        dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
+        telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
+        rol_id: [null, Validators.required],
+        contraseña: ['']
+      });
+          this.registerForm.get('rol_id')?.valueChanges.subscribe(value => {
+      const passwordControl = this.registerForm.get('conntraseña');
+      if (value === 1) {
+        passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+      } else {
+        passwordControl?.clearValidators();
+        passwordControl?.reset();
+      }
+      passwordControl?.updateValueAndValidity();
     });
   }
+
+  get esSupervisor(): boolean {
+    return this.registerForm.get('rol_id')?.value === 'Supervisor';
+  }
+
+  
 
   enviar(): void {
     if (this.registerForm.invalid) {
@@ -56,5 +74,5 @@ export class Register {
   volver():void { 
     this.router.navigate(['/home']);
   }
-   
+  
 }
