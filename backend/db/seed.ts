@@ -4,6 +4,7 @@ import { RoleEntity } from '../src/entities/roles.entity';
 
 import { PermissionEntity } from '../src/entities/permissions.entity';
 
+
 const AppDataSource = new DataSource({
   type: 'postgres',
   host: '127.0.0.1',
@@ -11,7 +12,7 @@ const AppDataSource = new DataSource({
   username: 'postgres',
   password: 'postgres',
   database: 'gestion',
-  entities: [ TalleEntity, RoleEntity, PermissionEntity ],
+  entities: [ TalleEntity, RoleEntity, PermissionEntity],
   synchronize: false,
 });
 
@@ -31,6 +32,7 @@ async function seed() {
   ]);
 
   await rolRepo.save([
+    { nombre: 'Supervisor' },
     { nombre: 'Vendedor' },
     { nombre: 'Comprador' },
   ]);
@@ -38,5 +40,4 @@ async function seed() {
   console.log('Datos insertados 🚀');
   await AppDataSource.destroy();
 }
-
 seed();

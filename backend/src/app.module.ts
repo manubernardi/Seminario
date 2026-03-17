@@ -12,6 +12,7 @@ import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { DataSource } from 'typeorm/browser/data-source/index.js';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({

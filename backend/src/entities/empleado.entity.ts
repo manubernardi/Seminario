@@ -17,10 +17,9 @@ export class EmpleadoEntity {
     @Column()
     apellido!: string;
 
-    @Column()
-    telefono: string;
+    @Column({nullable: true})
+    contraseña: string;
 
-     
     @Column() 
     rol_id: number;
 
