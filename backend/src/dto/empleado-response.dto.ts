@@ -49,9 +49,6 @@ export class EmpleadoResponseDto {
   @ApiProperty()
   legajo!: string;
 
-  @ApiProperty()
-  telefono!: string;
-
   @ApiProperty({ type: RolResponseDto })
   rol!: RolResponseDto;
 

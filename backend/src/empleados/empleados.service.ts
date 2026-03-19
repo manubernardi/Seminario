@@ -20,7 +20,7 @@ export class EmpleadoService {
       return await this.empleadoRepository.save(empleado);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('El legajo ya existe');
+        throw new ConflictException('El dni ya existe');
       }
       throw error;
     }
@@ -60,9 +60,9 @@ export class EmpleadoService {
     return empleado;
   }
 
-  async findByLegajo(legajo: number): Promise<EmpleadoEntity> {
+  async findByDni(dni: string): Promise<EmpleadoEntity> {
     const empleado = await this.empleadoRepository.findOne({
-      where: { legajo },
+      where: { dni },
       relations: {
         rol: {
           permissions: true
@@ -71,7 +71,7 @@ export class EmpleadoService {
     });
 
     if (!empleado) {
-      throw new NotFoundException(`Empleado con legajo ${legajo} no encontrado`);
+      throw new NotFoundException(`Empleado con dni ${dni} no encontrado`);
     }
 
     return empleado;
@@ -85,7 +85,7 @@ export class EmpleadoService {
       return await this.empleadoRepository.save(empleado);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('El legajo ya existe');
+        throw new ConflictException('El dni ya existe');
       }
       throw error;
     }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsPhoneNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateEmpleadoDto {
   @IsString()
@@ -14,10 +14,11 @@ export class CreateEmpleadoDto {
   dni: string;
 
 
-  @IsNotEmpty()
-  telefono: string;
-
   @IsNumber()
   @IsNotEmpty()
   rol_id: number; 
+
+  @IsString()
+  @IsOptional()
+  contraseña: string;
 }

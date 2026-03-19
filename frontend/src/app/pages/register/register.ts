@@ -21,6 +21,7 @@
   export class Register {
     registerForm: FormGroup;
     error = '';
+    mostrarPassword: boolean = false;
 
     constructor(
       private usuarioService: UsuariosService,
@@ -32,11 +33,12 @@
         dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
         rol_id: [null, Validators.required],
         contraseña: ['']
+        
       });
           this.registerForm.get('rol_id')?.valueChanges.subscribe(value => {
       const passwordControl = this.registerForm.get('contraseña');
       if (value === 1) {
-        passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+        passwordControl?.setValidators([Validators.required, Validators.minLength(6), Validators.maxLength(20)]);
       } else {
         passwordControl?.clearValidators();
         passwordControl?.reset();

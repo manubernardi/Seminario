@@ -36,8 +36,8 @@ export class EmpleadoController {
   }
 
   @Get('legajo/:legajo')
-  async findByLegajo(@Param('legajo') legajo: number): Promise<EmpleadoEntity> {
-    return await this.empleadoService.findByLegajo(legajo);
+  async findByLegajo(@Param('legajo') dni: string): Promise<EmpleadoEntity> {
+    return await this.empleadoService.findByDni(dni);
   }
 
   @Get(':dni')

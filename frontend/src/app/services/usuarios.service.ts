@@ -8,8 +8,9 @@ export interface EmpleadoBackend{
     nombre: string;
     apellido: string;
     dni: string;
-    telefono: string;
     rol_id: number;
+    contraseña: string
+
     
 }
 

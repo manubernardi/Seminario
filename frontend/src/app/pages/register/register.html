@@ -83,14 +83,20 @@
 
                     
                     @if (registerForm.get('rol_id')?.value === 1){
-                        <div class = form-group>
+                        <div class="form-group">
                             <label>Contraseña</label>
-                            <input type="contraseña" formControlName="contraseña" />
+                            <input type="password" formControlName="contraseña"
+                            class ="form-control p-3"  />
 
-                            @if (registerForm.get('contraseña')?.invalid && registerForm.get('contraseña')?.touched) {
-                            <div>
-                                La contraseña es obligatoria
-                            </div>
+                            @if (registerForm.get('contraseña')?.touched && registerForm.get('contraseña')?.errors?.['required']) {
+                                <div class="msj-error text-danger mt-2 p-2">
+                                    La contraseña es obligatoria
+                                </div>
+                            }
+                            @if (registerForm.get('contraseña')?.touched && registerForm.get('contraseña')?.errors?.['minlength']){
+                                <div class="msj-error text-danger mt-2 p-2">
+                                    La contraseña debe contener minimo 6 caracteres
+                                </div>
                             }
                         
                         </div>

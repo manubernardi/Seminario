@@ -24,7 +24,7 @@ import { DataSource } from 'typeorm/browser/data-source/index.js';
         username: 'postgres',
         password: 'postgres',
         synchronize: true,
-        dropSchema: false,
+        dropSchema: true,
         entities,
       }),
       VentasModule,
