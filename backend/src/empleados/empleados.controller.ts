@@ -23,6 +23,7 @@ export class EmpleadoController {
   async create(@Body() createEmpleadoDto: CreateEmpleadoDto): Promise<EmpleadoEntity> {
     console.log("Controller", createEmpleadoDto)
     return await this.empleadoService.create(createEmpleadoDto);
+    
   }
 
   @Get()

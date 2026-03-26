@@ -63,6 +63,7 @@
     console.log('Tipo de rol_id:', typeof registroDto.rol_id);
 
 
+
     this.usuarioService.nuevoUsuario(registroDto).subscribe({
       next: (response) => {
         this.registerForm.reset();

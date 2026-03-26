@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Not, Repository } from 'typeorm';
 import { EmpleadoEntity } from '../entities/empleado.entity';
+import { RoleEntity } from '../entities/roles.entity';
 import { CreateEmpleadoDto } from '../dto/createEmpleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
 
@@ -10,13 +11,29 @@ export class EmpleadoService {
   constructor(
     @InjectRepository(EmpleadoEntity)
     private readonly empleadoRepository: Repository<EmpleadoEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
-  async create(data: CreateEmpleadoDto): Promise<any> {
-      console.log("Service", data)
-   try {
-      const empleado = this.empleadoRepository.create(data);
-    
+  async create(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
+    console.log("Service", data);
+    try {
+      // Buscar el rol por ID
+      const rol = await this.roleRepository.findOne({
+        where: { id: data.rol_id }
+      });
+
+      if (!rol) {
+        throw new BadRequestException(`El rol con ID ${data.rol_id} no existe`);
+      }
+
+      // Crear el empleado sin incluir rol_id en los datos
+      const { rol_id, ...empleadoData } = data;
+      const empleado = this.empleadoRepository.create({
+        ...empleadoData,
+        rol
+      });
+
       return await this.empleadoRepository.save(empleado);
     } catch (error) {
       if (error.code === '23505') {
