@@ -18,7 +18,7 @@ export class EmpleadoEntity {
     apellido!: string;
 
     @Column({nullable: true})
-    contraseña: string;
+    password: string;
 
     @ManyToOne(() => RoleEntity)
     @JoinColumn({ name: 'rol_id' })

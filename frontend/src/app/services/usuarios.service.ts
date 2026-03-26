@@ -9,7 +9,7 @@ export interface EmpleadoBackend{
     apellido: string;
     dni: string;
     rol_id: number;
-    contraseña: string
+    password: string
 
     
 }

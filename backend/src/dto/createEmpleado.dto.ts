@@ -20,5 +20,5 @@ export class CreateEmpleadoDto {
 
   @IsString()
   @IsOptional()
-  contraseña: string;
+  password: string;
 }

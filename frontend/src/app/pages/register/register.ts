@@ -7,9 +7,8 @@
       nombre: string;
       apellido: string;
       dni: string;
-      telefono: string;
       rol_id: number;
-      contraseña: string
+      password: string;
   }
   @Component({
     selector: 'register',
@@ -32,10 +31,11 @@
         apellido: ['', Validators.required],
         dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
         rol_id: [null, Validators.required],
-        contraseña: ['']
+        password: ['']
         
       });
-          this.registerForm.get('rol_id')?.valueChanges.subscribe(value => {
+      
+      this.registerForm.get('rol_id')?.valueChanges.subscribe(value => {
       const passwordControl = this.registerForm.get('contraseña');
       if (value === 1) {
         passwordControl?.setValidators([Validators.required, Validators.minLength(6), Validators.maxLength(20)]);

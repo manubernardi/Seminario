@@ -11,22 +11,30 @@ import { ClientesModule } from './clientes/clientes.module';
 import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
-import { DataSource } from 'typeorm/browser/data-source/index.js';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
+
   imports: [
+      ConfigModule.forRoot({
+        isGlobal: true,
+  
+      }),
+    
+
     TypeOrmModule.forRoot({
       // Configuración de la conexión a la base de datos PostgreSQL
         type: 'postgres',
-        host: '127.0.0.1',
-        port: 5434,
-        database: 'gestion',
-        username: 'postgres',
-        password: 'postgres',
+        host: process.env.DATABASE_HOST,
+        port: Number(process.env.DATABASE_PORT),
+        database: process.env.DATABASE_NAME,
+        username: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+
         synchronize: true,
-        dropSchema: true,
+        dropSchema: false,
         entities,
       }),
+      
       VentasModule,
       EmpleadoModule,  
       StockModule,
@@ -40,4 +48,7 @@ import { DataSource } from 'typeorm/browser/data-source/index.js';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+
+export class AppModule {
+  
+}
