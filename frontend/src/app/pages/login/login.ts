@@ -66,44 +66,28 @@ export class Login {
   }
 
   public enviar() {
-  if (this.loginForm.invalid) {
-    this.error = 'Completa todos los campos correctamente.';
-    return;
-  }
-
-  const formValue = this.loginForm.value;
-  const isSupervisor = formValue.supervisor.enabled;
-
-  // Construir payload limpio
-  const data = {
-    dni: formValue.dni,
-    ...(isSupervisor && { isSupervisor: true })
-  };
-
-  console.log('Enviando datos:', data);
-
-  this.authService.login(data).subscribe({
-    next: response => {
-      console.log('Login exitoso:', response);
-      localStorage.setItem('empleadoDni', response.empleado.dni);  // <- Solo el DNI
-      localStorage.setItem('empleado', JSON.stringify(response.empleado));  // <- El objeto completo
-      
-      this.router.navigate(['/home']);
-    },
-    error: err => {
-      console.error('Error en login:', err);
-      
-      // Mejorar mensajes de error
-      if (err.status === 404) {
-        this.error = 'DNI no encontrado';
-      } else if (err.status === 403) {
-        this.error = 'No tienes permisos de supervisor';
-      } else if (err.status === 400) {
-        this.error = 'DNI inválido';
-      } else {
-        this.error = 'Error de conexión con el servidor';
-      }
+    if (this.loginForm.invalid) {
+      this.error = 'Completa todos los campos correctamente.';
+      return;
     }
-  });
+
+    const formValue = this.loginForm.value;
+    const isSupervisor = formValue.supervisor.enabled;
+
+    const data = {
+      dni: String(formValue.dni),
+      ...(isSupervisor && { password: formValue.supervisor.password })
+    };
+
+    console.log('Datos a enviar:', data);
+
+    this.authService.login(data).subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: err => {
+        if (err.status === 401) this.error = 'DNI o contraseña incorrectos';
+        else if (err.status === 404) this.error = 'DNI no encontrado';
+        else this.error = 'Error de conexión con el servidor';
+      }
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard'; // Ajusta la ruta según tu estructura
+import { AuthGuard } from './guards/auth.guard'; 
 import { Login } from '../app/pages/login/login';
 import { Home } from '../app/pages/home/home';
 import { Register } from '../app/pages/register/register';
@@ -64,10 +64,4 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always'
   },
- /* { 
-    path: 'registrar-compras', 
-    component: ClientesComponent,
-    canActivate: [AuthGuard],
-    runGuardsAndResolvers: 'always'
-  } */
 ];

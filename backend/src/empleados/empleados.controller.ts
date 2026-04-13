@@ -11,21 +11,28 @@ import {
   HttpCode
 } from '@nestjs/common';
 import { EmpleadoService } from './empleados.service';
-import { CreateEmpleadoDto } from '../dto/createEmpleado.dto';
+import { CreateEmpleadoDto, LoginDTO } from '../dto/createEmpleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
 import { EmpleadoEntity } from '../entities/empleado.entity';
+import { AuthService } from '../auth/auth.service';
+
 
 @Controller('empleados')
 export class EmpleadoController {
-  constructor(private readonly empleadoService: EmpleadoService) {}
+  constructor(
+    private readonly empleadoService: EmpleadoService,
+    private readonly authService: AuthService
+  ) {}
 
-  @Post()
+  @Post('register')
   async create(@Body() createEmpleadoDto: CreateEmpleadoDto): Promise<EmpleadoEntity> {
-    console.log("Controller", createEmpleadoDto)
-    return await this.empleadoService.create(createEmpleadoDto);
-    
+    return await this.empleadoService.register(createEmpleadoDto);
   }
 
+  @Post('login')
+  async login(@Body() body: LoginDTO): Promise<{accessToken: string, refreshToken: string}> {
+    return await this.authService.login(body.dni, body.password);
+  }
   @Get()
   async findAll(): Promise<EmpleadoEntity[]> {
     return await this.empleadoService.findAll();
@@ -38,7 +45,7 @@ export class EmpleadoController {
 
   @Get('legajo/:legajo')
   async findByLegajo(@Param('legajo') dni: string): Promise<EmpleadoEntity> {
-    return await this.empleadoService.findByDni(dni);
+    return await this.empleadoService.findOne(dni);
   }
 
   @Get(':dni')

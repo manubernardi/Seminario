@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Not, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { EmpleadoEntity } from '../entities/empleado.entity';
 import { RoleEntity } from '../entities/roles.entity';
 import { CreateEmpleadoDto } from '../dto/createEmpleado.dto';
 import { UpdateEmpleadoDto } from '../dto/update-empleado.dto';
+import { JwtService } from '../jwt/jwt.service';
 
 @Injectable()
 export class EmpleadoService {
@@ -13,10 +14,10 @@ export class EmpleadoService {
     private readonly empleadoRepository: Repository<EmpleadoEntity>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
+    private jwtService: JwtService,
   ) {}
 
-  async create(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
-    console.log("Service", data);
+  async register(data: CreateEmpleadoDto): Promise<EmpleadoEntity> {
     try {
       // Buscar el rol por ID
       const rol = await this.roleRepository.findOne({
@@ -26,16 +27,20 @@ export class EmpleadoService {
       if (!rol) {
         throw new BadRequestException(`El rol con ID ${data.rol_id} no existe`);
       }
-
+      
+      if (data.password) {
+        data.password = await this.jwtService.hashPassword(data.password);
+      }
       // Crear el empleado sin incluir rol_id en los datos
-      const { rol_id, ...empleadoData } = data;
+      const { rol_id, ...empleadoData } = data; //Desestructuración para separar rol_id del resto de los datos
       const empleado = this.empleadoRepository.create({
         ...empleadoData,
         rol
       });
 
       return await this.empleadoRepository.save(empleado);
-    } catch (error) {
+
+    } catch (error: any) {
       if (error.code === '23505') {
         throw new ConflictException('El dni ya existe');
       }
@@ -60,29 +65,6 @@ export class EmpleadoService {
       relations: {
         rol: {
           permissions: true
-        },
-        ventas: {
-          detalles: {
-            prenda: true
-          },
-          cliente: true
-        }
-      }
-    });
-
-    if (!empleado) {
-      throw new NotFoundException(`Empleado con DNI ${dni} no encontrado`);
-    }
-
-    return empleado;
-  }
-
-  async findByDni(dni: string): Promise<EmpleadoEntity> {
-    const empleado = await this.empleadoRepository.findOne({
-      where: { dni },
-      relations: {
-        rol: {
-          permissions: true
         }
       }
     });
@@ -100,7 +82,7 @@ export class EmpleadoService {
     try {
       Object.assign(empleado, updateEmpleadoDto);
       return await this.empleadoRepository.save(empleado);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === '23505') {
         throw new ConflictException('El dni ya existe');
       }
@@ -113,6 +95,12 @@ export class EmpleadoService {
     await this.empleadoRepository.remove(empleado);
   }
 
+  async updatePassword(dni: string, password: string) {
+    const empleado = await this.findOne(dni);
+    empleado.password = password;
+    await this.empleadoRepository.save(empleado);
+  }
+  
   async getEmpleadosConVentas(): Promise<EmpleadoEntity[]> {
   return await this.empleadoRepository
     .createQueryBuilder('empleado')

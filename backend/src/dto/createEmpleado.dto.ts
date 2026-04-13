@@ -20,5 +20,15 @@ export class CreateEmpleadoDto {
 
   @IsString()
   @IsOptional()
-  password: string;
+  password?: string;
+}
+
+export class LoginDTO {
+  @IsString()
+  @IsNotEmpty()
+  dni: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
 }

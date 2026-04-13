@@ -149,7 +149,7 @@
                                         [(ngModel)]="cantidadSeleccionada"
                                         [ngModelOptions]="{standalone: true}"
                                         min="1"
-                                        [max]="talleSeleccionado?.cantidad || 0"
+                                        [max]="talleSeleccionado.cantidad || 0"
                                         [disabled]="!talleSeleccionado" 
                                     />
                                 </div>
