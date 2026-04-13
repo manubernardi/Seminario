@@ -21,6 +21,7 @@ export class Ventas {
     });
 
   }
+  
   verDetalles(venta: any): void {
     this.ventaSeleccionada = venta;
   }

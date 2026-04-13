@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { UsuariosService } from './usuarios.service';
 
 export interface EmpleadoAuth {
   nombre: string;
@@ -25,7 +26,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private empleadoService: UsuariosService
   ) {}
 
   login(data: {dni: string, password?: string}): Observable<any> {
@@ -34,7 +36,8 @@ export class AuthService {
         console.log('Respuesta del backend:', response);
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
-        this.cargarEmpleado();
+        this.empleadoService.setUser(response.empleado);
+        localStorage.setItem('empleado', JSON.stringify(response.empleado));
       })
     );
   }

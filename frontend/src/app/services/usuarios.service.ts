@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap} from 'rxjs/operators';
 
 interface EmpleadoFrontend{
@@ -28,6 +28,8 @@ export interface EmpleadoBackend{
 })
 
 export class UsuariosService {
+  private userSubject = new BehaviorSubject<any>(this.getUserFromStorage());
+  user$ = this.userSubject.asObservable();
   private apiUrl = 'http://localhost:3000/empleados'; // URL del backend
 
   constructor(private http: HttpClient) {}
@@ -45,6 +47,20 @@ export class UsuariosService {
   
   verificarEmpleado(dni: string): Observable<any> {
     return this.http.get(`http://localhost:3000/auth/verificar/${dni}`);
+  }
+
+  setUser(user: any) {
+    this.userSubject.next(user);
+  }
+
+  clearUser() {
+    this.userSubject.next(null);
+    localStorage.removeItem('user');
+  }
+
+  private getUserFromStorage() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 }
  

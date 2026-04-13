@@ -16,6 +16,8 @@ export class AuthController {
   @Get('me')
   @UseGuards(RolesGuard)  
   getMe(@Request() req) {
+    console.log('En AuthController.getMe')
+    console.log('Usuario autenticado:', req.user); //Undefined
     return req.user; // viene del JWT decodificado por el guard
   }
 }

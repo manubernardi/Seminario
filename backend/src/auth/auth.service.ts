@@ -10,7 +10,7 @@ export class AuthService {
         private jwtService: JwtService,
     ){}
 
-    async login(dni: string, password?:string): Promise<{accessToken: string, refreshToken: string}> {
+    async login(dni: string, password?:string): Promise<{accessToken: string, refreshToken: string, empleado: any}> {
         
         const empleado = await this.empleadoService.findOne(dni);
     
@@ -49,7 +49,7 @@ export class AuthService {
         const accessToken = this.jwtService.generateToken(payload);
         const refreshToken = this.jwtService.generateToken(payload, 'refresh');
     
-        return { accessToken, refreshToken };
+        return { accessToken, refreshToken, empleado };
     }
 
     refreshToken(refreshToken: string): { accessToken: string; refreshToken: string } {
