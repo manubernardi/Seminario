@@ -16,19 +16,49 @@
     </tr>
   </thead>
   <tbody>
-    @for(compra of compras; track compra.numCompra){
+    @for(compra of compras; track compra.NumCompra) {
     <tr>
       <td>{{ compra.numCompra }}</td>
-      <td>{{ compra.fecha }}</td>
-      <td>{{ compra.empleado.nombre }}</td>
-      <td>{{ compra.montoTotal}}</td>
-      <td>{{ compra.cliente?.nombre }} {{ compra.cliente?.apellido }} || N/A</td>
+      <td>{{ compra.fecha | date:'dd/MM/yyyy' }}</td>
+      <td>{{ compra.empleado?.nombre }} {{ compra.empleado?.apellido }}</td>
+      <td>{{ compra.montoTotal | currency:'ARS':'symbol':'1.2-2' }}</td>
+      <td>{{ compra.proveedor?.razonSocial || 'N/A' }}</td>
       <td>
-        <!--<div>
-          <button class="btn-detalles" (click)="verDetalles(compra)">Ver Detalles</button>
-        </div>-->
+        <button class="btn-detalles" (click)="verDetalles(compra)">Ver Detalles</button>
       </td>
     </tr>
-  }
+    }
   </tbody>
 </table>
+
+<!-- Modal -->
+<!-- Modal -->
+@if(modalAbierto && compraSeleccionada) {
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <h3>Compra #{{ compraSeleccionada.numCompra }}</h3>
+    <table class="tabla-detalle">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(detalle of compraSeleccionada.detalles; track detalle.id) {
+        <tr>
+          <td>{{ detalle.prenda?.descripcion || detalle.codigoPrenda }}</td>
+          <td>{{ detalle.cantidad }}</td>
+          <td>{{ detalle.subtotal | currency:'ARS':'symbol':'1.2-2' }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+
+    <button class="btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+  </div>
+</div>
+}

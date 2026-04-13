@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
 import { EmpleadoEntity } from './empleado.entity';
 import { DetalleCompraEntity } from './detalle.compra.entity';
+import { ProveedorEntity } from './proveedor.entity';
 
 @Entity()
 export class CompraEntity{
@@ -17,6 +18,13 @@ export class CompraEntity{
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.compras)
     @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
     empleado: EmpleadoEntity;
+
+    @Column({ nullable: true })
+    proveedorId: number;
+
+    @ManyToOne(() => ProveedorEntity)
+    @JoinColumn({ name: 'proveedorId' })
+    proveedor: ProveedorEntity;
 
     @Column()
     montoTotal: number;
