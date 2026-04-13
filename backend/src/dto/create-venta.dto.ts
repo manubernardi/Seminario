@@ -3,14 +3,14 @@ import { Type } from 'class-transformer';
 
 export class CreateDetalleVentaDto {
   @IsNotEmpty({ message: 'El código de la prenda es obligatorio' })
-  codigoPrenda: string;
+  prendaCodigo: string;
   
   @IsNumber({}, { message: 'La cantidad debe ser un número' })
   @Min(1, { message: 'La cantidad debe ser al menos 1' })
   cantidad: number;
 
   @IsNotEmpty({ message: 'El talle de la prenda es obligatorio'})
-  talleId: number;
+  talleCodigo: number;
 }
 
 export class CreateVentaDto {

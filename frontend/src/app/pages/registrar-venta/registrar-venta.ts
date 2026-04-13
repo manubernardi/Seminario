@@ -270,9 +270,9 @@ export class RegistrarVenta implements OnInit {
       empleadoLegajo: Number(this.empleadoLogueado?.legajo),
       clienteId: formValues.clienteId ? Number(formValues.clienteId) : undefined,
       detalles: this.detalles.map(d => ({
-      codigoPrenda: d.codigoPrenda,
+      prendaCodigo: d.codigoPrenda,
       cantidad: d.cantidad,
-      talleId: d.talleId
+      talleCodigo: d.talleId
       }))
     };
 

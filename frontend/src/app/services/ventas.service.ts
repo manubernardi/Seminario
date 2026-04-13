@@ -32,6 +32,8 @@ export class VentasService {
   }
 
   crearVenta(venta: any): Observable<any> {
+    console.log('Datos enviados para crear venta:', venta);
     return this.http.post(`${this.baseUrl}/ventas`, venta);
+
   }
 }

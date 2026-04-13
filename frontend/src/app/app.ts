@@ -20,7 +20,8 @@ export class App implements OnInit {
   }
 
   verificarSesion() {
-    const dni = localStorage.getItem('empleadoDni');
+    console.log(localStorage);
+    const dni = localStorage.getItem('empleado') ? JSON.parse(localStorage.getItem('empleado')!).dni : null;
      console.log('🔍 empleado guardado:', dni);
 
     

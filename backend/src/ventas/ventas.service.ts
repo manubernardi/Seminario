@@ -27,6 +27,7 @@ export class VentasService {
   ) {}
 
   async create(venta: CreateVentaDto): Promise<VentaEntity> {
+    console.log('Creando venta con datos:', venta);
     // Validar empleado
     const empleado = await this.empleadoRepository.findOneBy({ legajo: venta.empleadoLegajo});
     if (!empleado) {
@@ -47,20 +48,20 @@ export class VentasService {
     
     for (const detalleDto of venta.detalles) {
       const prenda = await this.prendaRepository.findOne({
-        where: { codigo: detalleDto.codigoPrenda }
+        where: { codigo: detalleDto.prendaCodigo }
       });
       
       if (!prenda) {
-        throw new NotFoundException(`Prenda con código ${detalleDto.codigoPrenda} no encontrada`);
+        throw new NotFoundException(`Prenda con código ${detalleDto.prendaCodigo} no encontrada`);
       }
 
       const prendaXTalle = await this.prendaXTalleRepository.findOne({
         where: {
           prenda_codigo: prenda.codigo,
-          talle_id: detalleDto.talleId
+          talle_id: detalleDto.talleCodigo
         }})
 
-      if (!prendaXTalle) throw new NotFoundException(`La prenda ${detalleDto.codigoPrenda} no tiene talle con id ${detalleDto.talleId}`)
+      if (!prendaXTalle) throw new NotFoundException(`La prenda ${detalleDto.prendaCodigo} no tiene talle con id ${detalleDto.talleCodigo}`)
 
       if (prendaXTalle.cantidad < detalleDto.cantidad) {
         throw new BadRequestException(
@@ -95,6 +96,7 @@ export class VentasService {
     
     // Guardar TODO 
     const ventaGuardada = await this.ventaRepository.save(nuevaVenta);
+    console.log('Venta guardada:', ventaGuardada);
     
     return ventaGuardada;
   }

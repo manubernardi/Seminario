@@ -17,7 +17,7 @@ export class Ventas {
   
     this.ventasService.getVentas().subscribe((data) => {
       this.ventas = data;
-      console.log(data);
+      console.log('Controller Frontend', data);
     });
 
   }
