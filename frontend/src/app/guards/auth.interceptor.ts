@@ -12,9 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   
   // Obtener el token de autenticación
-  const authToken = localStorage.getItem('token');
-
-  console.log('Interceptor - Token encontrado:', authToken);
+  const authToken = localStorage.getItem('accessToken');
 
   let authReq = req;
 
@@ -32,8 +30,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Continuar con la request y manejar errores
   return next(authReq).pipe(
     catchError(error => {
+      const isAuthRoute = req.url.includes('/auth/login');
       // Si hay error 401 (no autorizado), redirigir al login
-      if (error.status === 401) {
+      if (error.status === 401 && authToken && !isAuthRoute) {
+        console.log('Interceptor - Error 401, redirigiendo al login');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         router.navigate(['/login']);

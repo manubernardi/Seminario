@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { VentaEntity } from '../entities/venta.entity';
@@ -8,6 +8,7 @@ import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { CreateVentaDto} from '../dto/create-venta.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
+import { TalleEntity } from '../entities/talle.entity';
 
 @Injectable()
 export class VentasService {
@@ -23,11 +24,13 @@ export class VentasService {
     @InjectRepository(PrendaEntity)
     private prendaRepository: Repository<PrendaEntity>,
     @InjectRepository(PrendaXTalleEntity)
-    private prendaXTalleRepository: Repository<PrendaXTalleEntity>
+    private prendaXTalleRepository: Repository<PrendaXTalleEntity>,
+    @InjectRepository(TalleEntity)
+    private talleRepository: Repository<TalleEntity>
   ) {}
 
   async create(venta: CreateVentaDto): Promise<VentaEntity> {
-    console.log('Creando venta con datos:', venta);
+    console.log('Creando venta con datos:', venta.detalles);
     // Validar empleado
     const empleado = await this.empleadoRepository.findOneBy({ legajo: venta.empleadoLegajo});
     if (!empleado) {
@@ -55,6 +58,12 @@ export class VentasService {
         throw new NotFoundException(`Prenda con código ${detalleDto.prendaCodigo} no encontrada`);
       }
 
+      const talle = await this.talleRepository.findOne({
+        where: { codigo: detalleDto.talleCodigo }
+      });
+
+      if (!talle) throw new NotFoundException(`Talle con ID ${detalleDto.talleCodigo} no encontrado`);
+
       const prendaXTalle = await this.prendaXTalleRepository.findOne({
         where: {
           prenda_codigo: prenda.codigo,
@@ -78,7 +87,8 @@ export class VentasService {
       const detalle = this.detalleVentaRepository.create({
         cantidad: detalleDto.cantidad,
         subtotal: subtotal,
-        prenda: prenda
+        prenda: prenda,
+        talle: talle,
       });
       
       detalles.push(detalle);

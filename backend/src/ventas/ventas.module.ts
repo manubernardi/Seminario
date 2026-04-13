@@ -8,6 +8,7 @@ import { EmpleadoEntity } from '../entities/empleado.entity';
 import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
+import { TalleEntity } from '../entities/talle.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
       EmpleadoEntity,
       ClienteEntity,
       PrendaEntity, 
-      PrendaXTalleEntity
+      PrendaXTalleEntity,
+      TalleEntity
     ])
   ],
   controllers: [VentasController],
