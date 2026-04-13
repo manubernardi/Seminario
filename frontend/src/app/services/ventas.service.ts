@@ -7,11 +7,31 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class VentasService {
-  private apiUrl = 'http://localhost:3000/ventas'; // URL del backend
+  private baseUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
   getVentas(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    return this.http.get(`${this.baseUrl}/ventas`);
+  }
+
+  getClientes(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/clientes`);
+  }
+
+  getPrendas(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/stock`);
+  }
+
+  getTalles(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/talles`);
+  }
+
+  crearCliente(cliente: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/clientes`, cliente);
+  }
+
+  crearVenta(venta: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ventas`, venta);
   }
 }

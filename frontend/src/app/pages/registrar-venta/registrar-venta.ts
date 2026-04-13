@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { VentasService } from '../../services/ventas.service';
 
 interface Talle {
   codigo: number;
@@ -60,11 +60,9 @@ export class RegistrarVenta implements OnInit {
   guardandoCliente: boolean = false;
   talles: any[] = []; // Estan fijos en memoria
 
-  private apiUrl = 'http://localhost:3000';
-
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private ventasService: VentasService,
     private router: Router,
     private authService: AuthService
   ) {
@@ -113,7 +111,7 @@ export class RegistrarVenta implements OnInit {
   }
 
   cargarClientes(): void {
-    this.http.get<Cliente[]>(`${this.apiUrl}/clientes`).subscribe({
+    this.ventasService.getClientes().subscribe({
       next: (data) => {
         this.clientes = data;
       },
@@ -125,7 +123,7 @@ export class RegistrarVenta implements OnInit {
   }
 
   cargarPrendas(): void {
-    this.http.get<Prenda[]>(`${this.apiUrl}/stock`).subscribe({
+    this.ventasService.getPrendas().subscribe({
       next: (data) => {
         // Solo las prendas con stock > 0 en algun talle
         this.prendas = data;
@@ -139,15 +137,15 @@ export class RegistrarVenta implements OnInit {
   }
 
   cargarTalles(): void {
-    this.http.get<Talle[]>(`${this.apiUrl}/talles`).subscribe({
+    this.ventasService.getTalles().subscribe({
       next: (data) => {
-        this.talles=data;
+        this.talles = data;
       },
       error: (error) => {
-        console.error('Error al cargar talles:', error)
+        console.error('Error al cargar talles:', error);
       }
-  })
-}
+    });
+  }
 
  clienteHabilitado = false;
 
@@ -173,7 +171,7 @@ export class RegistrarVenta implements OnInit {
 
     this.guardandoCliente = true;
 
-    this.http.post<Cliente>(`${this.apiUrl}/clientes`, this.clienteForm.value).subscribe({
+    this.ventasService.crearCliente(this.clienteForm.value).subscribe({
       next: (nuevoCliente) => {
         this.clientes.push(nuevoCliente);
         this.ventaForm.patchValue({ clienteId: nuevoCliente.id });
@@ -280,7 +278,7 @@ export class RegistrarVenta implements OnInit {
 
     console.log('Datos a enviar:', ventaData);
 
-    this.http.post(`${this.apiUrl}/ventas`, ventaData).subscribe({
+    this.ventasService.crearVenta(ventaData).subscribe({
       next: (response) => {
         alert('Venta registrada correctamente');
         this.router.navigate(['/ventas']);
