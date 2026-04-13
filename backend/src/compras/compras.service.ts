@@ -105,11 +105,12 @@ export class ComprasService {
 
     // Crear compra
     const nuevaCompra = this.compraRepository.create({
-      fecha: new Date(),
-      montoTotal: montoTotal,
-      empleado: empleado,
-      detalles: detalles
-    });
+  fecha: new Date(),
+  montoTotal: montoTotal,
+  empleado: empleado,
+  proveedor: proveedor, // 👈 falta esto
+  detalles: detalles
+});
 
     // Guardar todo junto 
     const compraGuardada = await this.compraRepository.save(nuevaCompra);
@@ -117,15 +118,15 @@ export class ComprasService {
   }
 
   async findAll(): Promise<CompraEntity[]> {
-    return await this.compraRepository.find({
-      relations: ['empleado', 'detalles', 'detalles.prenda']
-    });
-  }
+  return await this.compraRepository.find({
+    relations: ['empleado', 'detalles', 'detalles.prenda', 'proveedor']
+  });
+}
 
   async findOne(numCompra: number): Promise<CompraEntity> {
     const compra = await this.compraRepository.findOne({
       where: { numCompra: numCompra },
-      relations: ['empleado', 'detalles', 'detalles.prenda']
+      relations: ['empleado', 'detalles', 'detalles.prenda', 'proveedor']
     });
 
     if (!compra) {
@@ -138,7 +139,7 @@ export class ComprasService {
   async findByEmpleado(legajo: number): Promise<CompraEntity[]> {
     return await this.compraRepository.find({
       where: { empleado: { legajo } },
-      relations: ['empleado', 'detalles', 'detalles.prenda']
+      relations: ['empleado', 'detalles', 'detalles.prenda', 'proveedor']
     });
   }
 
