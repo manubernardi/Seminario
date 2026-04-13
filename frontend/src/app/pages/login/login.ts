@@ -84,7 +84,7 @@ export class Login {
     this.authService.login(data).subscribe({
       next: () => this.router.navigate(['/home']),
       error: err => {
-        if (err.status === 401) this.error = 'DNI o contraseña incorrectos';
+        if (err.status === 401) this.error = 'Contraseña incorrecta';
         else if (err.status === 404) this.error = 'DNI no encontrado';
         else this.error = 'Error de conexión con el servidor';
       }

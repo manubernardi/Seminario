@@ -1,11 +1,11 @@
 <body>
-    <div class=" inicio text-white p-4 mb-2">
+    <div class="inicio text-white p-4 mb-2">
         <h4 class="text-center">GESTOR DE INDUMENTARIA</h4>
     </div>
     <div class="container">
         <div class="card-body">
             <p class="titulo text-center mt-3">Inicio de Sesión</p>
-            <form  [formGroup]="loginForm" class="form-signin p-2 mb-2" (ngSubmit)="enviar()">
+            <form [formGroup]="loginForm" class="form-signin p-2 mb-2" (ngSubmit)="enviar()">
                 
                 <!-- Campo DNI -->
                 <div class="form-group">
@@ -14,13 +14,12 @@
                             class="form-control p-3" 
                             id="dni"  
                             placeholder="Ingrese su DNI"
-                            formControlName="dni">
+                            formControlName="dni"
+                            (input)="error = ''">
                     @if (loginForm.get('dni')?.invalid && loginForm.get('dni')?.touched) {
-                        <!--Validación específica para dni requerido-->
                         @if (loginForm.get('dni')?.errors?.['required']) {
                             <div class="msj-error text-danger mt-2 p-2">Ingresa tu DNI para ingresar</div>
                         }
-                        <!--Validación específica para formato del dni-->
                         @if (loginForm.get('dni')?.errors?.['minlength'] || loginForm.get('dni')?.errors?.['maxlength']) {
                             <div class="msj-error text-danger mt-2 p-2">El formato de DNI no es válido</div>
                         }
@@ -32,7 +31,7 @@
                     <div class="checkbox">
                         <input type="checkbox" formControlName="enabled" id="supervisor-check">
                         <label for="supervisor-check">
-                        <span>¿Ingresar como Supervisor?</span>
+                            <span>¿Ingresar como Supervisor?</span>
                         </label>
                     </div>
 
@@ -47,10 +46,10 @@
 
                             @if (loginForm.get('supervisor.password')?.invalid && loginForm.get('supervisor.password')?.touched) {
                                 @if (loginForm.get('supervisor.password')?.errors?.['required']) {
-                                <div class="msj-error text-danger mt-2 p-2">Ingresa la contraseña para ingresar</div>
+                                    <div class="msj-error text-danger mt-2 p-2">Ingresa la contraseña para ingresar</div>
                                 }
                                 @if (loginForm.get('supervisor.password')?.errors?.['minlength'] || loginForm.get('supervisor.password')?.errors?.['maxlength']) {
-                                <div class="msj-error text-danger mt-2 p-2">El formato de la contraseña no es válido</div>
+                                    <div class="msj-error text-danger mt-2 p-2">El formato de la contraseña no es válido</div>
                                 }
                             }
                         </div>
@@ -62,9 +61,14 @@
                     <button type="submit" 
                             class="btn btn-primary p-3 w-100"
                             [disabled]="loginForm.invalid">
-                    Iniciar Sesión
+                        Iniciar Sesión
                     </button>
+
+                    @if (error) {
+                        <div class="msj-error text-danger mt-2 p-2">{{ error }}</div>
+                    }
                 </div>
+
             </form>
         </div>
     </div>
