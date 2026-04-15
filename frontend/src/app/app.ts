@@ -21,22 +21,22 @@ export class App implements OnInit {
 
   verificarSesion() {
     console.log(localStorage);
-    const dni = localStorage.getItem('empleado') ? JSON.parse(localStorage.getItem('empleado')!).dni : null;
-     console.log('🔍 empleado guardado:', dni);
+    const accessToken = localStorage.getItem('accessToken');
+    console.log('🔍 accessToken guardado:', accessToken);
 
     
-    if (dni) {
+    if (accessToken) {
       console.log('📡 Llamando a verificar empleado...');
-      this.usuarioService.verificarEmpleado(dni).subscribe({
+      this.usuarioService.verificarEmpleado().subscribe({
         next: (response) => {
           console.log('✅ Sesión válida:', response);
         },
         error: (err) => {
           console.log('❌ Error completo:', err);
-          console.log('❌ URL llamada:', err.url);  // <- ESTO ES CLAVE
+          console.log('❌ URL llamada:', err.url); 
           console.log('❌ Status:', err.status);
           console.log('❌ Empleado no existe o fue eliminado');
-          alert('Tu sesión ha expirado. El empleado fue eliminado del sistema.');
+          alert('Tu sesión ha expirado. Vuelve a iniciar sesión.');
           localStorage.clear();
           this.router.navigate(['/login']);
         }

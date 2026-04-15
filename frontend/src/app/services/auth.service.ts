@@ -6,10 +6,11 @@ import { tap } from 'rxjs/operators';
 import { UsuariosService } from './usuarios.service';
 
 export interface EmpleadoAuth {
+  legajo: number;
   nombre: string;
   apellido: string;
   dni: string;
-  telefono: string;
+  password?:string;
   rol: {
     id: number;
     nombre: string;
@@ -42,19 +43,6 @@ export class AuthService {
     );
   }
 
-  cargarEmpleado() {
-    return this.http.get<any>(`${this.apiUrl}/me`).subscribe(emp => {
-      this.empleado.set(emp);
-    });
-  }
-
-  getEmpleado() {
-    return this.empleado();
-  }
-
-  hasPermission(permiso: string): boolean {
-    return this.empleado()?.permissions?.includes(permiso) || false;
-  }
 
   logout(): void {
     localStorage.clear();
@@ -63,24 +51,14 @@ export class AuthService {
   }
 
   getEmpleadoLogueado(): EmpleadoAuth | null {
-    const empleadoStr = localStorage.getItem('empleado');
-    if (!empleadoStr) return null;
-    
-    try {
-      return JSON.parse(empleadoStr);
-    } catch {
-      return null;
-    }
+    return JSON.parse(localStorage.getItem('empleado') || 'null');
+
   }
 
-  getEmpleadoId(): string | null {
+  getRol(): string | null {
     const empleado = this.getEmpleadoLogueado();
-    return empleado?.dni || null;
+    return empleado?.rol?.nombre || null;
   }
-
-  getDni(): string | null {
-    return localStorage.getItem('dni');
-  } 
 
   isAuthenticated(): boolean {
     return this.getEmpleadoLogueado() !== null;
