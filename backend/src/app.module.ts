@@ -11,6 +11,7 @@ import { ClientesModule } from './clientes/clientes.module';
 import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
+import { TipoPrendaModule } from './tipoPrenda/tipoPrenda.module';
 import { ConfigModule } from '@nestjs/config';
 @Module({
 
@@ -43,6 +44,7 @@ import { ConfigModule } from '@nestjs/config';
       AuthModule,
       ComprasModule,
       ProveedoresModule,
+      TipoPrendaModule,
       TypeOrmModule.forFeature(Object.values(entities)),
     ],
   controllers: [AppController],

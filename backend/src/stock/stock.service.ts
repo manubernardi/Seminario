@@ -6,6 +6,7 @@ import { CreatePrendaDto } from '../dto/createPrenda.dto';
 import { CreatePrendaXTalleDto } from '../dto/createPrendaXTalle.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
+import {TipoPrendaEntity} from '../entities/tipoPrenda.entity'
 import { error } from 'console';
 
 @Injectable()
@@ -17,6 +18,8 @@ export class StockService {
     private readonly prendaXTalleRepository: Repository<PrendaXTalleEntity>,
     @InjectRepository(TalleEntity)
     private readonly TalleRepository: Repository<TalleEntity>,
+    @InjectRepository(TipoPrendaEntity)
+    private readonly tipoPrendaRepository: Repository<TipoPrendaEntity>
     ) {}
 
 async findAll(): Promise<PrendaEntity[]> {
@@ -51,28 +54,34 @@ async getPrendaByCodigo(codigo: string): Promise<PrendaEntity> {
     // Crear nueva prenda
 
 async create(dto: CreatePrendaDto): Promise<PrendaEntity> {
-  const prenda = this.prendaRepository.create({
-    codigo: dto.codigo,
-    descripcion: dto.descripcion,
-    precio: dto.precio,
-  });
-
-  if (dto.prendasXTalles && dto.prendasXTalles.length > 0) {
-    prenda.prendasXTalles = [];
-
-    for (const item of dto.prendasXTalles) {
-      const talle = await this.TalleRepository.findOneBy({ codigo: item.talle_id });
-      if (!talle) {
-        throw new NotFoundException(`Talle ID ${item.talle_id} no encontrado`);
-      }
-
-      const rel = new PrendaXTalleEntity();
-      rel.talle = talle;
-      rel.cantidad = item.cantidad;
-
-      prenda.prendasXTalles.push(rel);
+    // 1. Verificar que el tipo existe y está activo
+    const tipo = await this.tipoPrendaRepository.findOne({ 
+        where: { id: dto.tipoPrendaId } 
+    });
+    if (!tipo) throw new NotFoundException(`Tipo de prenda con id ${dto.tipoPrendaId} no encontrado`);
+    if (!tipo.activo) throw new BadRequestException(`El tipo "${tipo.nombre}" está inactivo`);
+    if (!tipo.talles || tipo.talles.length === 0) {
+        throw new BadRequestException(`El tipo "${tipo.nombre}" no tiene talles configurados`);
     }
-  }
+
+    // 2. Crear la prenda
+    const prenda = this.prendaRepository.create({
+        codigo: dto.codigo,
+        descripcion: dto.descripcion,
+        precio: dto.precio,
+        tipo_prenda_id: dto.tipoPrendaId,
+    });
+
+    // 3. Generar un PrendaXTalle por cada talle del tipo (cantidad inicial = 0)
+    prenda.prendasXTalles = tipo.talles.map(talle => {
+        const pxt = new PrendaXTalleEntity();
+        pxt.prenda_codigo = dto.codigo;
+        pxt.talle_id = talle.codigo;
+        pxt.cantidad = 0;
+        return pxt;
+    });
+
+    return await this.prendaRepository.save(prenda); // cascade:true guarda los PrendaXTalle solos
 
   return await this.prendaRepository.save(prenda);
 }
