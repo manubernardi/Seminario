@@ -63,6 +63,11 @@ export class RegistrarCompra implements OnInit {
   detalles: DetalleConInfo[] = [];
   montoTotal = 0;
 
+  // ── Toggle tipo de compra ──────────────────────────────────────────────────
+  mostrarReponer = false;
+  mostrarNuevo = false;
+  // ──────────────────────────────────────────────────────────────────────────
+
   constructor(
     private fb: FormBuilder,
     private comprasService: ComprasService,
@@ -133,8 +138,6 @@ export class RegistrarCompra implements OnInit {
   }
 
   cargarTalles() {
-    // Asumiendo que tenés un servicio para talles
-    // O podés usar los talles de una prenda específica
     this.stockService.getTalles().subscribe({
       next: (response: any) => {
         this.talles = response; 
@@ -166,11 +169,10 @@ export class RegistrarCompra implements OnInit {
       precioUnitario: Number(this.detalleForm.value.precioUnitario)
     };
 
-    // Buscar info de la prenda para mostrar
     const prenda = this.prendas.find(p => p.codigo === detalle.codigoPrenda);
     const talle = this.talles.find(t => t.codigo === detalle.talleId);
 
-     const detalleConInfo: DetalleConInfo = {  // <- TIPADO EXPLÍCITO
+     const detalleConInfo: DetalleConInfo = {
     ...detalle,
     descripcionPrenda: prenda?.descripcion || 'Desconocida',
     descripcionTalle: talle?.descripcion || 'Desconocido',
@@ -233,7 +235,6 @@ export class RegistrarCompra implements OnInit {
     const prenda = this.prendas.find(p => p.codigo === codigoPrenda);
     
     if (prenda) {
-      // Autocompletar precio unitario con el precio de venta (opcional)
       this.detalleForm.patchValue({
         precioUnitario: prenda.precio
       });
@@ -257,13 +258,8 @@ guardarPrenda() {
   };
 
   this.stockService.crearPrenda(prenda).subscribe(resp => {
-
-    // 🔥 agregar al selector
     this.prendas.push(resp);
-
-    // 🔥 agregar al resumen
     this.agregarNuevaPrendaAlResumen(resp);
-
     this.prendaForm.reset();
   });
 }
@@ -284,6 +280,7 @@ guardarPrenda() {
       return a.talle_id - b.talle_id;
     });
   }
+
 agregarNuevaPrendaAlResumen(prenda: Prenda) {
 
   prenda.prendasXTalles.forEach((pt: PrendaXTalle) => {
@@ -291,7 +288,6 @@ agregarNuevaPrendaAlResumen(prenda: Prenda) {
     if (pt.cantidad > 0) {
 
       const talle = this.talles.find(t => t.codigo == pt.talle_id);
-
 
       if (talle) {
         const detalle: DetalleCompra = {
