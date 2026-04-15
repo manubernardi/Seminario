@@ -13,7 +13,6 @@ export class CreatePrendaDto {
   @Min(0)
   precio: number;
 
-  @IsOptional()
-  @IsArray()
-  prendasXTalles: { talle_id: number; cantidad: number; prenda_codigo: string }[];
+  @IsNumber()
+    tipoPrendaId: number;
 }

@@ -1,0 +1,44 @@
+/* ── Tipo de Compra: botones toggle ── */
+.tipo-compra-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.tipo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tipo-btn:hover {
+  border-color: #42a5f5;
+  background-color: #f0f8ff;
+  color: #1565c0;
+}
+
+.tipo-btn.activo {
+  border-color: #1976d2;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+/* ── Sección expandible con animación ── */
+.seccion-compra {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

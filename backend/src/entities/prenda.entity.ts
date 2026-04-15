@@ -1,7 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn  } from "typeorm";
 import { PrendaXTalleEntity } from "./prendaXTalleEntity";
 import { IsOptional } from "class-validator";
-
+import { TipoPrendaEntity } from "./tipoPrenda.entity";
 
 @Entity('prendas')
 export class PrendaEntity {
@@ -14,11 +14,18 @@ export class PrendaEntity {
     @Column()
     precio: number;
 
+     @Column({nullable: true})
+    tipo_prenda_id: number;
+
     @Column({ default: true })  // Para borrar prendas, porque si borramos una prenda literal, 
     // y esa prenda fue vendida, habria que borrar toda la venta y perderiamos esa info, 
     // entonces la marcamos como inactiva en vez de borrarla como tal
-    
     activo: boolean;
+    
+    @ManyToOne(() => TipoPrendaEntity, tp => tp.prendas, { eager: true })
+    @JoinColumn({ name: 'tipo_prenda_id' })
+    tipoPrenda: TipoPrendaEntity;
+
 
     @OneToMany(() => PrendaXTalleEntity, px => px.prenda, { cascade: true, eager: true, onDelete: 'CASCADE' })
     prendasXTalles: PrendaXTalleEntity[];
