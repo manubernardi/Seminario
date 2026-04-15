@@ -12,6 +12,10 @@ import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { ConfigModule } from '@nestjs/config';
+import { ArcaService } from './arca/arca.service';
+import { ArcaModule } from './arca/arca.module';
+import { ArcaController } from './arca/arca.controller';
+import { ArcaService } from './arca/arca.service';
 @Module({
 
   imports: [
@@ -44,9 +48,10 @@ import { ConfigModule } from '@nestjs/config';
       ComprasModule,
       ProveedoresModule,
       TypeOrmModule.forFeature(Object.values(entities)),
+      ArcaModule,
     ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ArcaController],
+  providers: [AppService, ArcaService],
 })
 
 export class AppModule {
