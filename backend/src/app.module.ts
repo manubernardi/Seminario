@@ -11,6 +11,7 @@ import { ClientesModule } from './clientes/clientes.module';
 import { ComprasModule } from './compras/compras.module';
 import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
+import { TipoPrendaModule } from './tipoPrenda/tipoPrenda.module';
 import { ConfigModule } from '@nestjs/config';
 import { ArcaService } from './arca/arca.service';
 import { ArcaModule } from './arca/arca.module';
@@ -47,6 +48,7 @@ import { ArcaService } from './arca/arca.service';
       AuthModule,
       ComprasModule,
       ProveedoresModule,
+      TipoPrendaModule,
       TypeOrmModule.forFeature(Object.values(entities)),
       ArcaModule,
     ],

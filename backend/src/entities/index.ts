@@ -10,5 +10,6 @@ import { PrendaXTalleEntity } from "./prendaXTalleEntity"
 import { CompraEntity } from "./compra.entity"
 import { DetalleCompraEntity } from "./detalle.compra.entity"
 import { ProveedorEntity } from "./proveedor.entity"
+import { TipoPrendaEntity } from "./tipoPrenda.entity"
 
-export const entities = {ClienteEntity, DetalleVentaEntity, EmpleadoEntity, PermissionEntity, PrendaEntity, RoleEntity, TalleEntity, VentaEntity, PrendaXTalleEntity, CompraEntity, DetalleCompraEntity, ProveedorEntity}
+export const entities = {ClienteEntity, DetalleVentaEntity, EmpleadoEntity, PermissionEntity, PrendaEntity, RoleEntity, TalleEntity, VentaEntity, PrendaXTalleEntity, CompraEntity, DetalleCompraEntity, ProveedorEntity, TipoPrendaEntity}

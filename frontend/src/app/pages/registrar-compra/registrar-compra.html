@@ -6,12 +6,10 @@
       <i class="bi bi-arrow-left"></i> Volver al Inicio
     </button>
 
-
     <h4 class="text-center m-0">NUEVA COMPRA</h4>
   </div>
   <div class="d-flex justify-content-between align-items-center mb-3">
   </div>
-
 
   <div class="row">
     <!-- Columna izquierda: Formulario -->
@@ -59,135 +57,163 @@
             </div>
           </form>
 
-          <hr>
-
-          <!-- Agregar detalles -->
-          <h5 class="mb-3">Reponer Productos</h5>
-          <form [formGroup]="detalleForm">
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label for="codigoPrenda" class="form-label">Prenda *</label>
-                <select 
-                  class="form-select" 
-                  id="codigoPrenda" 
-                  formControlName="codigoPrenda"
-                  (change)="onPrendaChange($event)">
-                  <option value="">Seleccione...</option>
-                  @for (prenda of prendas; track prenda.codigo) {
-                    <option [value]="prenda.codigo">
-                      {{ prenda.codigo }} - {{ prenda.descripcion }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label for="talleId" class="form-label">Talle *</label>
-                <select 
-                  class="form-select" 
-                  id="talleId" 
-                  formControlName="talleId">
-                  <option value="">Seleccione...</option>
-                  @for (talle of talles; track talle.codigo) {
-                    <option [value]="talle.codigo">
-                      {{ talle.descripcion }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <div class="col-md-2 mb-3">
-                <label for="cantidad" class="form-label">Cantidad *</label>
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="cantidad" 
-                  formControlName="cantidad"
-                  min="1">
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label for="precioUnitario" class="form-label">Precio Unit. *</label>
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="precioUnitario" 
-                  formControlName="precioUnitario"
-                  min="0"
-                  step="0.01">
-              </div>
-              
+          <!-- Tipo de Compra -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Tipo de compra</label>
+            <div class="tipo-compra-buttons d-flex gap-2">
+              <button
+                type="button"
+                class="tipo-btn flex-fill"
+                [class.activo]="mostrarReponer"
+                (click)="mostrarReponer = !mostrarReponer">
+                <i class="bi bi-arrow-repeat me-2"></i>Reponer Productos
+              </button>
+              <button
+                type="button"
+                class="tipo-btn flex-fill"
+                [class.activo]="mostrarNuevo"
+                (click)="mostrarNuevo = !mostrarNuevo">
+                <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
+              </button>
             </div>
+          </div>
 
-            <button 
-              type="button" 
-              class="btn btn-primary w-100"
-              (click)="agregarDetalle()"
-              [disabled]="detalleForm.invalid">
-              <i class="bi bi-plus-circle"></i> Agregar Producto
-            </button>
-          </form>
+          <!-- Sección: Reponer Productos -->
+          @if (mostrarReponer) {
+            <div class="seccion-compra">
+              <hr>
+              <h5 class="mb-3">Reponer Productos</h5>
+              <form [formGroup]="detalleForm">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="codigoPrenda" class="form-label">Prenda *</label>
+                    <select 
+                      class="form-select" 
+                      id="codigoPrenda" 
+                      formControlName="codigoPrenda"
+                      (change)="onPrendaChange($event)">
+                      <option value="">Seleccione...</option>
+                      @for (prenda of prendas; track prenda.codigo) {
+                        <option [value]="prenda.codigo">
+                          {{ prenda.codigo }} - {{ prenda.descripcion }}
+                        </option>
+                      }
+                    </select>
+                  </div>
 
-    <h5 class="mb-3">Nuevo producto</h5>
-    <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
-        <div class="mb-3">
-          <label class="form-label">Código</label>
-          <input
-            type="text"
-            formControlName="codigo"
-            class="form-control"
-            [readonly]="modoEdicion"
-          />
-        </div>
+                  <div class="col-md-3 mb-3">
+                    <label for="talleId" class="form-label">Talle *</label>
+                    <select 
+                      class="form-select" 
+                      id="talleId" 
+                      formControlName="talleId">
+                      <option value="">Seleccione...</option>
+                      @for (talle of talles; track talle.codigo) {
+                        <option [value]="talle.codigo">
+                          {{ talle.descripcion }}
+                        </option>
+                      }
+                    </select>
+                  </div>
 
-        <div class="mb-3">
-          <label class="form-label">Descripción</label>
-          <input type="text" formControlName="descripcion" class="form-control" />
-        </div>
+                  <div class="col-md-2 mb-3">
+                    <label for="cantidad" class="form-label">Cantidad *</label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="cantidad" 
+                      formControlName="cantidad"
+                      min="1">
+                  </div>
 
-        <div class="mb-3">
-          <label class="form-label">Precio</label>
-          <input
-            type="number"
-            formControlName="precio"
-            class="form-control"
-            min="0"
-          />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Prenda por Talle</label>
-          <div class="d-flex flex-wrap gap-2">
-            <div *ngFor="let talle of talles; let i = index"
-                [formGroup]="prendasXTallesForm[i]"
-                class="talle-card border rounded p-2">
-              <div class="text-center mb-2" fw-bold>
-                {{ talle.descripcion }} 
-              </div>
+                  <div class="col-md-3 mb-3">
+                    <label for="precioUnitario" class="form-label">Precio Unit. *</label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="precioUnitario" 
+                      formControlName="precioUnitario"
+                      min="0"
+                      step="0.01">
+                  </div>
+                </div>
 
-              <div class="mb-3">
-                <label class="form-label">Cantidad</label>
-                <input
-                  type="number"
-                  formControlName="cantidad"
-                  class="form-control"
-                  min="0"
-                />
-              </div>
-              </div>
-              </div>
-              </div>
-            
-        
-        <button 
-          type="button" 
-          class="btn btn-primary w-100"
-          (click)="guardarPrenda()"
-          [disabled]="prendaForm.invalid">
-          <i class="bi bi-plus-circle"></i> Agregar Producto
-        </button>
-    </form>
-    </div> 
+                <button 
+                  type="button" 
+                  class="btn btn-primary w-100"
+                  (click)="agregarDetalle()"
+                  [disabled]="detalleForm.invalid">
+                  <i class="bi bi-plus-circle"></i> Agregar Producto
+                </button>
+              </form>
+            </div>
+          }
 
+          <!-- Sección: Nuevo Producto -->
+          @if (mostrarNuevo) {
+            <div class="seccion-compra">
+              <hr>
+              <h5 class="mb-3">Nuevo Producto</h5>
+              <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
+                <div class="mb-3">
+                  <label class="form-label">Código</label>
+                  <input
+                    type="text"
+                    formControlName="codigo"
+                    class="form-control"
+                    [readonly]="modoEdicion"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Descripción</label>
+                  <input type="text" formControlName="descripcion" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Precio</label>
+                  <input
+                    type="number"
+                    formControlName="precio"
+                    class="form-control"
+                    min="0"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Prenda por Talle</label>
+                  <div class="d-flex flex-wrap gap-2">
+                    <div *ngFor="let talle of talles; let i = index"
+                        [formGroup]="prendasXTallesForm[i]"
+                        class="talle-card border rounded p-2">
+                      <div class="text-center mb-2" fw-bold>
+                        {{ talle.descripcion }} 
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input
+                          type="number"
+                          formControlName="cantidad"
+                          class="form-control"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <button 
+                  type="button" 
+                  class="btn btn-primary w-100"
+                  (click)="guardarPrenda()"
+                  [disabled]="prendaForm.invalid">
+                  <i class="bi bi-plus-circle"></i> Agregar Producto
+                </button>
+              </form>
+            </div>
+          }
+
+        </div> 
       </div>
     </div>
 
@@ -257,4 +283,4 @@
     </div>
   
   </div>  
-  </div>
+</div>

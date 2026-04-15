@@ -3,24 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap} from 'rxjs/operators';
 
-interface EmpleadoFrontend{
+interface EmpleadoDTO{
     nombre: string;
     apellido: string;
     dni: string;
     rol_id: number
     password?: string
-}
-
-
-export interface EmpleadoBackend{
-    nombre: string;
-    apellido: string;
-    dni: string;
-    rol_id: {
-      id: number,
-      nombre: string
-    };
-    password?: string  
 }
 
 @Injectable({
@@ -34,10 +22,10 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) {}
 
-  nuevoUsuario(body: EmpleadoFrontend): Observable<EmpleadoBackend> {
+  nuevoUsuario(body: EmpleadoDTO): Observable<EmpleadoDTO> {
 
     console.log("Service front" , body)
-    return this.http.post<EmpleadoBackend>(`${this.apiUrl}/register`, body).pipe(
+    return this.http.post<EmpleadoDTO>(`${this.apiUrl}/register`, body).pipe(
       catchError(error => {
         console.error('Error al registrar usuario:', error);
         return throwError(() => new Error('Error al registrar usuario. Intenta nuevamente.'));
@@ -45,8 +33,8 @@ export class UsuariosService {
     );
   }
   
-  verificarEmpleado(dni: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/auth/verificar/${dni}`);
+  verificarEmpleado(): Observable<any> {
+    return this.http.get(`http://localhost:3000/auth/me`);
   }
 
   setUser(user: any) {
