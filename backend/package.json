@@ -36,11 +36,15 @@
     "loadsh": "^0.0.4",
     "momento": "^0.2.0",
     "node-forge": "^1.4.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "soap": "^1.9.1",
     "swagger-ui-express": "^5.0.1",
+    "typeorm": "^0.3.27",
+    "xml2js": "^0.6.2"
     "typeorm": "^0.3.27",
     "xml2js": "^0.6.2"
   },
@@ -55,6 +59,7 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.10.7",
+    "@types/passport-jwt": "^4.0.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
