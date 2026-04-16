@@ -62,11 +62,11 @@
             <label class="form-label fw-semibold">Tipo de compra</label>
             <div class="tipo-compra-buttons d-flex gap-2">
               <button
-                type="button"
-                class="tipo-btn flex-fill"
-                [class.activo]="mostrarReponer"
-                (click)="mostrarReponer = !mostrarReponer">
-                <i class="bi bi-arrow-repeat me-2"></i>Reponer Productos
+                    type="button"
+                    class="tipo-btn flex-fill"
+                    [class.activo]="mostrarReponer"
+                    (click)="mostrarReponer = !mostrarReponer; talles = tallesOriginales">
+                    <i class="bi bi-arrow-repeat me-2"></i>Reponer Productos
               </button>
               <button
                 type="button"
@@ -102,19 +102,25 @@
                   </div>
 
                   <div class="col-md-3 mb-3">
-                    <label for="talleId" class="form-label">Talle *</label>
-                    <select 
-                      class="form-select" 
-                      id="talleId" 
-                      formControlName="talleId">
-                      <option value="">Seleccione...</option>
-                      @for (talle of talles; track talle.codigo) {
-                        <option [value]="talle.codigo">
-                          {{ talle.descripcion }}
-                        </option>
-                      }
-                    </select>
-                  </div>
+  <label for="talleId" class="form-label">Talle *</label>
+  <select 
+    class="form-select" 
+    id="talleId" 
+    formControlName="talleId">
+    
+    <option value="">Seleccione...</option>
+
+    @for (talle of tallesFiltradosReponer; track talle.codigo) {
+      <option [value]="talle.codigo">
+        {{ talle.descripcion }}
+      </option>
+    }
+  </select>
+
+  @if (tallesFiltradosReponer.length === 0 && detalleForm.get('codigoPrenda')?.value) {
+    <small class="text-muted">La prenda no tiene talles asociados.</small>
+  }
+</div>
 
                   <div class="col-md-2 mb-3">
                     <label for="cantidad" class="form-label">Cantidad *</label>

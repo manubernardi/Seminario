@@ -22,6 +22,7 @@ interface Prenda {
   precio: number;
   cantidadTotal: number;
   prendasXTalles: PrendaXTalle[];
+  tipoPrenda?: TipoPrenda
 }
 export interface DetalleCompra {
   codigoPrenda: string;
@@ -69,7 +70,9 @@ export class RegistrarCompra implements OnInit {
   montoTotal = 0;
 
   tiposPrenda: TipoPrenda[] = [];
+  tallesOriginales: Talle[] = [];
   tallesDelTipo: Talle[] = []; // talles que muestra según el tipo elegido
+  tallesFiltradosReponer: Talle[] = [];
 
   // ── Toggle tipo de compra ──────────────────────────────────────────────────
   mostrarReponer = false;
@@ -108,6 +111,7 @@ export class RegistrarCompra implements OnInit {
   );    
   }
 
+  
   ngOnInit() {
     this.cargarEmpleadoLogueado();
     this.cargarProveedores();
@@ -150,22 +154,45 @@ export class RegistrarCompra implements OnInit {
 
   cargarTalles() {
     this.stockService.getTalles().subscribe({
-      next: (response: any) => {
-        this.talles = response; 
-          this.prendasXTallesForm = this.talles.map(t =>
-          this.fb.group({
-            cantidad: [0]
-          })
-        );
+    next: (response: any) => {
+      this.tallesOriginales = response;
+      this.talles = response; // 
+      this.tallesFiltradosReponer = []; // Empieza vacío hasta elegir prenda
+    },
+    error: (err) => console.error('Error al cargar talles:', err)
+  });
+}
+//-------------------------------------------------------------------------
+//PARA ORDENAR
+ordenarTallesDinamico(talles: Talle[]): Talle[] {
+  const ordenLetras: { [key: string]: number } = {
+    'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'XXXL': 7
+  };
 
-        console.log('Talles cargados:', this.talles);
+  return [...talles].sort((a, b) => {
+    // Limpiamos espacios y pasamos a mayúsculas. Reemplazamos coma por punto por las dudas.
+    const descA = a.descripcion.trim().toUpperCase().replace(',', '.');
+    const descB = b.descripcion.trim().toUpperCase().replace(',', '.');
 
-      },
-      error: (err) => {
-        console.error('Error al cargar talles:', err);
-      }
-    });
-  }
+    // 1. Lógica para Letras (S, M, L)
+    if (ordenLetras[descA] && ordenLetras[descB]) {
+      return ordenLetras[descA] - ordenLetras[descB];
+    }
+
+    // 2. Lógica para Números (incluyendo 34.5, 36, etc.)
+    // Usamos parseFloat para no perder los decimales
+    const numA = parseFloat(descA);
+    const numB = parseFloat(descB);
+
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return numA - numB;
+    }
+
+    // 3. Fallback: Orden alfabético
+    return descA.localeCompare(descB);
+  });
+}
+//--------------------------------------------------------------------------------
 
   agregarDetalle() {
     if (this.detalleForm.invalid) {
@@ -242,15 +269,26 @@ export class RegistrarCompra implements OnInit {
   }
 
   onPrendaChange(event: any) {
-    const codigoPrenda = event.target.value;
-    const prenda = this.prendas.find(p => p.codigo === codigoPrenda);
+  const codigoPrenda = event.target.value;
+  const prenda = this.prendas.find(p => p.codigo === codigoPrenda);
+
+  console.log('Prenda seleccionada:', prenda); // <--- MIRÁ ESTO EN LA CONSOLA (F12)
+  console.log('Talles disponibles en esta prenda:', prenda?.prendasXTalles);
+  
+  if (prenda) {
+    this.detalleForm.patchValue({ precioUnitario: prenda.precio });
     
-    if (prenda) {
-      this.detalleForm.patchValue({
-        precioUnitario: prenda.precio
-      });
+    if (prenda.tipoPrenda && prenda.tipoPrenda.talles) {
+      this.tallesFiltradosReponer = this.ordenarTallesDinamico(prenda.tipoPrenda.talles);
+    } else {
+      this.tallesFiltradosReponer = this.ordenarTallesDinamico(this.tallesOriginales);
     }
+  } else {
+    this.tallesFiltradosReponer = [];
   }
+
+  this.detalleForm.get('talleId')?.setValue(''); 
+}
 
   
 guardarPrenda() {
@@ -310,7 +348,8 @@ cargarTiposPrenda() {
 onTipoChange(event: any) {
   const id = Number(event.target.value);
   const tipo = this.tiposPrenda.find(t => t.id === id);
-  this.tallesDelTipo = tipo ? tipo.talles : [];
+  // Ordenamos los talles del tipo seleccionado
+  this.tallesDelTipo = tipo ? this.ordenarTallesDinamico(tipo.talles) : [];
 
   // Regenerar formularios de cantidad por talle
   this.prendasXTallesForm = this.tallesDelTipo.map(() =>
