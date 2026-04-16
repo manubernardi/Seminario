@@ -58,6 +58,10 @@ i.bi {
   font-size: 2rem;
 }
 
+.logout {
+  font-size: 1rem;
+}
+
 .disabled {
   opacity: 0.4;
   filter: grayscale(100%);

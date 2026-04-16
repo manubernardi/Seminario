@@ -50,7 +50,7 @@ import { ArcaController } from './arca/arca.controller';
       TypeOrmModule.forFeature(Object.values(entities)),
       ArcaModule,
     ],
-  controllers: [AppController, ArcaController],
+  controllers: [AppController],
   providers: [AppService],
 })
 

@@ -62,11 +62,11 @@
             <label class="form-label fw-semibold">Tipo de compra</label>
             <div class="tipo-compra-buttons d-flex gap-2">
               <button
-                type="button"
-                class="tipo-btn flex-fill"
-                [class.activo]="mostrarReponer"
-                (click)="mostrarReponer = !mostrarReponer">
-                <i class="bi bi-arrow-repeat me-2"></i>Reponer Productos
+                    type="button"
+                    class="tipo-btn flex-fill"
+                    [class.activo]="mostrarReponer"
+                    (click)="mostrarReponer = !mostrarReponer; talles = tallesOriginales">
+                    <i class="bi bi-arrow-repeat me-2"></i>Reponer Productos
               </button>
               <button
                 type="button"
@@ -102,19 +102,25 @@
                   </div>
 
                   <div class="col-md-3 mb-3">
-                    <label for="talleId" class="form-label">Talle *</label>
-                    <select 
-                      class="form-select" 
-                      id="talleId" 
-                      formControlName="talleId">
-                      <option value="">Seleccione...</option>
-                      @for (talle of talles; track talle.codigo) {
-                        <option [value]="talle.codigo">
-                          {{ talle.descripcion }}
-                        </option>
-                      }
-                    </select>
-                  </div>
+  <label for="talleId" class="form-label">Talle *</label>
+  <select 
+    class="form-select" 
+    id="talleId" 
+    formControlName="talleId">
+    
+    <option value="">Seleccione...</option>
+
+    @for (talle of tallesFiltradosReponer; track talle.codigo) {
+      <option [value]="talle.codigo">
+        {{ talle.descripcion }}
+      </option>
+    }
+  </select>
+
+  @if (tallesFiltradosReponer.length === 0 && detalleForm.get('codigoPrenda')?.value) {
+    <small class="text-muted">La prenda no tiene talles asociados.</small>
+  }
+</div>
 
                   <div class="col-md-2 mb-3">
                     <label for="cantidad" class="form-label">Cantidad *</label>
@@ -151,67 +157,69 @@
 
           <!-- Sección: Nuevo Producto -->
           @if (mostrarNuevo) {
-            <div class="seccion-compra">
-              <hr>
-              <h5 class="mb-3">Nuevo Producto</h5>
-              <form [formGroup]="prendaForm" (ngSubmit)="guardarPrenda()">
-                <div class="mb-3">
-                  <label class="form-label">Código</label>
-                  <input
-                    type="text"
-                    formControlName="codigo"
-                    class="form-control"
-                    [readonly]="modoEdicion"
-                  />
-                </div>
+  <div class="seccion-compra">
+    <hr>
+    <h5 class="mb-3">Nuevo Producto</h5>
+    <form [formGroup]="prendaForm">
 
-                <div class="mb-3">
-                  <label class="form-label">Descripción</label>
-                  <input type="text" formControlName="descripcion" class="form-control" />
-                </div>
+      <div class="mb-3">
+        <label class="form-label">Código</label>
+        <input type="text" formControlName="codigo" class="form-control" />
+      </div>
 
-                <div class="mb-3">
-                  <label class="form-label">Precio</label>
-                  <input
-                    type="number"
-                    formControlName="precio"
-                    class="form-control"
-                    min="0"
-                  />
-                </div>
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <input type="text" formControlName="descripcion" class="form-control" />
+      </div>
 
-                <div class="mb-3">
-                  <label class="form-label">Prenda por Talle</label>
-                  <div class="d-flex flex-wrap gap-2">
-                    <div *ngFor="let talle of talles; let i = index"
-                        [formGroup]="prendasXTallesForm[i]"
-                        class="talle-card border rounded p-2">
-                      <div class="text-center mb-2" fw-bold>
-                        {{ talle.descripcion }} 
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label">Cantidad</label>
-                        <input
-                          type="number"
-                          formControlName="cantidad"
-                          class="form-control"
-                          min="0"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <button 
-                  type="button" 
-                  class="btn btn-primary w-100"
-                  (click)="guardarPrenda()"
-                  [disabled]="prendaForm.invalid">
-                  <i class="bi bi-plus-circle"></i> Agregar Producto
-                </button>
-              </form>
-            </div>
+      <div class="mb-3">
+        <label class="form-label">Precio</label>
+        <input type="number" formControlName="precio" class="form-control" min="0" />
+      </div>
+
+      <!-- Dropdown tipo de prenda -->
+      <div class="mb-3">
+        <label class="form-label">Tipo de Prenda *</label>
+        <select class="form-select" formControlName="tipoPrendaId" (change)="onTipoChange($event)">
+          <option value="">Seleccione un tipo...</option>
+          @for (tipo of tiposPrenda; track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.nombre }}</option>
           }
+        </select>
+      </div>
+
+      <!-- Cantidades por talle (aparece al elegir tipo) -->
+      @if (tallesDelTipo.length > 0) {
+        <div class="mb-3">
+          <label class="form-label">Stock inicial por talle</label>
+          <div class="d-flex flex-wrap gap-2">
+            @for (talle of tallesDelTipo; track talle.codigo; let i = $index) {
+              <div [formGroup]="prendasXTallesForm[i]" class="talle-card border rounded p-2 text-center">
+                <div class="fw-bold mb-2">{{ talle.descripcion }}</div>
+                <input
+                  type="number"
+                  formControlName="cantidad"
+                  class="form-control"
+                  min="0"
+                  style="width: 80px"
+                />
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="btn btn-primary w-100"
+        (click)="guardarPrenda()"
+        [disabled]="prendaForm.invalid || tallesDelTipo.length === 0">
+        <i class="bi bi-plus-circle"></i> Agregar Producto
+      </button>
+
+    </form>
+  </div>
+}
 
         </div> 
       </div>
