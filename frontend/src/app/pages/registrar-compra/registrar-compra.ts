@@ -111,6 +111,7 @@ export class RegistrarCompra implements OnInit {
   );    
   }
 
+  
   ngOnInit() {
     this.cargarEmpleadoLogueado();
     this.cargarProveedores();
@@ -155,12 +156,43 @@ export class RegistrarCompra implements OnInit {
     this.stockService.getTalles().subscribe({
     next: (response: any) => {
       this.tallesOriginales = response;
-      this.talles = response; // Por si lo usás en otro lado
+      this.talles = response; // 
       this.tallesFiltradosReponer = []; // Empieza vacío hasta elegir prenda
     },
     error: (err) => console.error('Error al cargar talles:', err)
   });
 }
+//-------------------------------------------------------------------------
+//PARA ORDENAR
+ordenarTallesDinamico(talles: Talle[]): Talle[] {
+  const ordenLetras: { [key: string]: number } = {
+    'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'XXXL': 7
+  };
+
+  return [...talles].sort((a, b) => {
+    // Limpiamos espacios y pasamos a mayúsculas. Reemplazamos coma por punto por las dudas.
+    const descA = a.descripcion.trim().toUpperCase().replace(',', '.');
+    const descB = b.descripcion.trim().toUpperCase().replace(',', '.');
+
+    // 1. Lógica para Letras (S, M, L)
+    if (ordenLetras[descA] && ordenLetras[descB]) {
+      return ordenLetras[descA] - ordenLetras[descB];
+    }
+
+    // 2. Lógica para Números (incluyendo 34.5, 36, etc.)
+    // Usamos parseFloat para no perder los decimales
+    const numA = parseFloat(descA);
+    const numB = parseFloat(descB);
+
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return numA - numB;
+    }
+
+    // 3. Fallback: Orden alfabético
+    return descA.localeCompare(descB);
+  });
+}
+//--------------------------------------------------------------------------------
 
   agregarDetalle() {
     if (this.detalleForm.invalid) {
@@ -247,10 +279,9 @@ export class RegistrarCompra implements OnInit {
     this.detalleForm.patchValue({ precioUnitario: prenda.precio });
     
     if (prenda.tipoPrenda && prenda.tipoPrenda.talles) {
-      this.tallesFiltradosReponer = prenda.tipoPrenda.talles;
+      this.tallesFiltradosReponer = this.ordenarTallesDinamico(prenda.tipoPrenda.talles);
     } else {
-      // Si por alguna razón no vino el tipo, usamos los originales como fallback
-      this.tallesFiltradosReponer = this.tallesOriginales;
+      this.tallesFiltradosReponer = this.ordenarTallesDinamico(this.tallesOriginales);
     }
   } else {
     this.tallesFiltradosReponer = [];
@@ -317,7 +348,8 @@ cargarTiposPrenda() {
 onTipoChange(event: any) {
   const id = Number(event.target.value);
   const tipo = this.tiposPrenda.find(t => t.id === id);
-  this.tallesDelTipo = tipo ? tipo.talles : [];
+  // Ordenamos los talles del tipo seleccionado
+  this.tallesDelTipo = tipo ? this.ordenarTallesDinamico(tipo.talles) : [];
 
   // Regenerar formularios de cantidad por talle
   this.prendasXTallesForm = this.tallesDelTipo.map(() =>
