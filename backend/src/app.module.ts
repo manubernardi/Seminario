@@ -16,7 +16,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ArcaService } from './arca/arca.service';
 import { ArcaModule } from './arca/arca.module';
 import { ArcaController } from './arca/arca.controller';
-import { ArcaService } from './arca/arca.service';
+import { WsaaService } from './arca/wsaa.service';
+import { WsfeService } from './arca/wsfe.service';
+
 @Module({
 
   imports: [
@@ -53,7 +55,7 @@ import { ArcaService } from './arca/arca.service';
       ArcaModule,
     ],
   controllers: [AppController, ArcaController],
-  providers: [AppService, ArcaService],
+  providers: [AppService, ArcaService, WsaaService, WsfeService],
 })
 
 export class AppModule {

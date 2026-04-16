@@ -34,10 +34,12 @@
     "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.3",
     "loadsh": "^0.0.4",
+    "momento": "^0.2.0",
+    "node-forge": "^1.4.0",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "soap": "^1.8.0",
+    "soap": "^1.9.1",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.27",
     "xml2js": "^0.6.2"
