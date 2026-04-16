@@ -38,6 +38,11 @@ interface DetalleConInfo extends CreateDetalleCompraDto {
   subtotal: number;
 
 }
+interface TipoPrenda {
+  id: number;
+  nombre: string;
+  talles: Talle[];
+}
 
 @Component({
   selector: 'app-registrar-compra',
@@ -62,6 +67,9 @@ export class RegistrarCompra implements OnInit {
   
   detalles: DetalleConInfo[] = [];
   montoTotal = 0;
+
+  tiposPrenda: TipoPrenda[] = [];
+  tallesDelTipo: Talle[] = []; // talles que muestra según el tipo elegido
 
   // ── Toggle tipo de compra ──────────────────────────────────────────────────
   mostrarReponer = false;
@@ -90,6 +98,7 @@ export class RegistrarCompra implements OnInit {
       codigo: ['', Validators.required],
       descripcion: ['', Validators.required],
       precio: [0, [Validators.required, Validators.min(0.01)]],
+      tipoPrendaId: ['', Validators.required],
     });
     this.prendasXTallesForm = this.talles.map(talle =>
     this.fb.group({
@@ -104,6 +113,8 @@ export class RegistrarCompra implements OnInit {
     this.cargarProveedores();
     this.cargarPrendas();
     this.cargarTalles();
+    this.cargarTiposPrenda();
+    
     
   }
 
@@ -246,21 +257,27 @@ guardarPrenda() {
 
   if (this.prendaForm.invalid) return;
 
-  const prenda = {
+   const prenda = {
     codigo: this.prendaForm.value.codigo,
     descripcion: this.prendaForm.value.descripcion,
     precio: this.prendaForm.value.precio,
-    prendasXTalles: this.prendasXTallesForm.map((f, i) => ({
-      talle_id: this.talles[i].codigo,
-      cantidad: f.value.cantidad,
-      prenda_codigo: this.prendaForm.value.codigo
-    }))
+    tipoPrendaId: Number(this.prendaForm.value.tipoPrendaId),
   };
 
   this.stockService.crearPrenda(prenda).subscribe(resp => {
-    this.prendas.push(resp);
-    this.agregarNuevaPrendaAlResumen(resp);
+    // Ahora armamos los detalles con las cantidades ingresadas
+    const prendaConCantidades = {
+      ...resp,
+      prendasXTalles: this.tallesDelTipo.map((t, i) => ({
+        talle_id: t.codigo,
+        cantidad: this.prendasXTallesForm[i].value.cantidad
+      }))
+    };
+    this.prendas.push(prendaConCantidades);
+    this.agregarNuevaPrendaAlResumen(prendaConCantidades);
     this.prendaForm.reset();
+    this.tallesDelTipo = [];
+    this.prendasXTallesForm = [];
   });
 }
   
@@ -280,6 +297,26 @@ guardarPrenda() {
       return a.talle_id - b.talle_id;
     });
   }
+
+cargarTiposPrenda() {
+  this.stockService.getTiposPrenda().subscribe({
+    next: (response: any) => {
+      this.tiposPrenda = response;
+    },
+    error: (err) => console.error('Error al cargar tipos de prenda:', err)
+  });
+}
+
+onTipoChange(event: any) {
+  const id = Number(event.target.value);
+  const tipo = this.tiposPrenda.find(t => t.id === id);
+  this.tallesDelTipo = tipo ? tipo.talles : [];
+
+  // Regenerar formularios de cantidad por talle
+  this.prendasXTallesForm = this.tallesDelTipo.map(() =>
+    this.fb.group({ cantidad: [0, [Validators.required, Validators.min(0)]] })
+  );
+}
 
 agregarNuevaPrendaAlResumen(prenda: Prenda) {
 

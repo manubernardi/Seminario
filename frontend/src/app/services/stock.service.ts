@@ -1,51 +1,54 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+  import { Injectable } from '@angular/core';
+  import { HttpClient } from '@angular/common/http';
+  import { Observable } from 'rxjs';
 
-export interface DashboardStats {
-  totalPrendas: number;
-  stockBajo: number;
-  sinStock: number;
-  fechaActualizacion: string;
-}
-
-@Injectable({ providedIn: 'root' })
-export class StockService {
-  private apiUrl = 'http://localhost:3000/stock';
-
-  constructor(private http: HttpClient) {}
-
-  getPrendas(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  export interface DashboardStats {
+    totalPrendas: number;
+    stockBajo: number;
+    sinStock: number;
+    fechaActualizacion: string;
   }
 
-  getTalles(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:3000/talles');
-  }
+  @Injectable({ providedIn: 'root' })
+  export class StockService {
+    private apiUrl = 'http://localhost:3000/stock';
 
-  crearPrenda(data: any): Observable<any> {
-    console.log('Datos enviados para crear prenda:', data);
-    return this.http.post(this.apiUrl, data);
-  }
+    constructor(private http: HttpClient) {}
 
-  actualizarPrenda(codigo: string, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${codigo}`, data);
-  }
+    getPrendas(): Observable<any[]> {
+      return this.http.get<any[]>(this.apiUrl);
+    }
 
-  eliminarPrenda(codigo: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${codigo}`);
-  }
+    getTalles(): Observable<any[]> {
+      return this.http.get<any[]>('http://localhost:3000/talles');
+    }
 
-  getStockTotal(codigo: string): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/${codigo}/stock-total`);
-  }
+    crearPrenda(data: any): Observable<any> {
+      console.log('Datos enviados para crear prenda:', data);
+      return this.http.post(this.apiUrl, data);
+    }
 
-  ajustarStock(codigo: string, talle_id: number, cantidad: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${codigo}/ajustar`, { talle_id, cantidad });
-  }
+    actualizarPrenda(codigo: string, data: any): Observable<any> {
+      return this.http.put(`${this.apiUrl}/${codigo}`, data);
+    }
 
-  getDashboardStats(): Observable<DashboardStats> {
-    return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard/stats`);
+    eliminarPrenda(codigo: string): Observable<void> {
+      return this.http.delete<void>(`${this.apiUrl}/${codigo}`);
+    }
+
+    getStockTotal(codigo: string): Observable<number> {
+      return this.http.get<number>(`${this.apiUrl}/${codigo}/stock-total`);
+    }
+
+    ajustarStock(codigo: string, talle_id: number, cantidad: number): Observable<any> {
+      return this.http.post(`${this.apiUrl}/${codigo}/ajustar`, { talle_id, cantidad });
+    }
+
+    getDashboardStats(): Observable<DashboardStats> {
+      return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard/stats`);
+    }
+    getTiposPrenda() {
+    return this.http.get(`http://localhost:3000/tipos-prenda`);
   }
-}
+  }
 
