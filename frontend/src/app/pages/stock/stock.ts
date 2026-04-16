@@ -65,7 +65,10 @@ export class Stock implements OnInit {
 
   cargarDashboardStats(): void {
     this.stockService.getDashboardStats().subscribe({
-      next: (data) => (this.dashboardStats = data),
+      next: (data) => {(this.dashboardStats = data);
+        console.log('Dashboard Stats:', this.dashboardStats);
+      },
+      
       error: (error) => console.error('Error al cargar estadísticas:', error)
     });
   }
