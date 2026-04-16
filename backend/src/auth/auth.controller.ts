@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
 import { LoginDTO } from '../dto/createEmpleado.dto';
-import { RolesGuard } from './roles.guard';
 import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -14,9 +14,8 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(RolesGuard)  
+  @UseGuards(AuthGuard)  
   getMe(@Request() req) {
-    console.log('En AuthController.getMe')
     console.log('Usuario autenticado:', req.user); //Undefined
     return req.user; // viene del JWT decodificado por el guard
   }
