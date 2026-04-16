@@ -22,6 +22,7 @@ interface Prenda {
   precio: number;
   cantidadTotal: number;
   prendasXTalles: PrendaXTalle[];
+  tipoPrenda?: TipoPrenda
 }
 export interface DetalleCompra {
   codigoPrenda: string;
@@ -69,7 +70,9 @@ export class RegistrarCompra implements OnInit {
   montoTotal = 0;
 
   tiposPrenda: TipoPrenda[] = [];
+  tallesOriginales: Talle[] = [];
   tallesDelTipo: Talle[] = []; // talles que muestra según el tipo elegido
+  tallesFiltradosReponer: Talle[] = [];
 
   // ── Toggle tipo de compra ──────────────────────────────────────────────────
   mostrarReponer = false;
@@ -150,22 +153,14 @@ export class RegistrarCompra implements OnInit {
 
   cargarTalles() {
     this.stockService.getTalles().subscribe({
-      next: (response: any) => {
-        this.talles = response; 
-          this.prendasXTallesForm = this.talles.map(t =>
-          this.fb.group({
-            cantidad: [0]
-          })
-        );
-
-        console.log('Talles cargados:', this.talles);
-
-      },
-      error: (err) => {
-        console.error('Error al cargar talles:', err);
-      }
-    });
-  }
+    next: (response: any) => {
+      this.tallesOriginales = response;
+      this.talles = response; // Por si lo usás en otro lado
+      this.tallesFiltradosReponer = []; // Empieza vacío hasta elegir prenda
+    },
+    error: (err) => console.error('Error al cargar talles:', err)
+  });
+}
 
   agregarDetalle() {
     if (this.detalleForm.invalid) {
@@ -242,15 +237,27 @@ export class RegistrarCompra implements OnInit {
   }
 
   onPrendaChange(event: any) {
-    const codigoPrenda = event.target.value;
-    const prenda = this.prendas.find(p => p.codigo === codigoPrenda);
+  const codigoPrenda = event.target.value;
+  const prenda = this.prendas.find(p => p.codigo === codigoPrenda);
+
+  console.log('Prenda seleccionada:', prenda); // <--- MIRÁ ESTO EN LA CONSOLA (F12)
+  console.log('Talles disponibles en esta prenda:', prenda?.prendasXTalles);
+  
+  if (prenda) {
+    this.detalleForm.patchValue({ precioUnitario: prenda.precio });
     
-    if (prenda) {
-      this.detalleForm.patchValue({
-        precioUnitario: prenda.precio
-      });
+    if (prenda.tipoPrenda && prenda.tipoPrenda.talles) {
+      this.tallesFiltradosReponer = prenda.tipoPrenda.talles;
+    } else {
+      // Si por alguna razón no vino el tipo, usamos los originales como fallback
+      this.tallesFiltradosReponer = this.tallesOriginales;
     }
+  } else {
+    this.tallesFiltradosReponer = [];
   }
+
+  this.detalleForm.get('talleId')?.setValue(''); 
+}
 
   
 guardarPrenda() {
