@@ -9,9 +9,14 @@ import { PrendaEntity } from '../entities/prenda.entity';
 import { CreateVentaDto} from '../dto/create-venta.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
+import { CreateInvoiceDto } from '../arca/dto/create-invoice.dto';
+import { WsfeService } from '../arca/wsfe.service';
+
 
 @Injectable()
 export class VentasService {
+  private wsfeService: WsfeService;
+
   constructor(
     @InjectRepository(VentaEntity)
     private ventaRepository: Repository<VentaEntity>,
@@ -26,10 +31,11 @@ export class VentasService {
     @InjectRepository(PrendaXTalleEntity)
     private prendaXTalleRepository: Repository<PrendaXTalleEntity>,
     @InjectRepository(TalleEntity)
-    private talleRepository: Repository<TalleEntity>
+    private talleRepository: Repository<TalleEntity>,
   ) {}
 
   async create(venta: CreateVentaDto): Promise<VentaEntity> {
+    this.wsfeService = new WsfeService();
     console.log('Creando venta con datos:', venta.detalles);
     // Validar empleado
     const empleado = await this.empleadoRepository.findOneBy({ legajo: venta.empleadoLegajo});
@@ -108,6 +114,28 @@ export class VentasService {
     const ventaGuardada = await this.ventaRepository.save(nuevaVenta);
     console.log('Venta guardada:', ventaGuardada);
     
+    // Crear factura en ARCA (AFIP)
+    const factura: CreateInvoiceDto = {
+      puntoVenta: 1,
+      tipoCbte: 11,
+      docTipo: 99,
+      docNro: 0,
+      neto: total,
+      iva: total * 0.21,
+      total: total * 1.21
+    }
+    
+    try {
+      await this.wsfeService.crearFactura(factura);
+      console.log('Factura creada exitosamente en ARCA');
+    } catch (error: any) {
+      // La venta se guardó, pero la factura falló
+      console.warn('Error al crear factura en ARCA:', error.message);
+      // No lanzamos el error para no revertir la venta
+    }
+
+
+
     return ventaGuardada;
   }
 

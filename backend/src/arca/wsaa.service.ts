@@ -6,13 +6,13 @@ import * as forge from 'node-forge'
 @Injectable()
 export class WsaaService {
 
-  private token = null
-  private sign = null
-  private expiration = null
+  private token: string | null = null
+  private sign: string | null = null
+  private expiration: Date | null = null
 
   async login() {
 
-    if (this.token && new Date() < this.expiration) {
+    if (this.token && this.expiration && new Date() < this.expiration) {
       return { token: this.token, sign: this.sign }
     }
 

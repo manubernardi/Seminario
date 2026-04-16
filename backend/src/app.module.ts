@@ -13,10 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { TipoPrendaModule } from './tipoPrenda/tipoPrenda.module';
 import { ConfigModule } from '@nestjs/config';
-import { ArcaService } from './arca/arca.service';
 import { ArcaModule } from './arca/arca.module';
 import { ArcaController } from './arca/arca.controller';
-import { ArcaService } from './arca/arca.service';
 @Module({
 
   imports: [
@@ -53,7 +51,7 @@ import { ArcaService } from './arca/arca.service';
       ArcaModule,
     ],
   controllers: [AppController, ArcaController],
-  providers: [AppService, ArcaService],
+  providers: [AppService],
 })
 
 export class AppModule {
