@@ -9,6 +9,8 @@ import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
+import { StockService } from '../stock/stock.service';
+import { TipoPrendaEntity } from '../entities/tipoPrenda.entity';
 
 @Module({
   imports: [
@@ -19,11 +21,12 @@ import { TalleEntity } from '../entities/talle.entity';
       ClienteEntity,
       PrendaEntity, 
       PrendaXTalleEntity,
-      TalleEntity
+      TalleEntity,
+      TipoPrendaEntity,
     ])
   ],
   controllers: [VentasController],
-  providers: [VentasService],
+  providers: [VentasService, StockService],
   exports: [VentasService]
 })
 export class VentasModule {}

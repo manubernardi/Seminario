@@ -51,35 +51,39 @@
         </td>
         <td>
           <div class="d-flex flex-wrap gap-2">
-            <div *ngFor="let prendaXTalle of prenda.prendasXTalles" class="talle-card border rounded p-2">
-              <div class="text-center mb-2">
-                <strong>{{ getTalleDescripcion(prendaXTalle.talle_id) }}</strong>
+            @for(pXt of ordenarTalles(prenda.prendasXTalles); track pXt.talle_id ){
+              <div class="talle-card border rounded p-2">
+                <div class="text-center mb-2">
+                  <strong>{{ getTalleDescripcion(pXt.talle_id) }}</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="fw-bold">{{ pXt.cantidad }}</span>
+                </div>
+                <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
+                    <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="ajustarStock(prenda.codigo, -1, pXt.talle_id)"
+                    >
+                    -
+                    </button>
+                    <button
+                    class="btn btn-sm btn-outline-success"
+                    (click)="ajustarStock(prenda.codigo, 1, pXt.talle_id)"
+                    >
+                    +
+                    </button>
+                </div>
               </div>
-              <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-                  <span class="fw-bold">{{ prendaXTalle.cantidad }}</span>
-              </div>
-              <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
-                  <button
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="ajustarStock(prenda.codigo, -1, prendaXTalle.talle_id)"
-                  >
-                  -
-                  </button>
-                  <button
-                  class="btn btn-sm btn-outline-success"
-                  (click)="ajustarStock(prenda.codigo, 1, prendaXTalle.talle_id)"
-                  >
-                  +
-                  </button>
-              </div>
-              </div>
+            } @empty {
+              <div>No hay talles disponibles</div>
+            }
           </div>
-          </td>
+        </td>
 
         <!-- Botones -->
         <td class="text-center">
           <button
-            class="btn btn-sm btn-primary me-2"
+            class="btn btn-sm btn-primary me-2 mb-3"
             (click)="editarPrenda(prenda)"
           >
             Editar

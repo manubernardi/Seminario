@@ -86,6 +86,8 @@ body {
 .btn-success {
     background-color: #28a745;
     border: none;
+    margin-right: 1rem;
+    padding: 0.6rem;
 }
 
 .btn-success:hover {

@@ -6,18 +6,16 @@
 </nav>
 
 <div class="grid-opciones">
-
-  @for(item of menu; track item.id){
+  @for(item of menuFiltrado; track item.id; let i = $index){
     <a 
-    [routerLink]="item.route"
-    class="tab {{ item.class }}"
-    [class.disabled]="!puedeAcceder(item)"
-  >
-    <i [class]="item.icon"></i>
-    <span>{{ item.label }}</span>
-  </a>
+      [routerLink]="item.route"
+      class="tab {{ item.class }}"
+      [style.grid-area]="getGridArea(i, menuFiltrado.length)"
+    >
+      <i [class]="item.icon"></i>
+      <span>{{ item.label }}</span>
+    </a>
   }
-  
 </div>
 
 <router-outlet></router-outlet>

@@ -9,6 +9,7 @@ import { PrendaEntity } from '../entities/prenda.entity';
 import { CreateVentaDto} from '../dto/create-venta.dto';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
+import { StockService } from '../stock/stock.service';
 
 @Injectable()
 export class VentasService {
@@ -23,6 +24,7 @@ export class VentasService {
     private clienteRepository: Repository<ClienteEntity>,
     @InjectRepository(PrendaEntity)
     private prendaRepository: Repository<PrendaEntity>,
+    private stockService: StockService,
     @InjectRepository(PrendaXTalleEntity)
     private prendaXTalleRepository: Repository<PrendaXTalleEntity>,
     @InjectRepository(TalleEntity)
@@ -31,6 +33,7 @@ export class VentasService {
 
   async create(venta: CreateVentaDto): Promise<VentaEntity> {
     console.log('Creando venta con datos:', venta.detalles);
+
     // Validar empleado
     const empleado = await this.empleadoRepository.findOneBy({ legajo: venta.empleadoLegajo});
     if (!empleado) {
@@ -50,13 +53,9 @@ export class VentasService {
     const detalles: DetalleVentaEntity[] = [];
     
     for (const detalleDto of venta.detalles) {
-      const prenda = await this.prendaRepository.findOne({
-        where: { codigo: detalleDto.prendaCodigo }
-      });
+      const prenda = await this.stockService.getPrendaByCodigo(detalleDto.prendaCodigo);
       
-      if (!prenda) {
-        throw new NotFoundException(`Prenda con código ${detalleDto.prendaCodigo} no encontrada`);
-      }
+      if (!prenda) throw new NotFoundException(`Prenda con código ${detalleDto.prendaCodigo} no encontrada`);
 
       const talle = await this.talleRepository.findOne({
         where: { codigo: detalleDto.talleCodigo }
@@ -79,7 +78,7 @@ export class VentasService {
       }
 
       // Actualizar stock
-      prendaXTalle.actualizarCantidad(-detalleDto.cantidad);
+      this.stockService.ajustarStock(prenda.codigo, -detalleDto.cantidad, detalleDto.talleCodigo);
       await this.prendaXTalleRepository.save(prendaXTalle);
 
       // Crear detalle
@@ -178,7 +177,7 @@ export class VentasService {
 
       if (!prendaXTalle) throw new NotFoundException(`La Prenda elegida no tiene ese talle`)
 
-      prendaXTalle.actualizarCantidad(detalle.cantidad);
+      this.stockService.ajustarStock(prenda.codigo, detalle.cantidad, detalle.talle.codigo);
       await this.prendaXTalleRepository.save(prendaXTalle);
     }
 
