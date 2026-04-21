@@ -32,6 +32,8 @@ export class WsfeService {
       DocTipo: data.docTipo,
       DocNro: data.docNro,
 
+      CondicionIVAReceptorId: data.condicionIVAReceptorId,
+
       CbteDesde: last + 1,
       CbteHasta: last + 1,
 
@@ -39,23 +41,23 @@ export class WsfeService {
 
       ImpTotal: data.total,
       ImpTotConc: 0,
-      ImpNeto: data.neto,
+      ImpNeto: data.total,
       ImpOpEx: 0,
-      ImpIVA: data.iva,
+      ImpIVA: 0,
       ImpTrib: 0,
 
       MonId: 'PES',
       MonCotiz: 1,
 
-      Iva: [
+      /*Iva: [
         {
           Id: 5,
           BaseImp: data.neto,
           Importe: data.iva
         }
-      ]
+      ]*/
     }
-
+    console.log(voucher)
     const res = await wsfe.createVoucher(voucher)
     console.log(res)
     return res
