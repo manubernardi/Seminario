@@ -137,6 +137,44 @@
                                         formControlName="telefono"
                                         placeholder="Ej: 3512345678">
                                 </div>
+                               
+                                    <!-- Tipo de Documento -->
+                                    <div class="col-md-4 mb-3">
+                                      <label class="form-label">Tipo de Documento *</label>
+                                      <div class="d-flex gap-2">
+                                        @for (tipo of tiposDoc; track tipo.id) {
+                                          <button
+                                            type="button"
+                                            class="btn flex-fill"
+                                            [class.btn-primary]="tipoDocSeleccionado === tipo.id"
+                                            [class.btn-outline-primary]="tipoDocSeleccionado !== tipo.id"
+                                            (click)="clienteForm.get('tipoDoc')?.setValue(tipo.id)">
+                                            {{ tipo.label }}
+                                          </button>
+                                        }
+                                      </div>
+                                    </div>
+                                  
+                                    <!-- Número de Documento -->
+                                    <div class="col-md-8 mb-3">
+                                      <label class="form-label">Número de Documento *</label>
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        formControlName="nroDoc"
+                                        [placeholder]="tipoDocSeleccionado === 1 ? 'Ej: 38456789' : 'Ej: 20384567890'"
+                                        [class.is-invalid]="clienteForm.get('nroDoc')?.invalid && clienteForm.get('nroDoc')?.touched">
+                                      @if (clienteForm.get('nroDoc')?.invalid && clienteForm.get('nroDoc')?.touched) {
+                                        <div class="invalid-feedback">
+                                          @if (clienteForm.get('nroDoc')?.errors?.['required']) {
+                                            El número de documento es obligatorio
+                                          } @else if (clienteForm.get('nroDoc')?.errors?.['pattern']) {
+                                            Solo se permiten números
+                                          }
+                                        </div>
+                                      }
+                                    </div>
+                                  
                             </div>
                         </form>
                     </div>

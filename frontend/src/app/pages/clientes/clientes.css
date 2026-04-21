@@ -8,7 +8,23 @@ body {
 .inicio {
     background-color: var(--primary-color);
 }
-
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+  
+  .btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+  
+  .btn-outline-primary:hover,
+  .btn-primary:hover {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+    opacity: 0.9;
+  }
 .card-header {
     font-weight: bold;
 }

@@ -16,6 +16,12 @@ export class ClienteEntity {
     @Column({ type: 'varchar', length: 20, nullable: true })
     telefono?: string;
 
+    @Column()
+    tipoDoc: number;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    nroDoc?: string;
+
     @OneToMany(() => VentaEntity, (venta) => venta.cliente)
     ventas?: VentaEntity[];
 

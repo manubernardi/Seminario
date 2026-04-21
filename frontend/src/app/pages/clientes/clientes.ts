@@ -21,7 +21,10 @@ export class ClientesComponent implements OnInit {
   clienteEditando: Cliente | null = null;
   guardando = false;
   busqueda = '';
-
+  tiposDoc = [
+    { id: 1, label: 'DNI' },
+    { id: 2, label: 'CUIT' },
+  ];
   constructor(
     private clienteService: ClientesService,
     private fb: FormBuilder
@@ -30,6 +33,8 @@ export class ClientesComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       telefono: ['', Validators.required],
+      tipoDoc:  [1, Validators.required],   // default DNI
+      nroDoc:   ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     });
   }
 
@@ -120,6 +125,9 @@ export class ClientesComponent implements OnInit {
         }
       });
     }
+  }
+  get tipoDocSeleccionado(): number {
+    return this.clienteForm.get('tipoDoc')?.value;
   }
 
   eliminarCliente(cliente: Cliente): void {
