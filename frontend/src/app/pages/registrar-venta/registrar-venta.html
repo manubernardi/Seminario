@@ -36,41 +36,51 @@
 
                             <!-- Cliente (Opcional CON BOTÓN PARA CREAR NUEVO) -->
                             <div class="mb-3">
-  <label for="clienteId" class="form-label fw-bold">Cliente (opcional)</label>
+                            <label for="clienteId" class="form-label fw-bold">Cliente (opcional)</label>
+                                                            
+                            <div class="input-group mb-2">
+                                <select
+                                class="form-select"
+                                id="clienteId"
+                                formControlName="clienteId"
+                                [class.is-invalid]="ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched">
+                                <option value="">Seleccione un cliente</option>
+                                @for (cliente of clientes; track cliente.id) {
+                                    <option [value]="cliente.id">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+                                }
+                                </select>
+
+                                <button
+                                type="button"
+                                class="btn btn-success"
+                                (click)="abrirModalCliente()"
+                                [disabled]="!ventaForm.get('clienteHabilitado')?.value"
+                                title="Registrar nuevo cliente">
+                                <i class="bi bi-person-plus-fill"></i>
+                                </button>
+                            </div>
+
+                            <div class="form-check mt-2">
+                                <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="habilitarCliente"
+                                formControlName="clienteHabilitado">
+                                <label class="form-check-label text-muted" for="habilitarCliente">
+                                Habilitar selección / registro de cliente
+                                </label>
+                            </div>
+                            </div>
+                            <!-- Tipo de Comprobante -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tipo de Comprobante *</label>
+                                <select class="form-select" formControlName="tipoCbte">
+                                <option [value]="11">Factura C (Consumidor Final)</option>
+                                <option [value]="1">Factura A (Responsable Inscripto)</option>
+                                <option [value]="6">Factura B (Monotributista)</option>
+                                </select>
                                 
-  <div class="input-group mb-2">
-    <select
-      class="form-select"
-      id="clienteId"
-      formControlName="clienteId"
-      [class.is-invalid]="ventaForm.get('clienteId')?.invalid && ventaForm.get('clienteId')?.touched">
-      <option value="">Seleccione un cliente</option>
-      @for (cliente of clientes; track cliente.id) {
-        <option [value]="cliente.id">{{ cliente.nombre }} {{ cliente.apellido }}</option>
-      }
-    </select>
-
-    <button
-      type="button"
-      class="btn btn-success"
-      (click)="abrirModalCliente()"
-      [disabled]="!ventaForm.get('clienteHabilitado')?.value"
-      title="Registrar nuevo cliente">
-      <i class="bi bi-person-plus-fill"></i>
-    </button>
-  </div>
-
-  <div class="form-check mt-2">
-    <input
-      type="checkbox"
-      class="form-check-input"
-      id="habilitarCliente"
-      formControlName="clienteHabilitado">
-    <label class="form-check-label text-muted" for="habilitarCliente">
-      Habilitar selección / registro de cliente
-    </label>
-  </div>
-</div>
+                            </div>
 
 
                             <!-- Fecha (solo lectura) -->
@@ -238,6 +248,92 @@
         </form>
     </div>
 
+    <!--MODAL PARA VER LA FACTURA-->
+    @if (mostrarModalFactura) {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+      
+              <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                  <i class="bi bi-check-circle-fill me-2"></i> Venta registrada correctamente
+                </h5>
+              </div>
+      
+              <div class="modal-body">
+                <div class="alert alert-success mb-3">
+                  <strong>Factura generada en ARCA exitosamente</strong>
+                </div>
+      
+                <h6 class="text-muted mb-2">Datos de la Factura</h6>
+                <table class="table table-bordered mb-4">
+                  <tbody>
+                    <tr>
+                      <th>N° Venta</th>
+                      <td>{{ facturaResultado?.numVenta }}</td>
+                      <th>Punto de Venta</th>
+                      <td>0001</td>
+                    </tr>
+                    <tr>
+                      <th>Tipo Comprobante</th>
+                      <td>
+                        {{ facturaResultado?.tipoCbte === 1 ? 'Factura A' :
+                           facturaResultado?.tipoCbte === 6 ? 'Factura B' : 'Factura C' }}
+                      </td>
+                      <th>Fecha</th>
+                      <td>{{ facturaResultado?.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                    </tr>
+                    <tr>
+                      <th>CAE</th>
+                      <td><strong>{{ facturaResultado?.cae || 'No disponible' }}</strong></td>
+                      <th>Vencimiento CAE</th>
+                      <td>{{ facturaResultado?.caeFchVto || 'No disponible' }}</td>
+                    </tr>
+                    <tr>
+                      <th>Total</th>
+                      <td colspan="3">
+                        <strong class="text-success fs-5">{{ facturaResultado?.total | currency:'ARS' }}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+                <h6 class="text-muted mb-2">Datos del Cliente</h6>
+                <table class="table table-bordered">
+                  <tbody>
+                    @if (facturaResultado?.cliente) {
+                      <tr>
+                        <th>Nombre</th>
+                        <td>{{ facturaResultado.cliente.nombre }} {{ facturaResultado.cliente.apellido }}</td>
+                      </tr>
+                      <tr>
+                        <th>Tipo Doc.</th>
+                        <td>{{ facturaResultado.cliente.tipoDoc === 1 ? 'DNI' : 'CUIT' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Nro. Doc.</th>
+                        <td>{{ facturaResultado.cliente.nroDoc }}</td>
+                      </tr>
+                    } @else {
+                      <tr>
+                        <td class="text-muted text-center">Consumidor Final</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+      
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" (click)="cerrarModalFactura()">
+                  <i class="bi bi-check"></i> Aceptar
+                </button>
+              </div>
+      
+            </div>
+          </div>
+        </div>
+      }
+
     <!-- MODAL PARA REGISTRAR NUEVO CLIENTE -->
     @if (mostrarModalCliente) {
         <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
@@ -299,4 +395,5 @@
             </div>
         </div>
     }
+    
 </body>

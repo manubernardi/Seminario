@@ -69,7 +69,8 @@ export class RegistrarVenta implements OnInit {
     this.ventaForm = this.fb.group({
       empleadoId: [{ value: '', disabled: true }, Validators.required],
       clienteId:[{ value: '', disabled: true }],   // empezamos deshabilitado
-      clienteHabilitado: [false]  
+      clienteHabilitado: [false],
+      tipoCbte: [11, Validators.required]  // 11 = Factura C por defecto  
     });
 
     this.clienteForm = this.fb.group({
@@ -77,7 +78,10 @@ export class RegistrarVenta implements OnInit {
       apellido: ['', Validators.required],
       telefono: ['', Validators.required],
     });
+
   }
+  facturaResultado: any = null;
+  mostrarModalFactura = false;
 
   ngOnInit(): void {
     this.cargarEmpleadoLogueado();
@@ -269,6 +273,7 @@ export class RegistrarVenta implements OnInit {
     const ventaData: any = {
       empleadoLegajo: Number(this.empleadoLogueado?.legajo),
       clienteId: formValues.clienteId ? Number(formValues.clienteId) : undefined,
+      tipoCbte: Number(formValues.tipoCbte),
       detalles: this.detalles.map(d => ({
       prendaCodigo: d.codigoPrenda,
       cantidad: d.cantidad,
@@ -280,14 +285,18 @@ export class RegistrarVenta implements OnInit {
 
     this.ventasService.crearVenta(ventaData).subscribe({
       next: (response) => {
-        alert('Venta registrada correctamente');
-        this.router.navigate(['/ventas']);
+        this.facturaResultado = response;
+        this.mostrarModalFactura = true;  // mostrar Factura
       },
       error: (error) => {
         console.error('Error al guardar venta:', error);
         alert(error.error?.message || 'Error al guardar la venta');
       }
     });
+  }
+  cerrarModalFactura(): void {
+    this.mostrarModalFactura = false;
+    this.router.navigate(['/ventas']);
   }
 
   cancelar(): void {

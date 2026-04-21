@@ -113,13 +113,29 @@ export class VentasService {
     const ventaGuardada = await this.ventaRepository.save(nuevaVenta);
     console.log('Venta guardada:', ventaGuardada);
     
-    // Crear factura en ARCA (AFIP)
+// Obtener cliente con sus datos de documento
+const cliente = venta.clienteId 
+  ? await this.clienteRepository.findOneBy({ id: venta.clienteId })
+  : null;
+
+  // Mapear tipoDoc a código AFIP
+  // 96 = DNI, 80 = CUIT, 99 = Consumidor Final
+  const docTipoAfip = cliente?.tipoDoc === 1 ? 96    // DNI
+                  : cliente?.tipoDoc === 2 ? 80    // CUIT
+                  : 99;                            //Consumidor Final para cuando no hay cliente
+
+    const docNro = cliente?.nroDoc ? parseInt(cliente.nroDoc) : 0;
+
+  /* Determinar tipo de comprobante según doc
+   11 = Factura C (consumidor final), 1 = Factura A (CUIT)
+    const tipoCbte = cliente?.tipoDoc === 2 ? 1 : 11;*/
+
     const factura: CreateInvoiceDto = {
       puntoVenta: 1,
-      tipoCbte: 11,
-      docTipo: 99,
-      docNro: 0,
-      condicionIVAReceptorId: 5,
+      tipoCbte: venta.tipoCbte,
+      docTipo: docTipoAfip,
+      docNro: docNro,
+      condicionIVAReceptorId: cliente?.tipoDoc === 2 ? 1 : 5,
       neto: total,
       iva: total * 0.21,
       total: total * 1.21
@@ -133,6 +149,21 @@ export class VentasService {
       console.warn('Error al crear factura en ARCA:', error.message);
       // No lanzamos el error para no revertir la venta
     }
+    try {
+      const resultadoFactura = await this.wsfeService.crearFactura(factura);
+      console.log('Factura creada exitosamente en ARCA');
+      
+      // Guardar CAE en la venta
+      ventaGuardada.cae = resultadoFactura.CAE;
+      ventaGuardada.caeFchVto = resultadoFactura.CAEFchVto;
+      ventaGuardada.tipoCbte = venta.tipoCbte;
+      await this.ventaRepository.save(ventaGuardada);
+    
+    } catch (error: any) {
+      console.warn('Error al crear factura en ARCA:', error.message);
+    }
+    
+    return ventaGuardada;
 
 
 

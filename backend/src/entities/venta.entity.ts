@@ -30,4 +30,13 @@ export class VentaEntity {
     @ManyToOne(() => EmpleadoEntity, empleado => empleado.ventas)
     @JoinColumn({ name: 'empleadoLegajo', referencedColumnName: 'legajo' })
     empleado: EmpleadoEntity;
+
+    @Column({ nullable: true })
+    cae?: string;
+
+    @Column({ nullable: true })
+    caeFchVto?: string;
+
+    @Column({ nullable: true })
+    tipoCbte?: number;
 }
