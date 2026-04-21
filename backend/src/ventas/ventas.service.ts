@@ -120,11 +120,12 @@ export class VentasService {
       tipoCbte: 11,
       docTipo: 99,
       docNro: 0,
+      condicionIVAReceptorId: 5,
       neto: total,
       iva: total * 0.21,
       total: total * 1.21
     }
-    
+    console.log(factura)
     try {
       await this.wsfeService.crearFactura(factura);
       console.log('Factura creada exitosamente en ARCA');
