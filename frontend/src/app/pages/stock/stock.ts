@@ -44,6 +44,11 @@ export class Stock implements OnInit {
   modoEdicion = false;
   dashboardStats: DashboardStats | null = null;
 
+  verStockBajo = false;
+  verSinStock = false;
+  modalStockTitulo = '';
+  modalStockLista: any[] = [];
+
   private modalInstance: any;
 
   constructor(
@@ -246,4 +251,18 @@ export class Stock implements OnInit {
 
   return prenda.codigo.split('-').map(part => part.trim()).join(' ');
   }
+
+  //MODAL STOCK BAJO
+  abrirModalStock(tipo: 'bajo' | 'sinStock') {
+  if (tipo === 'bajo') {
+    this.modalStockTitulo = 'Prendas con stock bajo';
+    this.modalStockLista = this.dashboardStats?.prendasStockBajo || [];
+  } else {
+    this.modalStockTitulo = 'Prendas sin stock';
+    this.modalStockLista = this.dashboardStats?.prendasSinStock || [];
+  }
+  const modalEl = document.getElementById('modalStock');
+  this.modalInstance = new bootstrap.Modal(modalEl);
+  this.modalInstance.show();
+}
 }

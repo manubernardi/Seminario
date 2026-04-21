@@ -3,11 +3,13 @@
   import { Observable } from 'rxjs';
 
   export interface DashboardStats {
-    totalPrendas: number;
-    stockBajo: number;
-    sinStock: number;
-    fechaActualizacion: string;
-  }
+  totalPrendas: number;
+  stockBajo: number;
+  sinStock: number;
+  prendasStockBajo: { codigo: string, descripcion: string, stock: number }[];
+  prendasSinStock: { codigo: string, descripcion: string }[];
+  fechaActualizacion: string;
+}
 
   @Injectable({ providedIn: 'root' })
   export class StockService {
