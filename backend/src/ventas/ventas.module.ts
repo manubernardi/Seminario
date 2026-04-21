@@ -23,7 +23,8 @@ import { TipoPrendaEntity } from '../entities/tipoPrenda.entity';
       ClienteEntity,
       PrendaEntity, 
       PrendaXTalleEntity,
-      TalleEntity
+      TalleEntity,
+      TipoPrendaEntity
     ])
   ],
   controllers: [VentasController],
