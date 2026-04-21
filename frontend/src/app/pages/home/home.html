@@ -1,8 +1,24 @@
 <nav class="menu-principal">
-  <button class="btn-volver "  style=" left: 1rem; "
-    (click)="logOut()">
+
+  <!-- IZQUIERDA: sesión -->
+  <div class="user-info">
+    <i class="bi bi-person-circle user-icon"></i>
+    <div class="user-text">
+      <div class="sesion">Sesión iniciada</div>
+      <div class="nombre">
+        {{ empleado?.nombre }} {{ empleado?.apellido }}
+      </div>
+      <div class="rol">
+        Rol: {{ rol }}
+      </div>
+    </div>
+  </div>
+
+  <!-- DERECHA: logout -->
+  <button class="btn-volver" (click)="logOut()">
     <i class="bi bi-arrow-left logout"></i> Cerrar Sesión
   </button>
+
 </nav>
 
 <div class="grid-opciones">
