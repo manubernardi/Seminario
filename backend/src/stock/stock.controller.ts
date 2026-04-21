@@ -19,12 +19,6 @@ export class StockController {
     return await this.stockService.getPrendaByCodigo(codigo);
   }
 
-  // 🔹 GET /stock/:codigo/stock-total → obtener stock total de una prenda
-  @Get(':codigo/stock-total')
-  async getStockTotal(@Param('codigo') codigo: string): Promise<number> {
-    return await this.stockService.getTotalStock(codigo);
-  }
-
   // 🔹 POST /stock → crear una nueva prenda
   @Post()
   async create(@Body() createPrendaDto: CreatePrendaDto): Promise<PrendaEntity> {

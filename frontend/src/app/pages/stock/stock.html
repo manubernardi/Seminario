@@ -32,7 +32,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let prenda of prendas">
+      <tr *ngFor="let prenda of prendasFiltradas">
         <td>{{ prenda.codigo }}</td>
         <td>{{ prenda.descripcion }}</td>
         <td>${{ prenda.precio | number: '1.2-2' }}</td>
@@ -51,35 +51,39 @@
         </td>
         <td>
           <div class="d-flex flex-wrap gap-2">
-            <div *ngFor="let prendaXTalle of prenda.prendasXTalles" class="talle-card border rounded p-2">
-              <div class="text-center mb-2">
-                <strong>{{ getTalleDescripcion(prendaXTalle.talle_id) }}</strong>
+            @for(pXt of ordenarTalles(prenda.prendasXTalles); track pXt.talle_id ){
+              <div class="talle-card border rounded p-2">
+                <div class="text-center mb-2">
+                  <strong>{{ getTalleDescripcion(pXt.talle_id) }}</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="fw-bold">{{ pXt.cantidad }}</span>
+                </div>
+                <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
+                    <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="ajustarStock(prenda.codigo, -1, pXt.talle_id)"
+                    >
+                    -
+                    </button>
+                    <button
+                    class="btn btn-sm btn-outline-success"
+                    (click)="ajustarStock(prenda.codigo, 1, pXt.talle_id)"
+                    >
+                    +
+                    </button>
+                </div>
               </div>
-              <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-                  <span class="fw-bold">{{ prendaXTalle.cantidad }}</span>
-              </div>
-              <div class="d-grid gap-1" style="grid-template-columns: 1fr 1fr;">
-                  <button
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="ajustarStock(prenda.codigo, -1, prendaXTalle.talle_id)"
-                  >
-                  -
-                  </button>
-                  <button
-                  class="btn btn-sm btn-outline-success"
-                  (click)="ajustarStock(prenda.codigo, 1, prendaXTalle.talle_id)"
-                  >
-                  +
-                  </button>
-              </div>
-              </div>
+            } @empty {
+              <div>No hay talles disponibles</div>
+            }
           </div>
-          </td>
+        </td>
 
         <!-- Botones -->
         <td class="text-center">
           <button
-            class="btn btn-sm btn-primary me-2"
+            class="btn btn-sm btn-primary me-2 mb-3"
             (click)="editarPrenda(prenda)"
           >
             Editar
@@ -204,23 +208,60 @@ aria-hidden="true"
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <h5>Stock Bajo (&lt; 5)</h5>
-          <h3 class="fw-bold text-warning">
-            {{ dashboardStats?.stockBajo || 0 }}
-          </h3>
-        </div>
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5>Stock Bajo (&lt; 5)</h5>
+        <h3 class="fw-bold text-warning">{{ dashboardStats?.stockBajo || 0 }}</h3>
+        @if (dashboardStats?.stockBajo) {
+          <button class="btn btn-sm btn-outline-warning mt-1" (click)="abrirModalStock('bajo')">
+            Ver prendas
+          </button>
+        }
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <h5>Sin Stock</h5>
-          <h3 class="fw-bold text-danger">
-            {{ dashboardStats?.sinStock || 0 }}
-          </h3>
-        </div>
+  </div>  <!-- ← cerraba acá y faltaba esto -->
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5>Sin Stock</h5>
+        <h3 class="fw-bold text-danger">{{ dashboardStats?.sinStock || 0 }}</h3>
+        @if (dashboardStats?.sinStock) {
+          <button class="btn btn-sm btn-outline-danger mt-1" (click)="abrirModalStock('sinStock')">
+            Ver prendas
+          </button>
+        }
       </div>
     </div>
   </div>
+</div>
+
+<!-- MODAL STOCK BAJO-->
+
+ <!-- MODAL STOCK -->
+<div class="modal fade" id="modalStock" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ modalStockTitulo }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        @if (modalStockLista.length === 0) {
+          <p class="text-muted">No hay prendas.</p>
+        } @else {
+          <ul class="list-group">
+            @for (p of modalStockLista; track p.codigo) {
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{ p.descripcion }}</span>
+                @if (p.stock !== undefined) {
+                  <span class="badge bg-warning text-dark">{{ p.stock }}</span>
+                } 
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -44,6 +44,11 @@ export class Stock implements OnInit {
   modoEdicion = false;
   dashboardStats: DashboardStats | null = null;
 
+  verStockBajo = false;
+  verSinStock = false;
+  modalStockTitulo = '';
+  modalStockLista: any[] = [];
+
   private modalInstance: any;
 
   constructor(
@@ -88,6 +93,33 @@ export class Stock implements OnInit {
     });
   }
 
+  ordenarTalles(talles: PrendaXTalle[]): PrendaXTalle[] {
+    const orden = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+
+    return [...talles].sort((a, b) => { //Copia el array original para no mutarlo
+      // sort() decide la posición de dos elementos consecutivos comparándolos.
+      const ta = this.getTalleDescripcion(a.talle_id); // descripción del talle A
+      const tb = this.getTalleDescripcion(b.talle_id); // descripción del talle B
+
+      const aEsNumero = !isNaN(Number(ta));
+      const bEsNumero = !isNaN(Number(tb));
+
+      // ambos numéricos → orden numérico
+      if (aEsNumero && bEsNumero) return Number(ta) - Number(tb);
+      // Si el resultado es positivo --> b va antes que a
+      // Si el resultado es negativo --> a va antes que b
+      // Si el resultado es cero --> a y b son iguales, no cambia
+
+      // ambos texto → orden según tabla
+      if (!aEsNumero && !bEsNumero) {
+        return orden.indexOf(ta) - orden.indexOf(tb);
+      }
+
+      // mixto → decidís prioridad (ej: primero letras)
+      return aEsNumero ? 1 : -1;
+    });
+  }
+
   cargarTalles(): void {
     this.stockService.getTalles().subscribe({
       next: (data) => (this.talles = data),
@@ -109,6 +141,7 @@ export class Stock implements OnInit {
   ajustarStock(prenda_codigo: string, talle_id: number, delta: number): void {
     this.stockService.ajustarStock(prenda_codigo, talle_id, delta).subscribe({
       next: (actualizado) => {
+        console.log('Stock ajustado:', actualizado);
         this.cargarPrendas();
         this.cargarDashboardStats();
       },
@@ -207,13 +240,6 @@ export class Stock implements OnInit {
     });
   }
 
-  getStockTotal(codigo: string): Observable<number> {
-    return this.stockService.getStockTotal(codigo);
-  }
-
-  getPrendasStockBajo(): number {
-    return this.prendas.filter(p => p.cantidadTotal < 5).length;
-  }
 
   private abrirModal(): void {
     const modalElement = document.getElementById('modalPrenda');
@@ -235,15 +261,23 @@ export class Stock implements OnInit {
     return talle ? talle.descripcion : 'Desconocido';
   }
 
-  ordenarTalles(prendasXTalles: PrendaXTalle[]): PrendaXTalle[] {
-    if (!prendasXTalles) return [];
-    return prendasXTalles.sort((a, b) => {
-      return a.talle_id - b.talle_id;
-    });
-  }
   ordenarPrendas(prenda: Prenda): string {
   if (!prenda.codigo) return '';
 
   return prenda.codigo.split('-').map(part => part.trim()).join(' ');
   }
+
+  //MODAL STOCK BAJO
+  abrirModalStock(tipo: 'bajo' | 'sinStock') {
+  if (tipo === 'bajo') {
+    this.modalStockTitulo = 'Prendas con stock bajo';
+    this.modalStockLista = this.dashboardStats?.prendasStockBajo || [];
+  } else {
+    this.modalStockTitulo = 'Prendas sin stock';
+    this.modalStockLista = this.dashboardStats?.prendasSinStock || [];
+  }
+  const modalEl = document.getElementById('modalStock');
+  this.modalInstance = new bootstrap.Modal(modalEl);
+  this.modalInstance.show();
+}
 }

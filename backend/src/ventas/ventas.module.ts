@@ -11,6 +11,8 @@ import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
 import { ArcaModule } from '../arca/arca.module';
 import { WsfeService } from '../arca/wsfe.service';
+import { StockService } from '../stock/stock.service';
+import { TipoPrendaEntity } from '../entities/tipoPrenda.entity';
 
 @Module({
   imports: [
@@ -21,12 +23,11 @@ import { WsfeService } from '../arca/wsfe.service';
       ClienteEntity,
       PrendaEntity, 
       PrendaXTalleEntity,
-      TalleEntity,
-    ]),
-    ArcaModule
+      TalleEntity
+    ])
   ],
   controllers: [VentasController],
-  providers: [VentasService],
+  providers: [VentasService, StockService],
   exports: [VentasService]
 })
 export class VentasModule {}

@@ -30,6 +30,24 @@ export class Home {
     return item.roles.includes(this.rol);
   }
 
+  get menuFiltrado() { // Sólo las opciones que el usuario puede acceder
+    return this.menu.filter(item => this.puedeAcceder(item));
+  }
+
+  getGridArea(index: number, total: number): string { // Cambia el grid-area según la posición del item
+    const cols = 4; // máximo de columnas
+    const colWidth = 2; // ancho de cada columna
+    const colStart = 2; // offset desde la izquierda
+
+    const col = index % cols; 
+    const row = Math.floor(index / cols); 
+
+    const cs = colStart + col * colWidth;
+    const rs = 2 + row * 2;
+
+    return `${rs} / ${cs} / ${rs + 2} / ${cs + colWidth}`;
+  }
+
   logOut() {
     this.authService.logout();
   }
