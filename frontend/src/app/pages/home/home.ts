@@ -1,28 +1,29 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MENU } from '../../menu.config';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [RouterOutlet, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-
 export class Home {
-  
-  constructor(
-    private authService: AuthService,
 
-  ) {}
+  constructor(private authService: AuthService) {}
 
   rol: string = '';
   menu = MENU;
+  empleado: any;
 
   ngOnInit() {
-    console.log('🔍 Empleado guardado:', this.authService.getEmpleadoLogueado());
+    this.empleado = this.authService.getEmpleadoLogueado();
     this.rol = this.authService.getRol()?.toLowerCase() || '';
+
+    console.log('🔍 Empleado:', this.empleado);
+    console.log('🔍 Rol:', this.rol);
   }
 
   puedeAcceder(item: any): boolean {
@@ -47,7 +48,7 @@ export class Home {
     return `${rs} / ${cs} / ${rs + 2} / ${cs + colWidth}`;
   }
 
-  logOut(){
+  logOut() {
     this.authService.logout();
   }
 }

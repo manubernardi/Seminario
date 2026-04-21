@@ -117,52 +117,39 @@ export class StockService {
     }
 
     // Estadísticas para dashboard
-    async getDashboardStats(): Promise<any> {
-        // Subconsulta: una fila por prenda con su stock total
-        const stockPorPrenda = this.prendaRepository.manager
-            .createQueryBuilder()
-            .select('p.codigo', 'codigo')
-            .addSelect('COALESCE(SUM(pxt.cantidad), 0)', 'total')
-            .from(PrendaEntity, 'p')
-            .leftJoin(PrendaXTalleEntity, 'pxt', 'pxt.prenda_codigo = p.codigo')
-            .groupBy('p.codigo');
-        
-        const result = await this.prendaRepository.manager
-        .createQueryBuilder()
-        .select('SUM(stock.total)', 'totalPrendas')
-        .addSelect(`
-            SUM(CASE 
-                WHEN stock.total < 5 AND stock.total > 0 
-                THEN 1 ELSE 0 
-            END)
-        `, 'stockBajo')
-        .addSelect(`
-            SUM(CASE 
-                WHEN stock.total = 0 
-                THEN 1 ELSE 0 
-            END)
-        `, 'sinStock')
-        .from('(' + stockPorPrenda.getQuery() + ')', 'stock')
-        .setParameters(stockPorPrenda.getParameters())
-        .getRawOne();
+   async getDashboardStats(): Promise<any> {
+    const prendas = await this.prendaRepository.find({
+        where: { activo: true },
+        relations: { prendasXTalles: true }
+    });
 
-        return {
-            totalPrendas: Number(result.totalPrendas) || 0,
-            stockBajo: Number(result.stockBajo) || 0,
-            sinStock: Number(result.sinStock) || 0,
-            fechaActualizacion: new Date().toISOString()
-        };
+    let totalPrendas = 0;
+    let stockBajo = 0;
+    let sinStock = 0;
+    const prendasStockBajo: { codigo: string, descripcion: string, stock: number }[] = [];
+    const prendasSinStock: { codigo: string, descripcion: string }[] = [];
+
+    for (const prenda of prendas) {
+        const stock = prenda.prendasXTalles?.reduce((sum, pt) => sum + (pt.cantidad || 0), 0) ?? 0;
+        totalPrendas += stock;
+        if (stock === 0) {
+            sinStock++;
+            prendasSinStock.push({ codigo: prenda.codigo, descripcion: prenda.descripcion });
+        } else if (stock < 5) {
+            stockBajo++;
+            prendasStockBajo.push({ codigo: prenda.codigo, descripcion: prenda.descripcion, stock });
+        }
     }
 
-    async getTotalStock(prenda_codigo: string): Promise<number> {
-        const result = await this.prendaXTalleRepository
-            .createQueryBuilder('pxt')
-            .select('SUM(pxt.cantidad)', 'total')
-            .where('pxt.prenda_codigo = :codigo', { codigo: prenda_codigo })
-            .getRawOne();
-        
-        return parseInt(result.total) || 0;
-    }
+    return {
+        totalPrendas,
+        stockBajo,
+        sinStock,
+        prendasStockBajo,   // ← lista de prendas con stock bajo
+        prendasSinStock,    // ← lista de prendas sin stock
+        fechaActualizacion: new Date().toISOString()
+    };
+}
 
 
      // Buscar prendas por descripción

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common'
-import { ArcaService } from './arca.service'
+import { ArcaController } from './arca.controller'
 import { WsaaService } from './wsaa.service'
 import { WsfeService } from './wsfe.service'
 
 @Module({
-  providers: [ArcaService, WsaaService, WsfeService],
-  exports: [ArcaService]
+  controllers: [ArcaController],
+  providers: [WsaaService, WsfeService],
+  exports: [ WsfeService, WsaaService]
 })
 export class ArcaModule {}

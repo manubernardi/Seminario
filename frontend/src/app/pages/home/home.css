@@ -5,7 +5,7 @@ body {
 
 .menu-principal {
     display: flex;
-    justify-content:end;
+    justify-content:space-between;
     gap: 3rem;
     padding: 1rem;
     background-color: var(--primary-color);
@@ -58,4 +58,47 @@ i.bi {
   filter: grayscale(100%);
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+.user-icon {
+  font-size: 2.5rem;
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.sesion {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.nombre {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.rol {
+  font-size: 0.8rem;
+}
+
+.btn-volver {
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #a8cfd0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }

@@ -1,96 +1,67 @@
 import { Injectable } from '@nestjs/common'
-import * as soap from 'soap'
-import { WsaaService } from './wsaa.service'
+import Afip from '@afipsdk/afip.js'
 import { CreateInvoiceDto } from './dto/create-invoice.dto'
 
 @Injectable()
 export class WsfeService {
 
-  constructor(private wsaa: WsaaService) {}
+  private afip: any
 
-  private CUIT = 20301234567
-
-  async client() {
-    return soap.createClientAsync(
-      'https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL'
-    )
-  }
-
-  //Obtiene el ultimo comprobante
-  async ultimoCbte(pv: number, tipo: number) {
-
-    const { token, sign } = await this.wsaa.login()
-    const client = await this.client()
-
-    const args = {
-      Auth: { Token: token, Sign: sign, Cuit: this.CUIT },
-      PtoVta: pv,
-      CbteTipo: tipo
-    }
-    //Llama al metodo de afip
-    const [res] = await client.FECompUltimoAutorizadoAsync(args)
-
-    return res.FECompUltimoAutorizadoResult.CbteNro
+  constructor() {
+    // Usar el token asignado por AfipSDK (ambiente de homologación)
+    this.afip = new Afip({
+      CUIT: 20409378472,
+      access_token: 'kYCKbwyqCF1J6Gx20w2B8PhrbDX4e92o72BiTgeLZS8h3hoszbRu0oVwb5Rzf1mn'
+    })
   }
 
   async crearFactura(data: CreateInvoiceDto) {
+    const wsfe = this.afip.ElectronicBilling
 
-    const { token, sign } = await this.wsaa.login()
-    const client = await this.client()
+    const last = await wsfe.getLastVoucher(
+      data.puntoVenta,
+      data.tipoCbte
+    )
 
-    const ultimo = await this.ultimoCbte(data.puntoVenta, data.tipoCbte)
-    const nro = ultimo + 1
+    const voucher = {
+      CantReg: 1,
+      PtoVta: data.puntoVenta,
+      CbteTipo: data.tipoCbte,
 
-    const args = {
-      Auth: { Token: token, Sign: sign, Cuit: this.CUIT },
-      //Cabecera de factura
-      FeCAEReq: {
-        FeCabReq: {
-          CantReg: 1,
-          PtoVta: data.puntoVenta,
-          CbteTipo: data.tipoCbte
-        },
+      Concepto: 1,
+      DocTipo: data.docTipo,
+      DocNro: data.docNro,
 
-        //Detalle de factura
-        FeDetReq: {
-          FECAEDetRequest: {
+      CondicionIVAReceptorId: data.condicionIVAReceptorId,
 
-            Concepto: 1, //Productos
-            DocTipo: data.docTipo,
-            DocNro: data.docNro,
+      CbteDesde: last + 1,
+      CbteHasta: last + 1,
 
-            CbteDesde: nro,
-            CbteHasta: nro,
+      CbteFch: parseInt(new Date().toISOString().slice(0,10).replace(/-/g,'')),
 
-            CbteFch: Number(new Date().toISOString().slice(0,10).replace(/-/g,'')),
+      ImpTotal: data.total,
+      ImpTotConc: 0,
+      ImpNeto: data.total,
+      ImpOpEx: 0,
+      ImpIVA: 0,
+      ImpTrib: 0,
 
-            //Importes
-            ImpTotal: data.total,
-            ImpTotConc: 0,
-            ImpNeto: data.neto,
-            ImpOpEx: 0,
-            ImpIVA: data.iva,
-            ImpTrib: 0,
+      MonId: 'PES',
+      MonCotiz: 1,
 
-            MonId: 'PES',
-            MonCotiz: 1,
-
-            //Iva
-            Iva: {
-              AlicIva: {
-                Id: 5, //5 - 21%  | 4 - 10,5% | 6 - 27%
-                BaseImp: data.neto,
-                Importe: data.iva
-              }
-            }
-
-          }
+      /*Iva: [
+        {
+          Id: 5,
+          BaseImp: data.neto,
+          Importe: data.iva
         }
-      }
+      ]*/
     }
-
-    const [res] = await client.FECAESolicitarAsync(args)
-
-    return res.FECAESolicitarResult
+    console.log(voucher)
+    const res = await wsfe.createVoucher(voucher)
+    console.log(res)
+    return res
+    
   }
+
 }

@@ -12,7 +12,7 @@ export class WsaaService {
 
   async login() {
 
-    if (this.token && this.expiration && new Date() < this.expiration ) {
+    if (this.token && this.expiration && new Date() < this.expiration) {
       return { token: this.token, sign: this.sign }
     }
 
