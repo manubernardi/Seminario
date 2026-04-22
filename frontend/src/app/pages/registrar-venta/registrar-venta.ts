@@ -4,11 +4,9 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { VentasService } from '../../services/ventas.service';
+import { StockService } from '../../services/stock.service';
 
-interface Talle {
-  codigo: number;
-  descripcion: string;
-}
+
 
 interface Cliente {
   id: number;
@@ -47,6 +45,7 @@ interface DetalleVenta {
   templateUrl: './registrar-venta.html',
   styleUrls: ['./registrar-venta.css']
 })
+
 export class RegistrarVenta implements OnInit {
   ventaForm: FormGroup;
   clienteForm: FormGroup;
@@ -70,7 +69,8 @@ export class RegistrarVenta implements OnInit {
     private fb: FormBuilder,
     private ventasService: VentasService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private stockService: StockService
   ) {
     this.ventaForm = this.fb.group({
       empleadoId: [{ value: '', disabled: true }, Validators.required],
@@ -135,7 +135,7 @@ export class RegistrarVenta implements OnInit {
   }
 
   cargarPrendas(): void {
-    this.ventasService.getPrendas().subscribe({
+    this.stockService.getPrendas().subscribe({
       next: (data) => {
         // Solo las prendas con stock > 0 en algun talle
         this.prendas = data.filter((prenda: Prenda) => prenda.prendasXTalles.some((pxt: PrendaXTalle) => pxt.cantidad > 0));
@@ -149,7 +149,7 @@ export class RegistrarVenta implements OnInit {
   }
 
   cargarTalles(): void {
-    this.ventasService.getTalles().subscribe({
+    this.stockService.getTalles().subscribe({
       next: (data) => {
         this.talles = data;
       },
@@ -306,4 +306,31 @@ export class RegistrarVenta implements OnInit {
     const talle = this.talles.find(t => t.codigo === talle_id);
     return talle ? talle.descripcion : 'Desconocido';
   }
+  ordenarPorTalles(talles: PrendaXTalle[]): PrendaXTalle[] {
+    const orden = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+
+    return [...talles].sort((a, b) => { //Copia el array original para no mutarlo
+      // sort() decide la posición de dos elementos consecutivos comparándolos.
+      const ta = this.getTalleDescripcion(a.talle_id); // descripción del talle A
+      const tb = this.getTalleDescripcion(b.talle_id); // descripción del talle B
+
+      const aEsNumero = !isNaN(Number(ta));
+      const bEsNumero = !isNaN(Number(tb));
+
+      // ambos numéricos → orden numérico
+      if (aEsNumero && bEsNumero) return Number(ta) - Number(tb);
+      // Si el resultado es positivo --> b va antes que a
+      // Si el resultado es negativo --> a va antes que b
+      // Si el resultado es cero --> a y b son iguales, no cambia
+
+      // ambos texto → orden según tabla
+      if (!aEsNumero && !bEsNumero) {
+        return orden.indexOf(ta) - orden.indexOf(tb);
+      }
+
+      // mixto → decidís prioridad (ej: primero letras)
+      return aEsNumero ? 1 : -1;
+    });
+  }
+  
 }

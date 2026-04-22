@@ -131,47 +131,50 @@
                                     </select>
                                 </div>
                                 <!-- Seleccion de Talle-->
-                                <div class="col-md-3" *ngIf="prendaSeleccionada">
-                                    <label class="form-label">Talle</label>
-                                    <select
-                                        class="form-select"
-                                        [(ngModel)]="talleSeleccionado"
-                                        [ngModelOptions]="{ standalone: true }"
-                                        (change)="onTalleChange()"
-                                    >
-                                        <option [ngValue]="null">Seleccione un talle</option>
-                                        <ng-container *ngFor="let talle of prendaSeleccionada.prendasXTalles"> 
-
-                                                <option *ngIf ="talle.cantidad > 0" [ngValue]="talle">
-                                                    {{(getTalleDescripcion(talle.talle_id)) }} (Stock: {{ talle.cantidad }})
-                                                </option>
-                                        
-                                        </ng-container>
-                    
-                                    </select>
-                                </div>
+                                 @if(prendaSeleccionada){
+                                    <div class="col-md-3" >
+                                        <label class="form-label">Talle</label>
+                                        <select
+                                            class="form-select"
+                                            [(ngModel)]="talleSeleccionado"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            (change)="onTalleChange()"
+                                        >
+                                            <option [ngValue]="null">Seleccione un talle</option>
+                                                @for(talle of ordenarPorTalles(prendaSeleccionada.prendasXTalles); track talle.talle_id){
+                                                    @if(talle.cantidad > 0){
+                                                        <option [ngValue]="talle">
+                                                            {{(getTalleDescripcion(talle.talle_id)) }} (Stock: {{ talle.cantidad }})
+                                                        </option>
+                                                    }
+                                                }
+                                        </select>
+                                    </div>
+                                }
                                 <!-- Cantidad -->
-                                <div class="col-md-3" *ngIf="talleSeleccionado">
-                                    <label class="form-label">Cantidad</label>
-                                    <input
-                                        type="number"
-                                        class="form-control"
-                                        [(ngModel)]="cantidadSeleccionada"
-                                        [ngModelOptions]="{standalone: true}"
-                                        min="1"
-                                        [max]="talleSeleccionado.cantidad || 0"
-                                        [disabled]="!talleSeleccionado" 
-                                    />
-                                </div>
-
+                                 @if(talleSeleccionado){
+                                    <div class="col-md-3" >
+                                        <label class="form-label">Cantidad</label>
+                                        <input
+                                            type="number"
+                                            class="form-control"
+                                            [(ngModel)]="cantidadSeleccionada"
+                                            [ngModelOptions]="{standalone: true}"
+                                            min="1"
+                                            [max]="talleSeleccionado.cantidad || 0"
+                                            [disabled]="!talleSeleccionado" 
+                                        />
+                                    </div>
+                                }
+                                
                                 <!-- Botón Agregar -->
-                                <div class="col-md-3">
+                                <div class="col-md-3 m-2">
                                     <button 
                                         type="button" 
                                         class="btn btn-success w-100"
                                         (click)="agregarPrenda()"
                                         [disabled]="!prendaSeleccionada || !talleSeleccionado || cantidadSeleccionada <= 0">
-                                        <i class="bi bi-plus-circle"></i> Agregar
+                                        <i class="bi bi-plus-circle "></i> Agregar
                                     </button>
                                 </div>
                             </div>

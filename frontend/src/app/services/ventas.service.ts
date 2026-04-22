@@ -18,15 +18,7 @@ export class VentasService {
   getClientes(): Observable<any> {
     return this.http.get(`${this.baseUrl}/clientes`);
   }
-
-  getPrendas(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/stock`);
-  }
-
-  getTalles(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/talles`);
-  }
-
+  
   crearCliente(cliente: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/clientes`, cliente);
   }
