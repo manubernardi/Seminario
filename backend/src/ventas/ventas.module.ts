@@ -9,8 +9,6 @@ import { ClienteEntity } from '../entities/cliente.entity';
 import { PrendaEntity } from '../entities/prenda.entity';
 import { PrendaXTalleEntity } from '../entities/prendaXTalleEntity';
 import { TalleEntity } from '../entities/talle.entity';
-import { ArcaModule } from '../arca/arca.module';
-import { WsfeService } from '../arca/wsfe.service';
 import { StockService } from '../stock/stock.service';
 import { TipoPrendaEntity } from '../entities/tipoPrenda.entity';
 
