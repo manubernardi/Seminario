@@ -13,6 +13,8 @@ interface Cliente {
   nombre: string;
   apellido: string;
   telefono: number;
+  tipoDoc: number;
+  nroDoc: string;
 }
 interface PrendaXTalle {
   talle_id: number;
@@ -58,6 +60,10 @@ export class RegistrarVenta implements OnInit {
   mostrarModalCliente: boolean = false;
   guardandoCliente: boolean = false;
   talles: any[] = []; // Estan fijos en memoria
+  tiposDoc = [
+    { id: 1, label: 'DNI' },
+    { id: 2, label: 'CUIT' },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -77,6 +83,8 @@ export class RegistrarVenta implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       telefono: ['', Validators.required],
+      tipoDoc:  [1, Validators.required],  
+      nroDoc: ['', Validators.required]
     });
 
   }
@@ -270,6 +278,7 @@ export class RegistrarVenta implements OnInit {
     this.ventasService.crearVenta(ventaData).subscribe({
       next: (response) => {
         this.facturaResultado = response;
+        console.log('Venta guardada con éxito:', response);
         this.mostrarModalFactura = true;  // mostrar Factura
       },
       error: (error) => {
