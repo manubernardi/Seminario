@@ -143,12 +143,11 @@
                                             <option [ngValue]="null">Seleccione un talle</option>
                                                 @for(talle of ordenarPorTalles(prendaSeleccionada.prendasXTalles); track talle.talle_id){
                                                     @if(talle.cantidad > 0){
-                                                        <option >
+                                                        <option [ngValue]="talle">
                                                             {{(getTalleDescripcion(talle.talle_id)) }} (Stock: {{ talle.cantidad }})
                                                         </option>
                                                     }
                                                 }
-
                                         </select>
                                     </div>
                                 }
