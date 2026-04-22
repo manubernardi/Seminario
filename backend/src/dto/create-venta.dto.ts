@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsArray, ValidateNested, ArrayMinSize, Min, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsArray, ValidateNested, ArrayMinSize, Min, IsOptional, IsString, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateDetalleVentaDto {
@@ -21,6 +21,11 @@ export class CreateVentaDto {
   @IsNumber({}, { message: 'El ID del cliente debe ser un número' })
   @IsOptional()
   clienteId?: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @IsIn([1,6,11])
+  tipoCbte: number
   
   @IsArray({ message: 'Los detalles deben ser un array' })
   @ArrayMinSize(1, { message: 'Debe haber al menos un detalle de venta' })
