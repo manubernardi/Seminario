@@ -286,6 +286,7 @@ export class RegistrarVenta implements OnInit {
     this.ventasService.crearVenta(ventaData).subscribe({
       next: (response) => {
         this.facturaResultado = response;
+        console.log('Venta guardada con éxito:', response);
         this.mostrarModalFactura = true;  // mostrar Factura
       },
       error: (error) => {

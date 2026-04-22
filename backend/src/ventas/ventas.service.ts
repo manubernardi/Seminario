@@ -104,6 +104,7 @@ export class VentasService {
     const nuevaVenta = this.ventaRepository.create({
       fecha: new Date(),
       total: total,
+      tipoCbte: venta.tipoCbte,
       empleado: { legajo: venta.empleadoLegajo },
       cliente: venta.clienteId ? { id: venta.clienteId } : undefined,
       detalles: detalles  // El cascade: true se encarga de guardar esto
@@ -111,7 +112,7 @@ export class VentasService {
     
     // Guardar TODO 
     const ventaGuardada = await this.ventaRepository.save(nuevaVenta);
-    console.log('Venta guardada:', ventaGuardada);
+    
     
 // Obtener cliente con sus datos de documento
 const cliente = venta.clienteId 
@@ -124,7 +125,9 @@ const cliente = venta.clienteId
                   : cliente?.tipoDoc === 2 ? 80    // CUIT
                   : 99;                            //Consumidor Final para cuando no hay cliente
 
-    const docNro = cliente?.nroDoc ? parseInt(cliente.nroDoc) : 0;
+  const docNro = cliente?.nroDoc ? parseInt(cliente.nroDoc) : 0;''
+
+  //console.log('DocTipo', docTipoAfip, 'DocNro', docNro);
 
   /* Determinar tipo de comprobante según doc
    11 = Factura C (consumidor final), 1 = Factura A (CUIT)
@@ -142,14 +145,6 @@ const cliente = venta.clienteId
     }
     console.log(factura)
     try {
-      await this.wsfeService.crearFactura(factura);
-      console.log('Factura creada exitosamente en ARCA');
-    } catch (error: any) {
-      // La venta se guardó, pero la factura falló
-      console.warn('Error al crear factura en ARCA:', error.message);
-      // No lanzamos el error para no revertir la venta
-    }
-    try {
       const resultadoFactura = await this.wsfeService.crearFactura(factura);
       console.log('Factura creada exitosamente en ARCA');
       
@@ -162,12 +157,8 @@ const cliente = venta.clienteId
     } catch (error: any) {
       console.warn('Error al crear factura en ARCA:', error.message);
     }
-    
-    return ventaGuardada;
-
-
-
-    return ventaGuardada;
+    console.log('Venta guardada:', ventaGuardada);
+    return await this.findOne(ventaGuardada.numVenta);
   }
 
   async findAll(): Promise<VentaEntity[]> {
@@ -175,11 +166,19 @@ const cliente = venta.clienteId
   }
 
   async findOne(numVenta: number): Promise<VentaEntity> {
-    const venta = await this.ventaRepository.findOneBy({ numVenta });
+    const venta = await this.ventaRepository.findOne({
+      where: {numVenta},
+      relations: {
+        cliente: true,
+        empleado: true,
+        detalles: {prenda: true}
+      }
+    });
 
     if (!venta) {
       throw new NotFoundException(`Venta con número ${numVenta} no encontrada`);
     }
+    console.log('Cliente en findOne: ', venta.cliente);
 
     return venta;
   }
