@@ -7,11 +7,6 @@ import { RouterLink } from '@angular/router';
 
 declare var bootstrap: any;
 
-interface Talle {
-  codigo: number;
-  descripcion: string;
-}
-
 interface PrendaXTalle {
   talle_id: number;
   cantidad: number;
@@ -23,6 +18,11 @@ interface Prenda {
   precio: number;
   cantidadTotal: number;
   prendasXTalles: PrendaXTalle[];
+}
+
+interface Talle {
+  codigo: number;
+  descripcion: string;
 }
 
 @Component({
@@ -82,8 +82,8 @@ export class Stock implements OnInit {
     this.stockService.getPrendas().subscribe({
       next: (data) => {
         //Ordenas los los talles de cada prenda de menor a mayor (s - XXXl)
-        this.prendas = data.map(prenda => ({...prenda, prendasXTalles: this.ordenarTalles(prenda.prendasXTalles)}));
-        this.prendasFiltradas = data.map(prenda => ({...prenda, prendasXTalles: this.ordenarTalles(prenda.prendasXTalles)}));
+        this.prendas = data.map(prenda => ({...prenda, prendasXTalles: this.ordenarPorTalles(prenda.prendasXTalles)}));
+        this.prendasFiltradas = data.map(prenda => ({...prenda, prendasXTalles: this.ordenarPorTalles(prenda.prendasXTalles)}));
 
       },
       error: (error) => {
@@ -93,7 +93,7 @@ export class Stock implements OnInit {
     });
   }
 
-  ordenarTalles(talles: PrendaXTalle[]): PrendaXTalle[] {
+  ordenarPorTalles(talles: PrendaXTalle[]): PrendaXTalle[] {
     const orden = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
     return [...talles].sort((a, b) => { //Copia el array original para no mutarlo
@@ -254,17 +254,13 @@ export class Stock implements OnInit {
   }
   
   getTalleDescripcion(codigo: number): string {
-    if (codigo == null) { 
-      return 'Desconocido';
-    }
     const talle = this.talles.find(t => t.codigo === codigo);
     return talle ? talle.descripcion : 'Desconocido';
   }
 
   ordenarPrendas(prenda: Prenda): string {
-  if (!prenda.codigo) return '';
-
-  return prenda.codigo.split('-').map(part => part.trim()).join(' ');
+    if (!prenda.codigo) return '';
+    return prenda.codigo.split('-').map(part => part.trim()).join(' ');
   }
 
   //MODAL STOCK BAJO

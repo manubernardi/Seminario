@@ -51,7 +51,7 @@
         </td>
         <td>
           <div class="d-flex flex-wrap gap-2">
-            @for(pXt of ordenarTalles(prenda.prendasXTalles); track pXt.talle_id ){
+            @for(pXt of ordenarPorTalles(prenda.prendasXTalles); track pXt.talle_id ){
               <div class="talle-card border rounded p-2">
                 <div class="text-center mb-2">
                   <strong>{{ getTalleDescripcion(pXt.talle_id) }}</strong>

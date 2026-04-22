@@ -11,6 +11,11 @@
   fechaActualizacion: string;
 }
 
+interface Talle {
+  codigo: number;
+  descripcion: string;
+}
+
   @Injectable({ providedIn: 'root' })
   export class StockService {
     private apiUrl = 'http://localhost:3000/stock';
@@ -21,8 +26,8 @@
       return this.http.get<any[]>(this.apiUrl);
     }
 
-    getTalles(): Observable<any[]> {
-      return this.http.get<any[]>('http://localhost:3000/talles');
+    getTalles(): Observable<Talle[]> {
+      return this.http.get<Talle[]>('http://localhost:3000/talles');
     }
 
     crearPrenda(data: any): Observable<any> {
@@ -50,7 +55,7 @@
       return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard/stats`);
     }
     getTiposPrenda() {
-    return this.http.get(`http://localhost:3000/tipos-prenda`);
-  }
+      return this.http.get(`http://localhost:3000/tipos-prenda`);
+    }
   }
 
