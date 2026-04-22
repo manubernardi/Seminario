@@ -61,6 +61,10 @@ export class RegistrarVenta implements OnInit {
   mostrarModalCliente: boolean = false;
   guardandoCliente: boolean = false;
   talles: any[] = []; // Estan fijos en memoria
+  tiposDoc = [
+    { id: 1, label: 'DNI' },
+    { id: 2, label: 'CUIT' },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -79,7 +83,7 @@ export class RegistrarVenta implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       telefono: ['', Validators.required],
-      tipoDoc: ['', Validators.required],
+      tipoDoc:  [1, Validators.required],  
       nroDoc: ['', Validators.required]
     });
 
