@@ -119,7 +119,8 @@ export class ComprasService {
 
   async findAll(): Promise<CompraEntity[]> {
   return await this.compraRepository.find({
-    relations: ['empleado', 'detalles', 'detalles.prenda', 'proveedor']
+    relations: ['empleado', 'detalles', 'detalles.prenda', 'proveedor'],
+    order: { numCompra: 'DESC' } // Ordenar por número de compra descendente
   });
 }
 
