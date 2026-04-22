@@ -126,7 +126,7 @@ export class RegistrarVenta implements OnInit {
     this.ventasService.getPrendas().subscribe({
       next: (data) => {
         // Solo las prendas con stock > 0 en algun talle
-        this.prendas = data;
+        this.prendas = data.filter((prenda: Prenda) => prenda.prendasXTalles.some((pxt: PrendaXTalle) => pxt.cantidad > 0));
         console.log(this.prendas);
       },
       error: (error) => {
@@ -209,31 +209,16 @@ export class RegistrarVenta implements OnInit {
     }
     const codigoPrenda = this.prendaSeleccionada.codigo;
     const descripcion = `${this.prendaSeleccionada.descripcion} - ${this.getTalleDescripcion(this.talleSeleccionado.talle_id)}`;
-    const detalleExistente = this.detalles.find(
-      d => d.codigoPrenda === codigoPrenda && d.descripcion === descripcion
-    );
     
-    
-
-   /* if (detalleExistente) {
-      const nuevaCantidad = detalleExistente.cantidad + this.cantidadSeleccionada;
-      if (nuevaCantidad > this.talleSeleccionado.cantidad) {
-        alert(`Solo hay ${this.talleSeleccionado.cantidad} unidades disponibles para este talle`);
-        return;
-      }
-     
-      detalleExistente.cantidad = nuevaCantidad;
-      detalleExistente.subtotal = detalleExistente.precio * nuevaCantidad;
-    }*/ 
-      this.detalles.push({
-        codigoPrenda, 
-        descripcion,
-        precio: this.prendaSeleccionada.precio,
-        talleId: this.talleSeleccionado.talle_id,
-        cantidad: this.cantidadSeleccionada,
-        subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
-      });
-      this.talleSeleccionado.cantidad -= this.cantidadSeleccionada;
+    this.detalles.push({
+      codigoPrenda, 
+      descripcion,
+      precio: this.prendaSeleccionada.precio,
+      talleId: this.talleSeleccionado.talle_id,
+      cantidad: this.cantidadSeleccionada,
+      subtotal: this.prendaSeleccionada.precio * this.cantidadSeleccionada
+    });
+    this.talleSeleccionado.cantidad -= this.cantidadSeleccionada;
     
     
     this.prendaSeleccionada = null;
@@ -241,7 +226,6 @@ export class RegistrarVenta implements OnInit {
     this.cantidadSeleccionada = 1;
     
   }
-
 
   eliminarDetalle(index: number): void {
     this.detalles.splice(index, 1);
@@ -293,10 +277,10 @@ export class RegistrarVenta implements OnInit {
   cancelar(): void {
     if (this.detalles.length > 0) {
       if (confirm('¿Está seguro de cancelar? Se perderán los datos ingresados')) {
-        this.router.navigate(['/ventas']);
+        this.router.navigate(['/home']);
       }
     } else {
-      this.router.navigate(['/ventas']);
+      this.router.navigate(['/registrar-venta']);
     }
   }
 
