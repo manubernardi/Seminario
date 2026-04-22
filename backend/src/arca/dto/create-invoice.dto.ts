@@ -1,4 +1,5 @@
 import { IsNumber, IsOptional, IsEnum } from 'class-validator'
+import { Double } from 'typeorm'
 
 export enum TipoComprobante {
   FACTURA_A = 1,

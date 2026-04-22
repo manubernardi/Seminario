@@ -23,6 +23,6 @@ export class ClienteEntity {
     nroDoc?: string;
 
     @OneToMany(() => VentaEntity, (venta) => venta.cliente)
-    ventas?: VentaEntity[];
+    ventas!: VentaEntity[];
 
 }

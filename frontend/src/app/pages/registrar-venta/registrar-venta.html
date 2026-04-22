@@ -291,9 +291,29 @@
                     </tr>
                     <tr>
                       <th>Total</th>
-                      <td colspan="3">
-                        <strong class="text-success fs-5">{{ facturaResultado?.total | currency:'ARS' }}</strong>
-                      </td>
+                      @if (facturaResultado?.tipoCbte === 1) {
+                        <tr>
+                          <th>Neto</th>
+                          <td colspan="3">{{ facturaResultado?.neto | currency:'ARS' }}</td>
+                        </tr>
+                        <tr>
+                          <th>IVA (21%)</th>
+                          <td colspan="3">{{ facturaResultado?.iva | currency:'ARS' }}</td>
+                        </tr>
+                        <tr>
+                          <th>Total</th>
+                          <td colspan="3">
+                            <strong class="text-success fs-5">{{ facturaResultado?.total | currency:'ARS' }}</strong>
+                          </td>
+                        </tr>
+                      } @else {
+                        <tr>
+                          <th>Total</th>
+                          <td colspan="3">
+                            <strong class="text-success fs-5">{{ facturaResultado?.total | currency:'ARS' }}</strong>
+                          </td>
+                        </tr>
+                      }
                     </tr>
                   </tbody>
                 </table>

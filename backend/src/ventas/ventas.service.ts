@@ -139,9 +139,9 @@ const cliente = venta.clienteId
       docTipo: docTipoAfip,
       docNro: docNro,
       condicionIVAReceptorId: cliente?.tipoDoc === 2 ? 1 : 5,
-      neto: total,
-      iva: total * 0.21,
-      total: total * 1.21
+      neto: total / 1.21,        
+      iva: total - (total / 1.21), 
+      total: total
     }
     console.log(factura)
     try {
@@ -152,6 +152,11 @@ const cliente = venta.clienteId
       ventaGuardada.cae = resultadoFactura.CAE;
       ventaGuardada.caeFchVto = resultadoFactura.CAEFchVto;
       ventaGuardada.tipoCbte = venta.tipoCbte;
+        // Guardar neto e iva solo para Factura A
+      if (venta.tipoCbte === 1) {
+        ventaGuardada.neto = total / 1.21;        // extraer neto del total
+        ventaGuardada.iva = total - (total / 1.21); // IVA = total - neto
+      }
       await this.ventaRepository.save(ventaGuardada);
     
     } catch (error: any) {

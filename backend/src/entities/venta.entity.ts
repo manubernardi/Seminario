@@ -11,6 +11,12 @@ export class VentaEntity {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     fecha: Date;
     
+    @Column({ type: 'decimal', nullable: true })
+    neto?: number;
+    
+    @Column({ type: 'decimal', nullable: true })
+    iva?: number;
+    
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     total: number; 
     
@@ -39,4 +45,6 @@ export class VentaEntity {
 
     @Column({ nullable: true })
     tipoCbte?: number;
+
+
 }

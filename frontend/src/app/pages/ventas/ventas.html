@@ -10,6 +10,9 @@
       <th>Venta</th>
       <th>Fecha</th>
       <th>Empleado</th>
+      <th>Tipo</th>      <!-- agregar -->
+      <th>Neto</th>      <!-- agregar -->
+      <th>IVA</th>       <!-- agregar -->
       <th>Total</th>
       <th>Cliente</th>
       <th>Detalles</th>
@@ -21,6 +24,24 @@
       <td>{{ venta.numVenta }}</td>
       <td>{{ venta.fecha | date: 'short' }}</td>
       <td>{{ venta.empleado.nombre }}</td>
+      <td>
+        {{ venta.tipoCbte === 1 ? 'Factura A' :
+           venta.tipoCbte === 6 ? 'Factura B' : 'Factura C' }}
+      </td>
+      <td>
+        @if (venta.tipoCbte === 1) {
+          {{ venta.neto | currency:'ARS' }}
+        } @else {
+          -
+        }
+      </td>
+      <td>
+        @if (venta.tipoCbte === 1) {
+          {{ venta.iva | currency:'ARS' }}
+        } @else {
+          -
+        }
+      </td>
       <td>{{ venta.total | currency:'ARS' }}</td>
       <td>{{ venta.cliente?.nombre }} {{ venta.cliente?.apellido }}</td>
       <td>

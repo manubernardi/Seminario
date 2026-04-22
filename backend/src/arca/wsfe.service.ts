@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import Afip from '@afipsdk/afip.js'
-import { CreateInvoiceDto } from './dto/create-invoice.dto'
+import { CreateInvoiceDto, TipoComprobante } from './dto/create-invoice.dto'
 
 @Injectable()
 export class WsfeService {
@@ -16,50 +16,57 @@ export class WsfeService {
   }
 
   async crearFactura(data: CreateInvoiceDto) {
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     const wsfe = this.afip.ElectronicBilling
 
     const last = await wsfe.getLastVoucher(
       data.puntoVenta,
       data.tipoCbte
     )
-
+    const esFacturaA = data.tipoCbte === TipoComprobante.FACTURA_A;
+    const total = round2(data.total);
+    const neto = esFacturaA ? round2(total / 1.21) : total;
+    const iva = esFacturaA ? round2(total - neto) : 0;
+    
     const voucher = {
       CantReg: 1,
       PtoVta: data.puntoVenta,
       CbteTipo: data.tipoCbte,
-
+    
       Concepto: 1,
       DocTipo: data.docTipo,
       DocNro: data.docNro,
-
+    
       CondicionIVAReceptorId: data.condicionIVAReceptorId,
-
+    
       CbteDesde: last + 1,
       CbteHasta: last + 1,
-
+    
       CbteFch: parseInt(new Date().toISOString().slice(0,10).replace(/-/g,'')),
-
+    
       ImpTotal: data.total,
       ImpTotConc: 0,
-      ImpNeto: data.total,
+      ImpNeto: neto,
       ImpOpEx: 0,
-      ImpIVA: 0,
+      ImpIVA: iva,
       ImpTrib: 0,
-
+    
       MonId: 'PES',
       MonCotiz: 1,
-
-      /*Iva: [
-        {
-          Id: 5,
-          BaseImp: data.neto,
-          Importe: data.iva
-        }
-      ]*/
+    
+      ...(esFacturaA && {
+        Iva: [
+          {
+            Id: 5,        // 5 = alícuota 21%
+            BaseImp: neto,
+            Importe: iva
+          }
+        ]
+      })
     }
-    console.log(voucher)
+    console.log('WSFE Voucher: ', voucher)
     const res = await wsfe.createVoucher(voucher)
-    console.log(res)
+    console.log('WSFE Res: ',res)
     return res
     
   }
