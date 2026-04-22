@@ -373,6 +373,26 @@
                                     maxlength="15"
                                     [class.is-invalid]="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tipo de Documento *</label>
+                                    <select 
+                                                        class="form-select" 
+                                                        formControlName="tipoDoc"
+                                                        [class.is-invalid]="clienteForm.get('tipoDoc')?.invalid && clienteForm.get('tipoDoc')?.touched">
+                                                        <option value="">Seleccione...</option>
+                                                        @for (tipo of tiposDoc; track tipo.id) {
+                                                         <option [value]="tipo.id">{{ tipo.label }}</option>
+                                                         }
+                                    </select>
+                                </div>
+                            <div class="col-md-6 mb-3">
+                                    <label class="form-label">Documento*</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        formControlName="nroDoc"
+                                        [class.is-invalid]="clienteForm.get('nroDoc')?.invalid && clienteForm.get('nroDoc')?.touched">
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
