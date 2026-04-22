@@ -15,6 +15,8 @@ interface Cliente {
   nombre: string;
   apellido: string;
   telefono: number;
+  tipoDoc: number;
+  nroDoc: string;
 }
 interface PrendaXTalle {
   talle_id: number;
@@ -77,6 +79,8 @@ export class RegistrarVenta implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       telefono: ['', Validators.required],
+      tipoDoc: ['', Validators.required],
+      nroDoc: ['', Validators.required]
     });
 
   }
